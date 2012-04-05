@@ -1,10 +1,10 @@
-# sleuthkit (tsk4r) (Ruby bindings for the SleuthKit C library)
+# tsk4r (tsk4r) (Ruby bindings for the SleuthKit C library)
 # version 0.0.1
 # Copyright 2011 ___Matthew H. Stephens___
 require 'mkmf'
 
 # permits passing of a library's path as config parameter, so user can link to any version desired at build time
-# e.g. --with-sleuthkit-include=/path/to/somelib/include
+# e.g. --with-somelib-include=/path/to/somelib/include
 # --with-somelib-lib=/path/to/somelib/lib
 # --with-somelib-dir=/path/to/somelib is a shortcut for the previous two
 

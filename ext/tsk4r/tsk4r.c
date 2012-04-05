@@ -40,7 +40,8 @@ static VALUE method_testOmethod(VALUE self);
 static VALUE method_testCmethod1(VALUE self);
 static VALUE method_testCmethod2(VALUE self);
 static VALUE method_testMmethod(VALUE self);
-static VALUE initialize(VALUE self);
+static VALUE initialize(int argc, VALUE *args, VALUE self);
+static VALUE image_open(VALUE self, VALUE filename_str);
 static VALUE image_size(VALUE self);
 static VALUE sector_size(VALUE self);
 VALUE klass;
@@ -50,10 +51,6 @@ struct myHandle {
 };
 
 // alloc & dealloc
-static void deallocate2(TSK_IMG_INFO * image){
-	//xfree((TSK_IMG_INFO *)image);
-	tsk_img_close(image);
-}
 static void deallocate(struct myHandle * ptr){
 	//xfree((TSK_IMG_INFO *)image);
 	TSK_IMG_INFO *image = ptr->image;
@@ -74,56 +71,37 @@ static VALUE allocate(VALUE klass){
 	 */
 }
 
-// init a FirstClass (Image) object
-VALUE initialize(VALUE self){
+static VALUE image_open(VALUE self, VALUE filename_str) {
 	char * filename;
-	filename = "spec/samples/test.image";
-	//TSK_IMG_INFO *image;  // declare inner struct
-	//Data_Get_Struct(self, TSK_IMG_INFO, image); // unwrap inner struct from self
-	// from here, manipulation of image will be reflected in self
-	// access self in other instance methods by using Data_Get_Struct in same fashion as above
-//	image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
-	/*
-	DATA_PTR(self) = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
-	 */
 	struct myHandle* ptr;
-	Data_Get_Struct(self, struct myHandle, ptr);
+	VALUE size;
+	VALUE sector_size;
+
+	//filename = "/usr/local/projects/RubyGemDev/sleuthkit/spec/samples/test.image";
+	filename=StringValuePtr(filename_str);
 	ptr->image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
 	TSK_IMG_INFO *image = ptr->image;
-	fprintf(stdout, "sector size: %d\n", (int)image->sector_size );
-	int x = (int)image->sector_size;
-	rb_iv_set(self, "@sec_size", INT2FIX(x));
-	rb_iv_set(self, "@size", INT2FIX((int)image->size));
-
-	//fprintf(stdout, "image size: %d\tsector size:%d\n", (int)image->size, (int)image->sector_size);
-/*
-	if (image == NULL) {
-        fprintf(stderr, "Error opening image %s\n", filename);
-		// TO DO: feed tsk error into Ruby exception or warning
-        tsk_error_print(stderr);
-        return Qfalse;
-    }
-	else {
-		fprintf(stdout, "image %s opened OK.\n", filename);
-	}
-	*/
-	/*
-	Check_Type(self, T_DATA);
-	// pump stuff into instance vars
-	VALUE size;
+	
 	size = INT2NUM((int)image->size);
 	rb_iv_set(self, "@size", size);
-	VALUE sector_size;
 	sector_size = INT2NUM((int)image->sector_size);
 	rb_iv_set(self, "@sec_size", sector_size);
-	fprintf(stdout, "image type: %d\n", (int)image->itype);
+	//fprintf(stdout, "image type: %d\n", (int)image->itype);
 	rb_iv_set(self, "@type", INT2NUM((int)image->itype));
-	 */
-	// done
-	fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
-	//DATA_PTR(self) = image;  // this is the UNDOCUMENTED SECRET to exposing the C Struct 'image' to other methods!!
-	fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
+	
+	fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
+	return self;
+}
 
+// init an Image object
+VALUE initialize(int argc, VALUE *args, VALUE self){
+	VALUE fn;
+	struct myHandle* ptr;
+	Data_Get_Struct(self, struct myHandle, ptr);
+	rb_scan_args(argc, args, "01", &fn);
+	if( ! NIL_P(fn)) {
+		image_open(self, fn);
+	} 
 	return self;
 }
 
@@ -139,10 +117,8 @@ static VALUE image_size(VALUE self){
 }
 
 static VALUE sector_size(VALUE self){
-	struct myHandle * ptr;
-	Data_Get_Struct(self, struct myHandle, ptr);
-	TSK_IMG_INFO *image=ptr->image;
-	//fprintf(stdout, "sector size: %d\n", (int)image->sector_size);
+	TSK_IMG_INFO *image;
+	Data_Get_Struct(self, TSK_IMG_INFO, image);
 	return INT2NUM(image->sector_size);
 }
 
@@ -154,11 +130,11 @@ static VALUE image_type(VALUE self){
 
 // The initialization method for this module
 void Init_tsk4r() {
-	rb_mtsk4r = rb_define_module("TSK");
+	rb_mtsk4r = rb_define_module("Sleuthkit");
 	
 	// class definitions
 	rb_cClass1 = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
-	rb_cClass2 = rb_define_class_under(rb_mtsk4r, "SecondClass", rb_cObject);
+	rb_cClass2 = rb_define_class_under(rb_mtsk4r, "Volume", rb_cObject);
 	
 	// allocation functions
 	rb_define_alloc_func(rb_cClass1, allocate);
@@ -179,7 +155,8 @@ void Init_tsk4r() {
 	// object methods for FirstClass objects
 	rb_define_method(rb_cClass1, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
 	rb_define_method(rb_cClass1, "object_hello", method_hello_world, 0); // change arg1 to klass?
-	rb_define_method(rb_cClass1, "initialize", initialize, 0);
+	rb_define_method(rb_cClass1, "initialize", initialize, -1);
+	rb_define_method(rb_cClass1, "image_open", image_open, 1);
 	rb_define_method(rb_cClass1, "image_size", image_size, 0);
 	rb_define_method(rb_cClass1, "sector_size", sector_size, 0);
 	rb_define_method(rb_cClass1, "image_type", image_type, 0);
@@ -190,7 +167,7 @@ void Init_tsk4r() {
 	rb_define_attr(rb_cClass1, "type", 1, 0);
 
 	
-	// object methods for SecondClass objects
+	// object methods for Volume objects
 	rb_define_method(rb_cClass2, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
 
 }
@@ -214,7 +191,7 @@ VALUE method_testCmethod1(VALUE klass)
 
 VALUE method_testCmethod2(VALUE klass)
 {
-	return rb_str_new2("This is class method 2 responding.  I was assigned to SecondClass");
+	return rb_str_new2("This is class method 2 responding.  I was assigned to Volume");
 }
 
 VALUE method_testOmethod(VALUE klass)
