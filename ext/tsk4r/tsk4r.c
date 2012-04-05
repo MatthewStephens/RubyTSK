@@ -74,18 +74,19 @@ static VALUE allocate(VALUE klass){
 static VALUE image_open(VALUE self, VALUE filename_str) {
 	char * filename;
 	struct myHandle* ptr;
-	VALUE size;
-	VALUE sector_size;
+	VALUE img_size;
+	VALUE img_sector_size;
 
 	//filename = "/usr/local/projects/RubyGemDev/sleuthkit/spec/samples/test.image";
+	Check_Type(filename_str, T_STRING);
 	filename=StringValuePtr(filename_str);
 	ptr->image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
 	TSK_IMG_INFO *image = ptr->image;
 	
-	size = INT2NUM((int)image->size);
-	rb_iv_set(self, "@size", size);
-	sector_size = INT2NUM((int)image->sector_size);
-	rb_iv_set(self, "@sec_size", sector_size);
+	img_size = INT2NUM((int)image->size);
+	rb_iv_set(self, "@size", img_size);
+	img_sector_size = INT2NUM((int)image->sector_size);
+	rb_iv_set(self, "@sec_size", img_sector_size);
 	//fprintf(stdout, "image type: %d\n", (int)image->itype);
 	rb_iv_set(self, "@type", INT2NUM((int)image->itype));
 	
@@ -117,9 +118,15 @@ static VALUE image_size(VALUE self){
 }
 
 static VALUE sector_size(VALUE self){
-	TSK_IMG_INFO *image;
-	Data_Get_Struct(self, TSK_IMG_INFO, image);
-	return INT2NUM(image->sector_size);
+	struct myHandle* img_ptr;
+	int val;
+	Data_Get_Struct(self, struct myHandle, img_ptr);
+	TSK_IMG_INFO *image_cpy = img_ptr->image;
+	val = image_cpy->sector_size;
+	//Data_Get_Struct(self, TSK_IMG_INFO, image);
+	VALUE sector_size = INT2NUM(val);
+	FIXNUM_P(sector_size);
+	return sector_size;
 }
 
 static VALUE image_type(VALUE self){

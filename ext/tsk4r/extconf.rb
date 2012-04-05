@@ -26,4 +26,4 @@ have_library("tsk3")
  unless find_header('tsk3/libtsk.h') # note: some libraries are 'name/libname.h', most are simply 'name.h'
    abort "tsk3/libtsk.h is missing.  please install tsk3/libtsk.h"
  end
-create_makefile("tsk4r")
+create_makefile("tsk4r/tsk4r")

@@ -3,7 +3,10 @@ require 'sleuthkit/version'
 require 'tsk4r/tsk4r'
 
 module Sleuthkit
-  # Your code goes here...
+  # tell us about yourself
+	def self.version_string
+		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION}"
+	end	
 	class Image
 		def ruby_welcome
 			puts "this is a pure ruby method for #{self.class} objects."
