@@ -45,11 +45,11 @@ static VALUE image_open(VALUE self, VALUE filename_str);
 static VALUE image_size(VALUE self);
 static VALUE sector_size(VALUE self);
 VALUE klass;
-
+/*
 struct myHandle {
 	TSK_IMG_INFO *image;
 };
-
+*/
 // alloc & dealloc
 static void deallocate(struct myHandle * ptr){
 	//xfree((TSK_IMG_INFO *)image);
@@ -63,8 +63,8 @@ static VALUE allocate(VALUE klass){
 //	fprintf(stdout, "allocation complete.\n");
 //	return Data_Wrap_Struct(klass, 0, 0, image);
 
-	struct myHandle *ptr;
-	return Data_Make_Struct(klass, struct myHandle, 0, deallocate, ptr);
+	myHandle * ptr;
+	return Data_Make_Struct(klass, myHandle, 0, deallocate, ptr);
 	/*
 	TSK_IMG_INFO *sval;
 	return Data_Make_Struct(klass, TSK_IMG_INFO, 0, deallocate, sval);
@@ -73,7 +73,7 @@ static VALUE allocate(VALUE klass){
 
 static VALUE image_open(VALUE self, VALUE filename_str) {
 	char * filename;
-	struct myHandle* ptr;
+	myHandle * ptr;
 	VALUE img_size;
 	VALUE img_sector_size;
 
@@ -97,8 +97,8 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
 // init an Image object
 VALUE initialize(int argc, VALUE *args, VALUE self){
 	VALUE fn;
-	struct myHandle* ptr;
-	Data_Get_Struct(self, struct myHandle, ptr);
+	myHandle * ptr;
+	Data_Get_Struct(self, myHandle, ptr);
 	rb_scan_args(argc, args, "01", &fn);
 	if( ! NIL_P(fn)) {
 		image_open(self, fn);
@@ -118,9 +118,9 @@ static VALUE image_size(VALUE self){
 }
 
 static VALUE sector_size(VALUE self){
-	struct myHandle* img_ptr;
+	myHandle * img_ptr;
 	int val;
-	Data_Get_Struct(self, struct myHandle, img_ptr);
+	Data_Get_Struct(self, myHandle, img_ptr);
 	TSK_IMG_INFO *image_cpy = img_ptr->image;
 	val = image_cpy->sector_size;
 	//Data_Get_Struct(self, TSK_IMG_INFO, image);
