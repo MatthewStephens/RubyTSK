@@ -1,0 +1,3 @@
+module Sleuthkit
+  VERSION = "0.0.2"
+end
