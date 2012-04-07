@@ -6,4 +6,4 @@
  *  Copyright 2011 Matthew H. Stephens. All rights reserved.
  *
  */
-#define VERSION "0.0.1"
+#define VERSION "0.0.2"
