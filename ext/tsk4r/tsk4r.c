@@ -45,13 +45,14 @@ static VALUE image_open(VALUE self, VALUE filename_str);
 static VALUE image_size(VALUE self);
 static VALUE sector_size(VALUE self);
 VALUE klass;
-/*
-struct myHandle {
-	TSK_IMG_INFO *image;
+
+static struct tsk4r_wrapper {
+	TSK_IMG_INFO * image;
+	char * fn_given;
 };
-*/
+
 // alloc & dealloc
-static void deallocate(struct myHandle * ptr){
+static void deallocate(struct tsk4r_wrapper * ptr){
 	//xfree((TSK_IMG_INFO *)image);
 	TSK_IMG_INFO *image = ptr->image;
 	tsk_img_close(image);
@@ -63,8 +64,10 @@ static VALUE allocate(VALUE klass){
 //	fprintf(stdout, "allocation complete.\n");
 //	return Data_Wrap_Struct(klass, 0, 0, image);
 
-	myHandle * ptr;
-	return Data_Make_Struct(klass, myHandle, 0, deallocate, ptr);
+	//struct tsk4r_wrapper * ptr = malloc(sizeof(struct tsk4r_wrapper)); // worked without malloc.  Do I need this?
+	struct tsk4r_wrapper * ptr = ALLOC(struct tsk4r_wrapper); // this might be improvement over previous
+	return Data_Make_Struct(klass, struct tsk4r_wrapper, 0, deallocate, ptr);
+	//return Data_Wrap_Struct(klass, 0, deallocate, ptr);
 	/*
 	TSK_IMG_INFO *sval;
 	return Data_Make_Struct(klass, TSK_IMG_INFO, 0, deallocate, sval);
@@ -73,14 +76,25 @@ static VALUE allocate(VALUE klass){
 
 static VALUE image_open(VALUE self, VALUE filename_str) {
 	char * filename;
-	myHandle * ptr;
+	struct tsk4r_wrapper * ptr;
+	Data_Get_Struct(self, struct tsk4r_wrapper, ptr);
+
 	VALUE img_size;
 	VALUE img_sector_size;
+	fprintf(stdout, "%s should be opened.\n", StringValuePtr(filename_str));
 
 	//filename = "/usr/local/projects/RubyGemDev/sleuthkit/spec/samples/test.image";
 	Check_Type(filename_str, T_STRING);
+	fprintf(stdout, "%s should be opened.\n", StringValuePtr(filename_str));
+	rb_str_modify(filename_str);
 	filename=StringValuePtr(filename_str);
+	ptr->fn_given = (char *)filename;
 	ptr->image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
+	fprintf(stdout, "attempt to open %s complete\n", (char *)filename);
+	if (ptr->image == NULL) {
+		fprintf(stdout, "%s could not be opened.\n", "some file");
+		//rb_raise(rb_eIOError, "%s could not be opened.\n", filename);
+	}
 	TSK_IMG_INFO *image = ptr->image;
 	
 	img_size = INT2NUM((int)image->size);
@@ -91,14 +105,15 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
 	rb_iv_set(self, "@type", INT2NUM((int)image->itype));
 	
 	fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
+	fprintf(stdout, "disk image has sectors %d bytes in size.\n", (int)image->sector_size ); // dev only
+
 	return self;
 }
 
-// init an Image object
-VALUE initialize(int argc, VALUE *args, VALUE self){
+// init an Image object (was lacking 'static' earlier)
+static VALUE initialize(int argc, VALUE *args, VALUE self){
 	VALUE fn;
-	myHandle * ptr;
-	Data_Get_Struct(self, myHandle, ptr);
+//	static struct tsk4r_wrapper * ptr;
 	rb_scan_args(argc, args, "01", &fn);
 	if( ! NIL_P(fn)) {
 		image_open(self, fn);
@@ -118,15 +133,32 @@ static VALUE image_size(VALUE self){
 }
 
 static VALUE sector_size(VALUE self){
-	myHandle * img_ptr;
+/*	struct tsk4r_wrapper * img_ptr = NULL;
 	int val;
-	Data_Get_Struct(self, myHandle, img_ptr);
+	Data_Get_Struct(self, struct tsk4r_wrapper, img_ptr);
 	TSK_IMG_INFO *image_cpy = img_ptr->image;
 	val = image_cpy->sector_size;
 	//Data_Get_Struct(self, TSK_IMG_INFO, image);
 	VALUE sector_size = INT2NUM(val);
 	FIXNUM_P(sector_size);
-	return sector_size;
+ */
+	fprintf(stdout, "calm before the storm...\n");
+
+	struct tsk4r_wrapper * new_ptr;
+	
+	Data_Get_Struct(self, struct tsk4r_wrapper, new_ptr);
+
+	TSK_IMG_INFO * image = new_ptr->image;
+	char * orig_fn = new_ptr->fn_given;
+	fprintf(stdout, "struct stored filename: >%s<\n", orig_fn);
+	VALUE s_size;
+	s_size = INT2FIX(22);
+	unsigned int sss = image->sector_size;
+	s_size = INT2FIX(sss);
+	fprintf(stdout, "disk size: %d\n", (int)image->size);
+	fprintf(stdout, "sector size: %d\n", sss);
+	FIXNUM_P(s_size);
+	return s_size;
 }
 
 static VALUE image_type(VALUE self){
