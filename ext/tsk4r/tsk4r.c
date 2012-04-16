@@ -165,13 +165,18 @@ static VALUE open_volume(VALUE self, VALUE img_obj) {
 	TSK_IMG_INFO * disk = rb_image->image;
 
 	vs_ptr = tsk_vs_open(disk, 0, TSK_VS_TYPE_DETECT);
-	printf("disk has sector size: %d\n", (int)disk-->sector_size );
+	printf("disk has sector size: %d\n", (int)disk->sector_size );
 	printf("vs_ptr has partition count: %d\n", (int)vs_ptr->part_count);
 	printf("vs_ptr has vs_type: %d\n", (int)vs_ptr->vstype);
 	printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(vs_ptr->vstype));
 	printf("vs_ptr has offset: %d\n", (int)vs_ptr->offset);
 	printf("vs_ptr has block size: %d\n", (int)vs_ptr->block_size);
 	printf("vs_ptr has endian: %d\n", (int)vs_ptr->endian);
+	
+	rb_iv_set(self, "@partition_count", INT2NUM((int)vs_ptr->part_count));
+	rb_iv_set(self, "@endian", INT2NUM((int)vs_ptr->endian));
+	rb_iv_set(self, "@offset", INT2NUM((int)vs_ptr->offset));
+	rb_iv_set(self, "@block_size", INT2NUM((int)vs_ptr->block_size));
 	
 //	printf("vs_part_ptr has desc: %s\n", (char *)partition_list->desc);
 //	printf("vs_part_ptr has start: %d\n", (int)partition_list->start);
@@ -208,13 +213,13 @@ static VALUE sector_size(VALUE self){
 
 	TSK_IMG_INFO * image = new_ptr->image;
 	char * orig_fn = new_ptr->fn_given;
-	fprintf(stdout, "struct stored filename: >%s<\n", orig_fn);
+//	fprintf(stdout, "struct stored filename: >%s<\n", orig_fn);
 	VALUE s_size;
 	s_size = INT2FIX(22);
 	unsigned int sss = image->sector_size;
 	s_size = INT2FIX(sss);
-	fprintf(stdout, "disk size: %d\n", (int)image->size);
-	fprintf(stdout, "sector size: %d\n", sss);
+//	fprintf(stdout, "disk size: %d\n", (int)image->size);
+//	fprintf(stdout, "sector size: %d\n", sss);
 	FIXNUM_P(s_size);
 	return s_size;
 }
@@ -274,6 +279,10 @@ void Init_tsk4r() {
 	rb_define_method(rb_cClass2, "walk", walk_volume, 1);
 	
 	// attributes
+	rb_define_attr(rb_cClass2, "partition_count", 1, 0);
+	rb_define_attr(rb_cClass2, "endian", 1, 0);
+	rb_define_attr(rb_cClass2, "offset", 1, 0);
+	rb_define_attr(rb_cClass2, "block_size", 1, 0);
 }
 
 // methods follow here
