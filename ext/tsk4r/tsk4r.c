@@ -40,25 +40,46 @@ static VALUE method_testOmethod(VALUE self);
 static VALUE method_testCmethod1(VALUE self);
 static VALUE method_testCmethod2(VALUE self);
 static VALUE method_testMmethod(VALUE self);
-static VALUE initialize(int argc, VALUE *args, VALUE self);
+// Sleuthkit::Image
+static VALUE initialize_disk_image(int argc, VALUE *args, VALUE self);
 static VALUE image_open(VALUE self, VALUE filename_str);
 static VALUE image_size(VALUE self);
 static VALUE sector_size(VALUE self);
+// Sleuthkit::Volume
+static VALUE initialize_volume(int argc, VALUE *args, VALUE self);
+static VALUE open_volume(VALUE self, VALUE image_obj);
+static VALUE close_volume(VALUE self);
+static VALUE read_volume_block(int argc, VALUE *args, VALUE self);
+static VALUE walk_volume(VALUE self);
+
 VALUE klass;
 
+// Sleuthkit::Image struct
 static struct tsk4r_wrapper {
 	TSK_IMG_INFO * image;
 	char * fn_given;
-};
+}tsk4r_wrapper;
+// Sleuthkit::Volume struct
+static struct tsk4r_vs_wrapper {
+	TSK_VS_INFO * volume;
+//	tsk4r_wrapper * disk;
+}tsk4r_vs_wrapper;
 
 // alloc & dealloc
-static void deallocate(struct tsk4r_wrapper * ptr){
+static void deallocate_image(struct tsk4r_wrapper * ptr){
 	//xfree((TSK_IMG_INFO *)image);
 	TSK_IMG_INFO *image = ptr->image;
 	tsk_img_close(image);
 	xfree(ptr);
 }
-static VALUE allocate(VALUE klass){
+
+static void deallocate_volume(struct tsk4r_vs_wrapper * ptr){
+	TSK_VS_INFO *volume = ptr->volume;
+	tsk_vs_close(volume);
+	xfree(ptr);
+}
+
+static VALUE allocate_image(VALUE klass){
 //	TSK_IMG_INFO *image = ALLOC(TSK_IMG_INFO);
 //	TSK_IMG_INFO * image = malloc(sizeof(TSK_IMG_INFO));
 //	fprintf(stdout, "allocation complete.\n");
@@ -66,12 +87,17 @@ static VALUE allocate(VALUE klass){
 
 	//struct tsk4r_wrapper * ptr = malloc(sizeof(struct tsk4r_wrapper)); // worked without malloc.  Do I need this?
 	struct tsk4r_wrapper * ptr = ALLOC(struct tsk4r_wrapper); // this might be improvement over previous
-	return Data_Make_Struct(klass, struct tsk4r_wrapper, 0, deallocate, ptr);
+	return Data_Make_Struct(klass, struct tsk4r_wrapper, 0, deallocate_image, ptr);
 	//return Data_Wrap_Struct(klass, 0, deallocate, ptr);
 	/*
 	TSK_IMG_INFO *sval;
 	return Data_Make_Struct(klass, TSK_IMG_INFO, 0, deallocate, sval);
 	 */
+}
+static VALUE allocate_volume(VALUE klass){
+	struct tsk4r_vs_wrapper * ptr;
+	ptr = ALLOC(struct tsk4r_vs_wrapper);
+	return Data_Make_Struct(klass, struct tsk4r_vs_wrapper, 0, deallocate_volume, ptr);
 }
 
 static VALUE image_open(VALUE self, VALUE filename_str) {
@@ -111,7 +137,7 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
 }
 
 // init an Image object (was lacking 'static' earlier)
-static VALUE initialize(int argc, VALUE *args, VALUE self){
+static VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
 	VALUE fn;
 //	static struct tsk4r_wrapper * ptr;
 	rb_scan_args(argc, args, "01", &fn);
@@ -119,6 +145,35 @@ static VALUE initialize(int argc, VALUE *args, VALUE self){
 		image_open(self, fn);
 	} 
 	return self;
+}
+
+static VALUE initialize_volume(int argc, VALUE *args, VALUE self) {
+	VALUE offset; VALUE vs_type;
+	VALUE * img_obj;
+	rb_scan_args(argc, args, "11", &img_obj);
+	if (rb_obj_is_kind_of((VALUE)img_obj, rb_cClass1)) {
+		open_volume(self, (VALUE)img_obj);
+	} else {
+		rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
+	}
+	
+	return self;
+}
+
+static VALUE open_volume(VALUE self, VALUE img_obj) {
+	fprintf(stdout, "I will open a volume, eventually.\n");
+}
+
+static VALUE close_volume(VALUE self){
+	return Qnil;
+}
+
+static VALUE read_volume_block(int argc, VALUE *args, VALUE self){
+	return Qnil;
+}
+
+static VALUE walk_volume(VALUE self){
+	return Qnil;
 }
 
 static VALUE image_size(VALUE self){
@@ -176,7 +231,8 @@ void Init_tsk4r() {
 	rb_cClass2 = rb_define_class_under(rb_mtsk4r, "Volume", rb_cObject);
 	
 	// allocation functions
-	rb_define_alloc_func(rb_cClass1, allocate);
+	rb_define_alloc_func(rb_cClass1, allocate_image);
+	rb_define_alloc_func(rb_cClass2, allocate_volume);
 
 	// sub classes
 	rb_cClass3 = rb_define_class_under(rb_cClass2, "ThirdClass", rb_cObject);
@@ -194,7 +250,7 @@ void Init_tsk4r() {
 	// object methods for FirstClass objects
 	rb_define_method(rb_cClass1, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
 	rb_define_method(rb_cClass1, "object_hello", method_hello_world, 0); // change arg1 to klass?
-	rb_define_method(rb_cClass1, "initialize", initialize, -1);
+	rb_define_method(rb_cClass1, "initialize", initialize_disk_image, -1);
 	rb_define_method(rb_cClass1, "image_open", image_open, 1);
 	rb_define_method(rb_cClass1, "image_size", image_size, 0);
 	rb_define_method(rb_cClass1, "sector_size", sector_size, 0);
@@ -206,9 +262,15 @@ void Init_tsk4r() {
 	rb_define_attr(rb_cClass1, "type", 1, 0);
 
 	
+	/* Sleuthkit::Volume */
 	// object methods for Volume objects
-	rb_define_method(rb_cClass2, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
-
+	rb_define_method(rb_cClass2, "initialize", initialize_volume, -1);
+	rb_define_method(rb_cClass2, "open", open_volume, 1); // change arg1 to klass?
+	rb_define_method(rb_cClass2, "close", close_volume, 1);
+	rb_define_method(rb_cClass2, "read_block", read_volume_block, 3); //read block given start and no. of blocks
+	rb_define_method(rb_cClass2, "walk", walk_volume, 1);
+	
+	// attributes
 }
 
 // methods follow here
