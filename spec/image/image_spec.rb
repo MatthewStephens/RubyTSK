@@ -1,6 +1,6 @@
 describe Sleuthkit::Image do
   before :all do
-		@sample_image = "spec/samples/test.image"
+		@sample_image = "spec/samples/tsk4r_img_01.dmg"
 		puts "File #{@sample_image} not found!!" unless File.exist?(@sample_image)
 	end
 
