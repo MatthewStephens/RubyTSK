@@ -107,19 +107,16 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
 
 	VALUE img_size;
 	VALUE img_sector_size;
-	fprintf(stdout, "%s should be opened.\n", StringValuePtr(filename_str));
+	fprintf(stdout, "opening %s.\n", StringValuePtr(filename_str));
 
-	//filename = "/usr/local/projects/RubyGemDev/sleuthkit/spec/samples/test.image";
 	Check_Type(filename_str, T_STRING);
-	fprintf(stdout, "%s should be opened.\n", StringValuePtr(filename_str));
 	rb_str_modify(filename_str);
 	filename=StringValuePtr(filename_str);
 	ptr->fn_given = (char *)filename;
 	ptr->image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
 	fprintf(stdout, "attempt to open %s complete\n", (char *)filename);
 	if (ptr->image == NULL) {
-		fprintf(stdout, "%s could not be opened.\n", "some file");
-		//rb_raise(rb_eIOError, "%s could not be opened.\n", filename);
+		rb_warn("unable to open disk.\n");
 	}
 	TSK_IMG_INFO *image = ptr->image;
 	
@@ -127,7 +124,6 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
 	rb_iv_set(self, "@size", img_size);
 	img_sector_size = INT2NUM((int)image->sector_size);
 	rb_iv_set(self, "@sec_size", img_sector_size);
-	//fprintf(stdout, "image type: %d\n", (int)image->itype);
 	rb_iv_set(self, "@type", INT2NUM((int)image->itype));
 	
 	fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
@@ -161,7 +157,26 @@ static VALUE initialize_volume(int argc, VALUE *args, VALUE self) {
 }
 
 static VALUE open_volume(VALUE self, VALUE img_obj) {
-	fprintf(stdout, "I will open a volume, eventually.\n");
+	TSK_VS_INFO * vs_ptr;
+	struct tsk4r_wrapper * rb_image;
+//	TSK_VS_PART_INFO * partition_list;
+//	partition_list = vs_ptr->part_list;
+	Data_Get_Struct(img_obj, struct tsk4r_wrapper, rb_image);
+	TSK_IMG_INFO * disk = rb_image->image;
+
+	vs_ptr = tsk_vs_open(disk, 0, TSK_VS_TYPE_DETECT);
+	printf("disk has sector size: %d\n", (int)disk-->sector_size );
+	printf("vs_ptr has partition count: %d\n", (int)vs_ptr->part_count);
+	printf("vs_ptr has vs_type: %d\n", (int)vs_ptr->vstype);
+	printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(vs_ptr->vstype));
+	printf("vs_ptr has offset: %d\n", (int)vs_ptr->offset);
+	printf("vs_ptr has block size: %d\n", (int)vs_ptr->block_size);
+	printf("vs_ptr has endian: %d\n", (int)vs_ptr->endian);
+	
+//	printf("vs_part_ptr has desc: %s\n", (char *)partition_list->desc);
+//	printf("vs_part_ptr has start: %d\n", (int)partition_list->start);
+//	printf("vs_part_ptr has length: %d\n", (int)partition_list->len);
+//	fprintf(stdout, "I will open a volume, eventually.\n");
 }
 
 static VALUE close_volume(VALUE self){
@@ -188,19 +203,7 @@ static VALUE image_size(VALUE self){
 }
 
 static VALUE sector_size(VALUE self){
-/*	struct tsk4r_wrapper * img_ptr = NULL;
-	int val;
-	Data_Get_Struct(self, struct tsk4r_wrapper, img_ptr);
-	TSK_IMG_INFO *image_cpy = img_ptr->image;
-	val = image_cpy->sector_size;
-	//Data_Get_Struct(self, TSK_IMG_INFO, image);
-	VALUE sector_size = INT2NUM(val);
-	FIXNUM_P(sector_size);
- */
-	fprintf(stdout, "calm before the storm...\n");
-
-	struct tsk4r_wrapper * new_ptr;
-	
+	struct tsk4r_wrapper * new_ptr;	
 	Data_Get_Struct(self, struct tsk4r_wrapper, new_ptr);
 
 	TSK_IMG_INFO * image = new_ptr->image;
