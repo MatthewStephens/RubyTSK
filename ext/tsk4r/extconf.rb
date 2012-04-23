@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # tsk4r (tsk4r) (Ruby bindings for the SleuthKit C library)
 # version 0.0.1
 # Copyright 2011 ___Matthew H. Stephens___
