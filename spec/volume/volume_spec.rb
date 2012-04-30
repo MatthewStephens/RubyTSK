@@ -1,4 +1,4 @@
-describe Sleuthkit::Volume do
+describe "spec/volume" do
   before :each do
 		@sample_image = "spec/samples/tsk4r_img_01.dmg"
 		puts "File #{@sample_image} not found!!" unless File.exist?(@sample_image)
