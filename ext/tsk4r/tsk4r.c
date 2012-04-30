@@ -246,9 +246,11 @@ static VALUE open_filesystem(VALUE self, VALUE img_obj) {
     //rb_iv_set(self, "@root_inum", INT2NUM((int)fs_ptr->filesystem->root_inum));
     TSK_INUM_T my_root_inum = 1968;
     TSK_INUM_T my_last_inum = 43;
+    unsigned int my_block_size = 0;
     if (fs_ptr->filesystem != NULL) {
         my_root_inum = fs_ptr->filesystem->root_inum; 
         my_last_inum = fs_ptr->filesystem->last_inum;
+        my_block_size = fs_ptr->filesystem->block_size;
     } else {
         my_root_inum = 222;
         my_last_inum = 333;
@@ -256,6 +258,7 @@ static VALUE open_filesystem(VALUE self, VALUE img_obj) {
     
     rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
     rb_iv_set(self, "@last_inum", INT2NUM(my_last_inum));
+    rb_iv_set(self, "@block_size", INT2NUM(my_block_size));
 
     return self;
 }
@@ -391,6 +394,7 @@ void Init_tsk4r() {
     // attributes
     rb_define_attr(rb_cClass3, "root_inum", 1, 0);
     rb_define_attr(rb_cClass3, "last_inum", 1, 0);
+    rb_define_attr(rb_cClass3, "block_size", 1, 0);
 }
 
 // methods follow here
