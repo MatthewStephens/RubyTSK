@@ -51,6 +51,12 @@ static VALUE open_volume(VALUE self, VALUE image_obj);
 static VALUE close_volume(VALUE self);
 static VALUE read_volume_block(int argc, VALUE *args, VALUE self);
 static VALUE walk_volume(VALUE self);
+// Sleuthkit::FileSystem
+static VALUE initialize_filesystem(int argc, VALUE *args, VALUE self);
+static VALUE open_filesystem(VALUE self, VALUE image_obj);
+static VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj);
+static VALUE close_filesystem(VALUE self);
+
 
 VALUE klass;
 
@@ -64,6 +70,10 @@ static struct tsk4r_vs_wrapper {
 	TSK_VS_INFO * volume;
 //	tsk4r_wrapper * disk;
 }tsk4r_vs_wrapper;
+// Sleuthkit::FileSystem struct
+static struct tsk4r_fs_wrapper {
+    TSK_FS_INFO * filesystem;
+}tsk4r_fs_wrapper;
 
 // alloc & dealloc
 static void deallocate_image(struct tsk4r_wrapper * ptr){
@@ -77,6 +87,11 @@ static void deallocate_volume(struct tsk4r_vs_wrapper * ptr){
 	TSK_VS_INFO *volume = ptr->volume;
 	tsk_vs_close(volume);
 	xfree(ptr);
+}
+static void deallocate_filesystem(struct tsk4r_fs_wrapper * ptr){
+    TSK_FS_INFO *filesystem = ptr->filesystem;
+    tsk_fs_close(filesystem);
+    xfree(ptr);
 }
 
 static VALUE allocate_image(VALUE klass){
@@ -98,6 +113,14 @@ static VALUE allocate_volume(VALUE klass){
 	struct tsk4r_vs_wrapper * ptr;
 	ptr = ALLOC(struct tsk4r_vs_wrapper);
 	return Data_Make_Struct(klass, struct tsk4r_vs_wrapper, 0, deallocate_volume, ptr);
+}
+
+static VALUE allocate_filesystem(VALUE klass){
+    printf("allocate_filesystem starting...\n");
+    struct tsk4r_fs_wrapper * ptr;
+    ptr = ALLOC(struct tsk4r_fs_wrapper);
+    printf("finishing allocation.\n");
+    return Data_Make_Struct(klass, struct tsk4r_fs_wrapper, 0, deallocate_filesystem, ptr);
 }
 
 static VALUE image_open(VALUE self, VALUE filename_str) {
@@ -156,6 +179,33 @@ static VALUE initialize_volume(int argc, VALUE *args, VALUE self) {
 	return self;
 }
 
+static VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
+    VALUE * img_obj;
+    rb_scan_args(argc, args, "1", &img_obj);
+
+    printf("filesystem object init with %d args.\n", argc);
+    printf("argument scan complete\n");
+    /*
+    printf("test1 %d\n", RTEST(rb_respond_to(img_obj, image_open)));
+    printf("test2 %d\n", RTEST(rb_respond_to(img_obj, open_volume)));
+    printf("test3 %d\n", RTEST(rb_is_instance_id(rb_cClass1)));
+    if (RTEST(rb_respond_to(img_obj, image_open))) {
+        printf("will open image object passed as arg1\n");
+        open_filesystem(self, (VALUE)img_obj);
+    }
+    if (RTEST(rb_respond_to((VALUE)img_obj, open_volume))) {
+        printf("will open volume object passed as arg1\n");
+        open_filesystem_from_vol(self, (VALUE)img_obj);
+    } else {
+        rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
+    }
+     */
+    printf("will open image object passed as arg1\n");
+    open_filesystem(self, (VALUE)img_obj);
+    //rb_iv_set(self, "@root_inum", INT2NUM(1968));
+    return self;
+}
+
 static VALUE open_volume(VALUE self, VALUE img_obj) {
 	TSK_VS_INFO * vs_ptr;
 	struct tsk4r_wrapper * rb_image;
@@ -182,6 +232,51 @@ static VALUE open_volume(VALUE self, VALUE img_obj) {
 //	printf("vs_part_ptr has start: %d\n", (int)partition_list->start);
 //	printf("vs_part_ptr has length: %d\n", (int)partition_list->len);
 //	fprintf(stdout, "I will open a volume, eventually.\n");
+    return self;
+}
+
+static VALUE open_filesystem(VALUE self, VALUE img_obj) {
+    printf("open_filesystem here....\n");
+    struct tsk4r_fs_wrapper * fs_ptr;
+    Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+    struct tsk4r_wrapper * rb_image;
+    Data_Get_Struct(img_obj, struct tsk4r_wrapper, rb_image);
+    TSK_IMG_INFO * disk = rb_image->image;
+    fs_ptr->filesystem = tsk_fs_open_img(disk, 0, TSK_FS_TYPE_DETECT);
+    //rb_iv_set(self, "@root_inum", INT2NUM((int)fs_ptr->filesystem->root_inum));
+    TSK_INUM_T my_root_inum = 1968;
+    TSK_INUM_T my_last_inum = 43;
+    if (fs_ptr->filesystem != NULL) {
+        my_root_inum = fs_ptr->filesystem->root_inum; 
+        my_last_inum = fs_ptr->filesystem->last_inum;
+    } else {
+        my_root_inum = 222;
+        my_last_inum = 333;
+    }
+    
+    rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
+    rb_iv_set(self, "@last_inum", INT2NUM(my_last_inum));
+
+    return self;
+}
+
+static VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj) {
+    printf("open filesystem_from_vol here...\n");
+    struct tsk4r_fs_wrapper * fs_ptr;
+    Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+    struct tsk4r_vs_wrapper * rb_volume;
+    Data_Get_Struct(vol_obj, struct tsk4r_vs_wrapper, rb_volume);
+    TSK_VS_INFO * volume = rb_volume->volume;
+    TSK_VS_PART_INFO * partition1 = rb_volume->volume->part_list;
+    fs_ptr->filesystem = tsk_fs_open_vol(partition1, TSK_FS_TYPE_DETECT);
+    TSK_INUM_T my_root_inum = 1976;
+    if (fs_ptr->filesystem != NULL) {
+        my_root_inum = fs_ptr->filesystem->root_inum;
+    } else {
+        my_root_inum = 444;
+    }
+    rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
+    return self;
 }
 
 static VALUE close_volume(VALUE self){
@@ -237,13 +332,16 @@ void Init_tsk4r() {
 	// class definitions
 	rb_cClass1 = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
 	rb_cClass2 = rb_define_class_under(rb_mtsk4r, "Volume", rb_cObject);
+	rb_cClass3 = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
 	
 	// allocation functions
 	rb_define_alloc_func(rb_cClass1, allocate_image);
 	rb_define_alloc_func(rb_cClass2, allocate_volume);
+    rb_define_alloc_func(rb_cClass3, allocate_filesystem);
+
 
 	// sub classes
-	rb_cClass3 = rb_define_class_under(rb_cClass2, "ThirdClass", rb_cObject);
+	//rb_cClass3 = rb_define_class_under(rb_cClass2, "ThirdClass", rb_cObject);
 
 	
 	// some method templates
@@ -283,6 +381,16 @@ void Init_tsk4r() {
 	rb_define_attr(rb_cClass2, "endian", 1, 0);
 	rb_define_attr(rb_cClass2, "offset", 1, 0);
 	rb_define_attr(rb_cClass2, "block_size", 1, 0);
+    
+    /* Sleuthkit::FileSystem */
+    // object methods for FileSystem objects
+    rb_define_method(rb_cClass3, "initialize", initialize_filesystem, -1);
+    rb_define_method(rb_cClass3, "open", open_filesystem, 1); // change arg1 to klass?
+
+    
+    // attributes
+    rb_define_attr(rb_cClass3, "root_inum", 1, 0);
+    rb_define_attr(rb_cClass3, "last_inum", 1, 0);
 }
 
 // methods follow here
