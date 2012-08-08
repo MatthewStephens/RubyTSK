@@ -246,11 +246,23 @@ static VALUE open_filesystem(VALUE self, VALUE img_obj) {
     //rb_iv_set(self, "@root_inum", INT2NUM((int)fs_ptr->filesystem->root_inum));
     TSK_INUM_T my_root_inum = 1968;
     TSK_INUM_T my_last_inum = 43;
+    TSK_INUM_T my_inum_count = 77;
+    TSK_OFF_T my_offset = 43;
+    TSK_ENDIAN_ENUM my_endian;
     unsigned int my_block_size = 0;
     if (fs_ptr->filesystem != NULL) {
         my_root_inum = fs_ptr->filesystem->root_inum; 
         my_last_inum = fs_ptr->filesystem->last_inum;
         my_block_size = fs_ptr->filesystem->block_size;
+				my_endian = fs_ptr->filesystem->endian;
+				my_offset = fs_ptr->filesystem->offset;
+				my_inum_count = fs_ptr->filesystem->inum_count;
+	      printf("fs_ptr has root_inum: %d\n", (int)fs_ptr->filesystem->root_inum);
+	      printf("fs_ptr has last_inum: %d\n", (int)fs_ptr->filesystem->last_inum);
+	      printf("fs_ptr has block_size: %d\n", (int)fs_ptr->filesystem->block_size);
+	      printf("fs_ptr has endian: %d\n", (int)fs_ptr->filesystem->endian);
+	      printf("fs_ptr has offset: %d\n", (int)fs_ptr->filesystem->offset);
+	      printf("fs_ptr has inum_count: %d\n", (int)fs_ptr->filesystem->inum_count);
     } else {
         my_root_inum = 222;
         my_last_inum = 333;
@@ -259,6 +271,9 @@ static VALUE open_filesystem(VALUE self, VALUE img_obj) {
     rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
     rb_iv_set(self, "@last_inum", INT2NUM(my_last_inum));
     rb_iv_set(self, "@block_size", INT2NUM(my_block_size));
+    rb_iv_set(self, "@endian", INT2NUM(my_endian));
+    rb_iv_set(self, "@offset", INT2NUM(my_offset));
+    rb_iv_set(self, "@inum_count", INT2NUM(my_inum_count));
 
     return self;
 }
@@ -340,7 +355,7 @@ void Init_tsk4r() {
 	// allocation functions
 	rb_define_alloc_func(rb_cClass1, allocate_image);
 	rb_define_alloc_func(rb_cClass2, allocate_volume);
-    rb_define_alloc_func(rb_cClass3, allocate_filesystem);
+  rb_define_alloc_func(rb_cClass3, allocate_filesystem);
 
 
 	// sub classes
@@ -395,6 +410,9 @@ void Init_tsk4r() {
     rb_define_attr(rb_cClass3, "root_inum", 1, 0);
     rb_define_attr(rb_cClass3, "last_inum", 1, 0);
     rb_define_attr(rb_cClass3, "block_size", 1, 0);
+    rb_define_attr(rb_cClass3, "endian", 1, 0);
+    rb_define_attr(rb_cClass3, "offset", 1, 0);
+    rb_define_attr(rb_cClass3, "inum_count", 1, 0);
 }
 
 // methods follow here
