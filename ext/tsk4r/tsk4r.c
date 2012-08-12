@@ -163,7 +163,7 @@ static VALUE initialize_volume(int argc, VALUE *args, VALUE self) {
   VALUE offset; VALUE vs_type;
   VALUE * img_obj;
   rb_scan_args(argc, args, "11", &img_obj);
-  if (rb_obj_is_kind_of((VALUE)img_obj, rb_cClass1)) {
+  if (rb_obj_is_kind_of((VALUE)img_obj, rb_cTSKImage)) {
     open_volume(self, (VALUE)img_obj);
   } else {
     rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
@@ -181,7 +181,7 @@ static VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
     /*
     printf("test1 %d\n", RTEST(rb_respond_to(img_obj, image_open)));
     printf("test2 %d\n", RTEST(rb_respond_to(img_obj, open_volume)));
-    printf("test3 %d\n", RTEST(rb_is_instance_id(rb_cClass1)));
+    printf("test3 %d\n", RTEST(rb_is_instance_id(rb_cTSKImage)));
     if (RTEST(rb_respond_to(img_obj, image_open))) {
         printf("will open image object passed as arg1\n");
         open_filesystem(self, (VALUE)img_obj);
@@ -341,18 +341,18 @@ void Init_tsk4r() {
   rb_mtsk4r = rb_define_module("Sleuthkit");
   
   // class definitions
-  rb_cClass1 = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
-  rb_cClass2 = rb_define_class_under(rb_mtsk4r, "Volume", rb_cObject);
-  rb_cClass3 = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
+  rb_cTSKImage = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
+  rb_cTSKVolume = rb_define_class_under(rb_mtsk4r, "Volume", rb_cObject);
+  rb_cTSKFileSystem = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
   
   // allocation functions
-  rb_define_alloc_func(rb_cClass1, allocate_image);
-  rb_define_alloc_func(rb_cClass2, allocate_volume);
-  rb_define_alloc_func(rb_cClass3, allocate_filesystem);
+  rb_define_alloc_func(rb_cTSKImage, allocate_image);
+  rb_define_alloc_func(rb_cTSKVolume, allocate_volume);
+  rb_define_alloc_func(rb_cTSKFileSystem, allocate_filesystem);
 
 
   // sub classes
-  //rb_cClass3 = rb_define_class_under(rb_cClass2, "ThirdClass", rb_cObject);
+  //rb_cTSKFileSystem = rb_define_class_under(rb_cTSKVolume, "ThirdClass", rb_cObject);
 
   
   // some method templates
@@ -361,51 +361,51 @@ void Init_tsk4r() {
   rb_define_module_function(rb_mtsk4r, "module_features", method_testMmethod, 0);
 
   // class methods
-  rb_define_module_function(rb_cClass1, "class_features", method_testCmethod1, 0);
-  rb_define_module_function(rb_cClass2, "class_features", method_testCmethod2, 0);
+  rb_define_module_function(rb_cTSKImage, "class_features", method_testCmethod1, 0);
+  rb_define_module_function(rb_cTSKVolume, "class_features", method_testCmethod2, 0);
 
   // object methods for FirstClass objects
-  rb_define_method(rb_cClass1, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
-  rb_define_method(rb_cClass1, "object_hello", method_hello_world, 0); // change arg1 to klass?
-  rb_define_method(rb_cClass1, "initialize", initialize_disk_image, -1);
-  rb_define_method(rb_cClass1, "image_open", image_open, 1);
-  rb_define_method(rb_cClass1, "image_size", image_size, 0);
-  rb_define_method(rb_cClass1, "sector_size", sector_size, 0);
-  rb_define_method(rb_cClass1, "image_type", image_type, 0);
+  rb_define_method(rb_cTSKImage, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKImage, "object_hello", method_hello_world, 0); // change arg1 to klass?
+  rb_define_method(rb_cTSKImage, "initialize", initialize_disk_image, -1);
+  rb_define_method(rb_cTSKImage, "image_open", image_open, 1);
+  rb_define_method(rb_cTSKImage, "image_size", image_size, 0);
+  rb_define_method(rb_cTSKImage, "sector_size", sector_size, 0);
+  rb_define_method(rb_cTSKImage, "image_type", image_type, 0);
 
   // attributes (read only)
-  rb_define_attr(rb_cClass1, "size", 1, 0);
-  rb_define_attr(rb_cClass1, "sec_size", 1, 0);
-  rb_define_attr(rb_cClass1, "type", 1, 0);
+  rb_define_attr(rb_cTSKImage, "size", 1, 0);
+  rb_define_attr(rb_cTSKImage, "sec_size", 1, 0);
+  rb_define_attr(rb_cTSKImage, "type", 1, 0);
 
   
   /* Sleuthkit::Volume */
   // object methods for Volume objects
-  rb_define_method(rb_cClass2, "initialize", initialize_volume, -1);
-  rb_define_method(rb_cClass2, "open", open_volume, 1); // change arg1 to klass?
-  rb_define_method(rb_cClass2, "close", close_volume, 1);
-  rb_define_method(rb_cClass2, "read_block", read_volume_block, 3); //read block given start and no. of blocks
-  rb_define_method(rb_cClass2, "walk", walk_volume, 1);
+  rb_define_method(rb_cTSKVolume, "initialize", initialize_volume, -1);
+  rb_define_method(rb_cTSKVolume, "open", open_volume, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKVolume, "close", close_volume, 1);
+  rb_define_method(rb_cTSKVolume, "read_block", read_volume_block, 3); //read block given start and no. of blocks
+  rb_define_method(rb_cTSKVolume, "walk", walk_volume, 1);
   
   // attributes
-  rb_define_attr(rb_cClass2, "partition_count", 1, 0);
-  rb_define_attr(rb_cClass2, "endian", 1, 0);
-  rb_define_attr(rb_cClass2, "offset", 1, 0);
-  rb_define_attr(rb_cClass2, "block_size", 1, 0);
+  rb_define_attr(rb_cTSKVolume, "partition_count", 1, 0);
+  rb_define_attr(rb_cTSKVolume, "endian", 1, 0);
+  rb_define_attr(rb_cTSKVolume, "offset", 1, 0);
+  rb_define_attr(rb_cTSKVolume, "block_size", 1, 0);
     
     /* Sleuthkit::FileSystem */
     // object methods for FileSystem objects
-    rb_define_method(rb_cClass3, "initialize", initialize_filesystem, -1);
-    rb_define_method(rb_cClass3, "open", open_filesystem, 1); // change arg1 to klass?
+    rb_define_method(rb_cTSKFileSystem, "initialize", initialize_filesystem, -1);
+    rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, 1); // change arg1 to klass?
 
     
     // attributes
-    rb_define_attr(rb_cClass3, "root_inum", 1, 0);
-    rb_define_attr(rb_cClass3, "last_inum", 1, 0);
-    rb_define_attr(rb_cClass3, "block_size", 1, 0);
-    rb_define_attr(rb_cClass3, "endian", 1, 0);
-    rb_define_attr(rb_cClass3, "offset", 1, 0);
-    rb_define_attr(rb_cClass3, "inum_count", 1, 0);
+    rb_define_attr(rb_cTSKFileSystem, "root_inum", 1, 0);
+    rb_define_attr(rb_cTSKFileSystem, "last_inum", 1, 0);
+    rb_define_attr(rb_cTSKFileSystem, "block_size", 1, 0);
+    rb_define_attr(rb_cTSKFileSystem, "endian", 1, 0);
+    rb_define_attr(rb_cTSKFileSystem, "offset", 1, 0);
+    rb_define_attr(rb_cTSKFileSystem, "inum_count", 1, 0);
 }
 
 // methods follow here
