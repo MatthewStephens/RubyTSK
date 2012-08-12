@@ -22,24 +22,9 @@
 #include <stdio.h>
 #include <tsk3/libtsk.h>
 #include <ruby.h>
+#include "tsk4r.h"
 
-// Prototype for the method and classes directly below it
-static VALUE rb_mtsk4r;
-static VALUE rb_cClass1;
-static VALUE rb_cClass2;
-
-// other classes here
-static VALUE rb_cClass3;
-
-// Prototype for the initialization method - Ruby calls this, not you
-void Init_tsk4r();
-
-// Prototype for our methods - methods are prefixed by 'method_' here (static keyword encapsulates these)
-static VALUE method_hello_world(VALUE self);
-static VALUE method_testOmethod(VALUE self);
-static VALUE method_testCmethod1(VALUE self);
-static VALUE method_testCmethod2(VALUE self);
-static VALUE method_testMmethod(VALUE self);
+// method prototypes
 // Sleuthkit::Image
 static VALUE initialize_disk_image(int argc, VALUE *args, VALUE self);
 static VALUE image_open(VALUE self, VALUE filename_str);
@@ -56,6 +41,14 @@ static VALUE initialize_filesystem(int argc, VALUE *args, VALUE self);
 static VALUE open_filesystem(VALUE self, VALUE image_obj);
 static VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj);
 static VALUE close_filesystem(VALUE self);
+
+// Prototype for our methods - methods are prefixed by 'method_' here (static keyword encapsulates these)
+static VALUE method_hello_world(VALUE self);
+static VALUE method_testOmethod(VALUE self);
+static VALUE method_testCmethod1(VALUE self);
+static VALUE method_testCmethod2(VALUE self);
+static VALUE method_testMmethod(VALUE self);
+
 
 
 VALUE klass;
