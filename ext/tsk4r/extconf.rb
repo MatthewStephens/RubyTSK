@@ -18,7 +18,7 @@ LIB_DIRS=[
 ]
 
 # # allow user configuration
-# dir_config("somelib", HEADER_DIRS, LIB_DIRS)
+dir_config("tsk3", HEADER_DIRS, LIB_DIRS)
 # 
 # # require presense of third-party library
 have_library("tsk3")
@@ -27,4 +27,8 @@ have_library("tsk3")
  unless find_header('tsk3/libtsk.h') # note: some libraries are 'name/libname.h', most are simply 'name.h'
    abort "tsk3/libtsk.h is missing.  please install tsk3/libtsk.h"
  end
+
+# 1.9 compatibility
+$CFLAGS += " -DRUBY_19" if RUBY_VERSION =~ /^1\.9/
+
 create_makefile("tsk4r/tsk4r")
