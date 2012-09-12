@@ -135,7 +135,7 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
     rb_warn("unable to open disk.\n");
   }
   TSK_IMG_INFO *image = ptr->image;
-  
+  if (ptr->image != NULL) {
   img_size = INT2NUM((int)image->size);
   rb_iv_set(self, "@size", img_size);
   img_sector_size = INT2NUM((int)image->sector_size);
@@ -144,7 +144,7 @@ static VALUE image_open(VALUE self, VALUE filename_str) {
   
   fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
   fprintf(stdout, "disk image has sectors %d bytes in size.\n", (int)image->sector_size ); // dev only
-
+  }
   return self;
 }
 
@@ -257,8 +257,9 @@ static VALUE open_filesystem(VALUE self, VALUE img_obj) {
         printf("fs_ptr has offset: %d\n", (int)fs_ptr->filesystem->offset);
         printf("fs_ptr has inum_count: %d\n", (int)fs_ptr->filesystem->inum_count);
     } else {
-        my_root_inum = 222;
-        my_last_inum = 333;
+      my_root_inum = 222;
+      my_last_inum = 333;
+      my_endian = 666;
     }
     
     rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
@@ -321,9 +322,12 @@ static VALUE sector_size(VALUE self){
   char * orig_fn = new_ptr->fn_given;
 //  fprintf(stdout, "struct stored filename: >%s<\n", orig_fn);
   VALUE s_size;
-  s_size = INT2FIX(22);
-  unsigned int sss = image->sector_size;
-  s_size = INT2FIX(sss);
+  if (image != NULL) {
+    unsigned int sss = image->sector_size;
+    s_size = INT2FIX(sss);
+  } else {
+    s_size = INT2FIX(22);
+  }
 //  fprintf(stdout, "disk size: %d\n", (int)image->size);
 //  fprintf(stdout, "sector size: %d\n", sss);
   FIXNUM_P(s_size);
