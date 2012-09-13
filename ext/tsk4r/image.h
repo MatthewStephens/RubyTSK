@@ -17,7 +17,7 @@ struct tsk4r_img_wrapper {
   char * fn_given;
 };
 
-// Sleuthkit::Image
+// Sleuthkit::Image function declarations
 VALUE allocate_image(VALUE klass);
 void  deallocate_image(struct tsk4r_img_wrapper * ptr);
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self);
