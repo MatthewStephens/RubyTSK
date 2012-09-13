@@ -25,11 +25,7 @@
 #include "tsk4r.h"
 
 // method prototypes
-// Sleuthkit::Image
-static VALUE initialize_disk_image(int argc, VALUE *args, VALUE self);
-static VALUE image_open(VALUE self, VALUE filename_str);
-static VALUE image_size(VALUE self);
-static VALUE sector_size(VALUE self);
+
 // Sleuthkit::Volume
 static VALUE initialize_volume(int argc, VALUE *args, VALUE self);
 static VALUE open_volume(VALUE self, VALUE image_obj);
@@ -53,15 +49,11 @@ static VALUE method_testMmethod(VALUE self);
 
 VALUE klass;
 
-// Sleuthkit::Image struct
-struct tsk4r_wrapper {
-  TSK_IMG_INFO * image;
-  char * fn_given;
-};
+
 // Sleuthkit::Volume struct
 struct tsk4r_vs_wrapper {
   TSK_VS_INFO * volume;
-//  tsk4r_wrapper * disk;
+//  tsk4r_img_wrapper * disk;
 };
 // Sleuthkit::FileSystem struct
 struct tsk4r_fs_wrapper {
@@ -69,12 +61,6 @@ struct tsk4r_fs_wrapper {
 };
 
 // alloc & dealloc
-static void deallocate_image(struct tsk4r_wrapper * ptr){
-  //xfree((TSK_IMG_INFO *)image);
-  TSK_IMG_INFO *image = ptr->image;
-  tsk_img_close(image);
-  xfree(ptr);
-}
 
 static void deallocate_volume(struct tsk4r_vs_wrapper * ptr){
   TSK_VS_INFO *volume = ptr->volume;
@@ -87,22 +73,7 @@ static void deallocate_filesystem(struct tsk4r_fs_wrapper * ptr){
     xfree(ptr);
 }
 
-static VALUE allocate_image(VALUE klass){
-//  TSK_IMG_INFO *image = ALLOC(TSK_IMG_INFO);
-//  TSK_IMG_INFO * image = malloc(sizeof(TSK_IMG_INFO));
-//  fprintf(stdout, "allocation complete.\n");
-//  return Data_Wrap_Struct(klass, 0, 0, image);
 
-  //struct tsk4r_wrapper * ptr = malloc(sizeof(struct tsk4r_wrapper)); // worked without malloc.  Do I need this?
-  struct tsk4r_wrapper * ptr;
-  //ptr = ALLOC(struct tsk4r_wrapper); // this might be improvement over previous
-  return Data_Make_Struct(klass, struct tsk4r_wrapper, 0, deallocate_image, ptr);
-  //return Data_Wrap_Struct(klass, 0, deallocate, ptr);
-  /*
-  TSK_IMG_INFO *sval;
-  return Data_Make_Struct(klass, TSK_IMG_INFO, 0, deallocate, sval);
-   */
-}
 static VALUE allocate_volume(VALUE klass){
   struct tsk4r_vs_wrapper * ptr;
 //  ptr = ALLOC(struct tsk4r_vs_wrapper);
@@ -117,48 +88,7 @@ static VALUE allocate_filesystem(VALUE klass){
     return Data_Make_Struct(klass, struct tsk4r_fs_wrapper, 0, deallocate_filesystem, ptr);
 }
 
-static VALUE image_open(VALUE self, VALUE filename_str) {
-  char * filename;
-  struct tsk4r_wrapper * ptr;
-  Data_Get_Struct(self, struct tsk4r_wrapper, ptr);
 
-  VALUE img_size;
-  VALUE img_sector_size;
-  fprintf(stdout, "opening %s.\n", StringValuePtr(filename_str));
-
-  Check_Type(filename_str, T_STRING);
-  rb_str_modify(filename_str);
-  filename=StringValuePtr(filename_str);
-  ptr->fn_given = (char *)filename;
-  ptr->image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
-  fprintf(stdout, "attempt to open %s complete\n", (char *)filename);
-  if (ptr->image == NULL) {
-    rb_warn("unable to open disk.\n");
-  }
-  TSK_IMG_INFO *image = ptr->image;
-  if (ptr->image != NULL) {
-  img_size = INT2NUM((int)image->size);
-  rb_iv_set(self, "@size", img_size);
-  img_sector_size = INT2NUM((int)image->sector_size);
-  rb_iv_set(self, "@sec_size", img_sector_size);
-  rb_iv_set(self, "@type", INT2NUM((int)image->itype));
-  
-  fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
-  fprintf(stdout, "disk image has sectors %d bytes in size.\n", (int)image->sector_size ); // dev only
-  }
-  return self;
-}
-
-// init an Image object (was lacking 'static' earlier)
-static VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
-  VALUE fn;
-//  static struct tsk4r_wrapper * ptr;
-  rb_scan_args(argc, args, "01", &fn);
-  if( ! NIL_P(fn)) {
-    image_open(self, fn);
-  } 
-  return self;
-}
 
 static VALUE initialize_volume(int argc, VALUE *args, VALUE self) {
 //  VALUE offset;
@@ -203,10 +133,10 @@ static VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
 
 static VALUE open_volume(VALUE self, VALUE img_obj) {
   TSK_VS_INFO * vs_ptr;
-  struct tsk4r_wrapper * rb_image;
+  struct tsk4r_img_wrapper * rb_image;
 //  TSK_VS_PART_INFO * partition_list;
 //  partition_list = vs_ptr->part_list;
-  Data_Get_Struct(img_obj, struct tsk4r_wrapper, rb_image);
+  Data_Get_Struct(img_obj, struct tsk4r_img_wrapper, rb_image);
   TSK_IMG_INFO * disk = rb_image->image;
 
   vs_ptr = tsk_vs_open(disk, 0, TSK_VS_TYPE_DETECT);
@@ -234,8 +164,8 @@ static VALUE open_filesystem(VALUE self, VALUE img_obj) {
     printf("open_filesystem here....\n");
     struct tsk4r_fs_wrapper * fs_ptr;
     Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
-    struct tsk4r_wrapper * rb_image;
-    Data_Get_Struct(img_obj, struct tsk4r_wrapper, rb_image);
+    struct tsk4r_img_wrapper * rb_image;
+    Data_Get_Struct(img_obj, struct tsk4r_img_wrapper, rb_image);
     TSK_IMG_INFO * disk = rb_image->image;
     fs_ptr->filesystem = tsk_fs_open_img(disk, 0, TSK_FS_TYPE_DETECT);
     //rb_iv_set(self, "@root_inum", INT2NUM((int)fs_ptr->filesystem->root_inum));
@@ -305,7 +235,7 @@ static VALUE walk_volume(VALUE self){
   return Qnil;
 }
 
-static VALUE image_size(VALUE self){
+VALUE image_size(VALUE self){
   TSK_IMG_INFO* image;
   fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
 
@@ -316,9 +246,9 @@ static VALUE image_size(VALUE self){
   return INT2NUM((int)image->size);
 }
 
-static VALUE sector_size(VALUE self){
-  struct tsk4r_wrapper * new_ptr;  
-  Data_Get_Struct(self, struct tsk4r_wrapper, new_ptr);
+VALUE sector_size(VALUE self){
+  struct tsk4r_img_wrapper * new_ptr;  
+  Data_Get_Struct(self, struct tsk4r_img_wrapper, new_ptr);
 
   TSK_IMG_INFO * image = new_ptr->image;
 //  char * orig_fn = new_ptr->fn_given;
