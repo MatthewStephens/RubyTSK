@@ -76,3 +76,41 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   } 
   return self;
 }
+
+
+VALUE sector_size(VALUE self){
+  struct tsk4r_img_wrapper * new_ptr;
+  Data_Get_Struct(self, struct tsk4r_img_wrapper, new_ptr);
+  
+  TSK_IMG_INFO * image = new_ptr->image;
+  //  char * orig_fn = new_ptr->fn_given;
+  //  fprintf(stdout, "struct stored filename: >%s<\n", orig_fn);
+  VALUE s_size;
+  if (image != NULL) {
+    unsigned int sss = image->sector_size;
+    s_size = INT2FIX(sss);
+  } else {
+    s_size = INT2FIX(22);
+  }
+  //  fprintf(stdout, "disk size: %d\n", (int)image->size);
+  //  fprintf(stdout, "sector size: %d\n", sss);
+  //  FIXNUM_P(s_size);
+  return s_size;
+}
+
+VALUE image_size(VALUE self){
+  TSK_IMG_INFO* image;
+  fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
+  
+  Data_Get_Struct(self, TSK_IMG_INFO, image);
+  fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
+  
+  //fprintf(stdout, "image size: %d\n", (int)image->size);
+  return INT2NUM((int)image->size);
+}
+
+VALUE image_type(VALUE self){
+  TSK_IMG_INFO *image;
+  Data_Get_Struct(self, TSK_IMG_INFO, image);
+  return INT2NUM((int)image->itype);
+}
