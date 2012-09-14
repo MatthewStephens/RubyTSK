@@ -115,19 +115,21 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKVolume, "offset", 1, 0);
   rb_define_attr(rb_cTSKVolume, "block_size", 1, 0);
     
-    /* Sleuthkit::FileSystem */
-    // object methods for FileSystem objects
-    rb_define_method(rb_cTSKFileSystem, "initialize", initialize_filesystem, -1);
-    rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, 1); // change arg1 to klass?
-
-    
-    // attributes
-    rb_define_attr(rb_cTSKFileSystem, "root_inum", 1, 0);
-    rb_define_attr(rb_cTSKFileSystem, "last_inum", 1, 0);
-    rb_define_attr(rb_cTSKFileSystem, "block_size", 1, 0);
-    rb_define_attr(rb_cTSKFileSystem, "endian", 1, 0);
-    rb_define_attr(rb_cTSKFileSystem, "offset", 1, 0);
-    rb_define_attr(rb_cTSKFileSystem, "inum_count", 1, 0);
+  /* Sleuthkit::FileSystem */
+  // object methods for FileSystem objects
+  rb_define_method(rb_cTSKFileSystem, "initialize", initialize_filesystem, -1);
+  rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKFileSystem, "system_name", get_filesystem_type, 0);
+  
+  
+  // attributes
+  rb_define_attr(rb_cTSKFileSystem, "root_inum", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "last_inum", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "block_size", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "endian", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "offset", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "inum_count", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "name", 1, 0);
 }
 
 // methods follow here

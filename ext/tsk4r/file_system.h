@@ -27,5 +27,6 @@ VALUE allocate_filesystem(VALUE self);
 VALUE open_filesystem(VALUE self, VALUE image_obj);
 VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj);
 VALUE close_filesystem(VALUE self);
+VALUE get_filesystem_type(VALUE self);
 
 #endif

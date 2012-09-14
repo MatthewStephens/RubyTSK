@@ -48,6 +48,13 @@ describe Sleuthkit::FileSystem do
       @filesystem.inum_count.should eq(4)
     end
   end
+  
+  describe "#get_filesystem_type" do
+    it "prints out the filesystem type as a string" do
+      @filesystem = Sleuthkit::FileSystem.new(@image)
+      @filesystem.system_name.should eq("iso9660")
+    end
+  end
     
 end
 

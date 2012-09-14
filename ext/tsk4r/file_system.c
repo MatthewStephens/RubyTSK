@@ -34,8 +34,6 @@ VALUE allocate_filesystem(VALUE klass){
 }
 
 
-
-
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
   VALUE * img_obj;
   rb_scan_args(argc, args, "1", &img_obj);
@@ -93,6 +91,7 @@ VALUE open_filesystem(VALUE self, VALUE img_obj) {
     printf("fs_ptr has offset: %d\n", (int)fs_ptr->filesystem->offset);
     printf("fs_ptr has inum_count: %d\n", (int)fs_ptr->filesystem->inum_count);
   } else {
+    printf("filesystem pointer is NULL\n");
     my_root_inum = 222;
     my_last_inum = 333;
     my_endian = 666;
@@ -106,6 +105,15 @@ VALUE open_filesystem(VALUE self, VALUE img_obj) {
   rb_iv_set(self, "@inum_count", INT2NUM(my_inum_count));
   
   return self;
+}
+
+VALUE get_filesystem_type(VALUE self) {
+  const char * mytype;
+  struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+  mytype = tsk_fs_type_toname(fs_ptr->filesystem->ftype);
+  rb_iv_set(self, "@name", rb_str_new2(mytype));
+  return rb_str_new2(mytype);
 }
 
 VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj) {
