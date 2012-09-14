@@ -11,16 +11,18 @@
 #define TSK4R_H
 
 #include "image.h"
+#include "volume.h"
+#include "file_system.h"
 
 // Prototype for the initialization method - Ruby calls this, not you
 void Init_tsk4r();
 
-// Prototype for the method and classes directly below it
+// Prototype for the module and classes directly below it
 VALUE rb_mtsk4r;
 VALUE rb_cTSKImage;
 VALUE rb_cTSKVolume;
 VALUE rb_cTSKFileSystem;
-VALUE allocate_image(VALUE klass);
 
+VALUE allocate_image(VALUE klass);
 
 #endif
