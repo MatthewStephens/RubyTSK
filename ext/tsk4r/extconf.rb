@@ -31,4 +31,8 @@ have_library("tsk3")
 # 1.9 compatibility
 $CFLAGS += " -DRUBY_19" if RUBY_VERSION =~ /^1\.9/
 
+# if you want to change compilers
+#Config::MAKEFILE_CONFIG["CC"]='/usr/bin/gcc'
+#puts "Creating makefile with Config::MAKEFILE_CONFIG['CC'] = #{Config::MAKEFILE_CONFIG['CC']}"
+
 create_makefile("tsk4r/tsk4r")
