@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.name        = "sleuthkit"
   s.version     = Sleuthkit::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Matthew Stepehens"]
+  s.authors     = ["Matthew Stephens"]
   s.email       = ["mattbastard@gmail.com"]
   s.homepage    = "https://github.com/MatthewStephens/RubyTSK"
   s.summary     = %q{Ruby bindings for The SleuthKit (TSK) forensics analysis toolkit}
