@@ -47,7 +47,20 @@ describe "spec/volume" do
 			@volume.partition_count.should eq(6)
 		end
 	end
-
+  
+	describe "#volume_system_type" do
+		it "returns the @volume_system_type attr" do
+			@volume = Sleuthkit::Volume.new(@image)
+			@volume.volume_system_type.should eq(8)
+		end
+	end
+  
+	describe "#description" do
+		it "returns the @description attr" do
+			@volume = Sleuthkit::Volume.new(@image)
+			@volume.description.should eq("MAC Partition Map")
+		end
+	end
 end
 
 

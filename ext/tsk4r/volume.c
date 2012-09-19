@@ -54,15 +54,17 @@ VALUE open_volume(VALUE self, VALUE img_obj) {
   TSK_IMG_INFO * disk = rb_image->image;
   
   vs_ptr = tsk_vs_open(disk, 0, TSK_VS_TYPE_DETECT);
-  printf("disk has sector size: %d\n", (int)disk->sector_size );
-  printf("vs_ptr has partition count: %d\n", (int)vs_ptr->part_count);
-  printf("vs_ptr has vs_type: %d\n", (int)vs_ptr->vstype);
-  printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(vs_ptr->vstype));
-  printf("vs_ptr has offset: %d\n", (int)vs_ptr->offset);
-  printf("vs_ptr has block size: %d\n", (int)vs_ptr->block_size);
-  printf("vs_ptr has endian: %d\n", (int)vs_ptr->endian);
+//  printf("disk has sector size: %d\n", (int)disk->sector_size );
+//  printf("vs_ptr has partition count: %d\n", (int)vs_ptr->part_count);
+//  printf("vs_ptr has vs_type: %d\n", (int)vs_ptr->vstype);
+//  printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(vs_ptr->vstype));
+//  printf("vs_ptr has offset: %d\n", (int)vs_ptr->offset);
+//  printf("vs_ptr has block size: %d\n", (int)vs_ptr->block_size);
+//  printf("vs_ptr has endian: %d\n", (int)vs_ptr->endian);
   
   rb_iv_set(self, "@partition_count", INT2NUM((int)vs_ptr->part_count));
+  rb_iv_set(self, "@volume_system_type", INT2NUM((int)vs_ptr->vstype));
+  rb_iv_set(self, "@description", rb_str_new2( (char *)tsk_vs_type_todesc(vs_ptr->vstype) ));
   rb_iv_set(self, "@endian", INT2NUM((int)vs_ptr->endian));
   rb_iv_set(self, "@offset", INT2NUM((int)vs_ptr->offset));
   rb_iv_set(self, "@block_size", INT2NUM((int)vs_ptr->block_size));

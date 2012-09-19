@@ -114,6 +114,8 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKVolume, "endian", 1, 0);
   rb_define_attr(rb_cTSKVolume, "offset", 1, 0);
   rb_define_attr(rb_cTSKVolume, "block_size", 1, 0);
+  rb_define_attr(rb_cTSKVolume, "description", 1, 0);
+  rb_define_attr(rb_cTSKVolume, "volume_system_type", 1, 0);
     
   /* Sleuthkit::FileSystem */
   // object methods for FileSystem objects
