@@ -89,10 +89,37 @@ VALUE volume_expose_part(VALUE self) {
   return volume_part;
 }
 
+VALUE volume_expose_part_by_idx(VALUE self, VALUE index) {
+  VALUE volume_part;
+  
+  // call VolumePart.new, passing self
+  volume_part = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 2, self, index);
+  
+  return volume_part;
+}
+
 // Sleuthkit::VolumePart functions
 
-VALUE open_volume_part(VALUE self, VALUE vs_obj){
-  printf("open_volume_part called\n");
+VALUE open_next_volume_part(VALUE self) {
+  
+  VALUE next_part;
+  struct tsk4r_vpart_wrapper * mydata;
+  Data_Get_Struct(self, struct tsk4r_vpart_wrapper, mydata);
+  next_part = Qnil;
+  if (mydata->volume_part->next != NULL) {
+
+  }
+  
+  return next_part;
+}
+
+VALUE open_volume_part(int argc, VALUE *args, VALUE self){
+  // self, vs_obj, index, e.g.
+  VALUE * vs_obj; VALUE index;
+  rb_scan_args(argc, args, "12", &vs_obj, &index);
+  printf("open_volume_part (aka #open) called\n");
+  if (NIL_P(index)) { index = INT2FIX(0); }
+  printf("open_volume_part recd index=%ld\n", FIX2INT(index));
   struct tsk4r_vpart_wrapper * partition;
   const TSK_VS_PART_INFO * vp_ptr;
   struct tsk4r_vs_wrapper * parent;  // pointer to parent volume system
@@ -110,11 +137,11 @@ VALUE open_volume_part(VALUE self, VALUE vs_obj){
   // open self's struct and assign partition to it
   Data_Get_Struct(self, struct tsk4r_vpart_wrapper, partition);
 
-//  printf("vs_ptr count is: %d\n", vs_ptr->volume->part_count);
+  printf("vs_ptr count is: %d\n", parent->volume->part_count); //no. of partitions
   TSK_VS_INFO * volume_system = parent->volume;
   printf("volume_system assigned to vs_ptr->volume\n");
 
-  TSK_PNUM_T idx = 0;
+  TSK_PNUM_T idx = FIX2INT(index);
   vp_ptr = tsk_vs_part_get(volume_system, idx);
   partition->volume_part = vp_ptr;
   printf("vp_ptr assigned to return of tsk_vs_part_get\n");
@@ -143,13 +170,21 @@ void deallocate_volume_part(struct tsk4r_vpart_wrapper * ptr){
 }
 
 VALUE initialize_volume_part(int argc, VALUE *args, VALUE self){
-  VALUE * vs_obj;
+  VALUE * vs_obj; VALUE index;
   fprintf(stdout, "initialize_volume_part called.\n");
-  rb_scan_args(argc, args, "11", &vs_obj);
+  rb_scan_args(argc, args, "11", &vs_obj, &index);
+  if (NIL_P(index)) { index = INT2FIX(0); }
+  printf("initialize_volume_part recd index=%ld\n", FIX2INT(index));
   if (rb_obj_is_kind_of((VALUE)vs_obj, rb_cTSKVolumeSystem)) {
-    printf("trying to call open_volume_part\n");
-    open_volume_part(self, (VALUE)vs_obj);
-  } else {
+    printf("trying to call open_volume_part passing VolumeSystem\n");
+    rb_funcall(self, rb_intern("open"), 2, (VALUE)vs_obj, (VALUE)index);
+//    open_volume_part(self, (VALUE)vs_obj, ));
+//    open_volume_part(3, [self, (VALUE)vs_obj, (VALUE)index], self);
+  } else if (rb_obj_is_kind_of((VALUE)vs_obj, rb_cTSKVolumePart)) {
+    printf("trying to call open_volume_part passing VolumePart\n");
+    rb_funcall(self, rb_intern("open"), 2, (VALUE)vs_obj, (VALUE)index);
+  }
+  else {
     rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::VolumeSystem expected)");
   }
   

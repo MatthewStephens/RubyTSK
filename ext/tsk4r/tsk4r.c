@@ -111,6 +111,7 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKVolumeSystem, "read_block", read_volume_block, 3); //read block given start and no. of blocks
   rb_define_method(rb_cTSKVolumeSystem, "walk", walk_volume, 1);
   rb_define_method(rb_cTSKVolumeSystem, "expose_part", volume_expose_part, 0);
+  rb_define_method(rb_cTSKVolumeSystem, "expose_part_at", volume_expose_part_by_idx, 1);
   
   // attributes
   rb_define_attr(rb_cTSKVolumeSystem, "partition_count", 1, 0);
@@ -125,7 +126,8 @@ void Init_tsk4r() {
   
   // object methods for VolumePart objects
   rb_define_method(rb_cTSKVolumePart, "initialize", initialize_volume_part, -1);
-  rb_define_method(rb_cTSKVolumePart, "open", open_volume_part, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKVolumePart, "open", open_volume_part, -1); // change arg1 to klass?
+  rb_define_method(rb_cTSKVolumePart, "next", open_next_volume_part, 1);
 //  rb_define_method(rb_cTSKVolumePart, "read_block", read_volume_part_block, 3); //read block given start and no. of blocks
 //  rb_define_method(rb_cTSKVolumePart, "walk", walk_volume_part, 1);
     

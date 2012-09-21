@@ -32,12 +32,14 @@ static VALUE close_volume_system(VALUE self);
 static VALUE read_volume_system_block(int argc, VALUE *args, VALUE self);
 static VALUE walk_volume_system(VALUE self);
 VALUE volume_expose_part(VALUE self);
+VALUE volume_expose_part_by_idx(VALUE self, VALUE index);
 
 // Sleuthkit::VolumePart function declarations
 VALUE allocate_volume_part(VALUE klass);
 void  deallocate_volume_part();
 VALUE initialize_volume_part(int argc, VALUE *args, VALUE self);
-VALUE open_volume_part(VALUE self, VALUE volume_obj);
+VALUE open_volume_part(int argc, VALUE *args, VALUE self);
+VALUE open_next_volume_part(VALUE self);
 //static VALUE close_volume_part(VALUE self);
 //VALUE read_volume_part_block(int argc, VALUE *args, VALUE self);
 //static VALUE walk_volume_part(VALUE self);
