@@ -23,7 +23,6 @@ struct tsk4r_img {
 
 VALUE allocate_volume_system(VALUE klass){
   struct tsk4r_vs_wrapper * ptr;
-  //  ptr = ALLOC(struct tsk4r_vs_wrapper);
   return Data_Make_Struct(klass, struct tsk4r_vs_wrapper, 0, deallocate_volume_system, ptr);
 }
 
@@ -34,8 +33,7 @@ void deallocate_volume_system(struct tsk4r_vs_wrapper * ptr){
 }
 
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
-  //  VALUE offset;
-  //  VALUE vs_type;
+
   VALUE * img_obj;
   rb_scan_args(argc, args, "11", &img_obj);
   if (rb_obj_is_kind_of((VALUE)img_obj, rb_cTSKImage)) {
@@ -84,14 +82,10 @@ VALUE open_volume_system(VALUE self, VALUE img_obj) {
 // called on VolumeSystem, returns first VolumePart
 VALUE volume_expose_part(VALUE self) {
   VALUE volume_part;
-//  struct tsk4r_vs_wrapper * parent_vs;  // pointer to parent volume system
-  
-  // get pointer to volume system struct
-//  Data_Get_Struct(self, struct tsk4r_vs_wrapper, parent_vs);
   
   // call VolumePart.new, passing self
   volume_part = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 1, self);
-//  volume_part = Data_Make_Struct(rb_cTSKVolumePart, TSK_VS_PART_INFO, 0, 0, parent_vs);
+
   return volume_part;
 }
 
@@ -125,15 +119,6 @@ VALUE open_volume_part(VALUE self, VALUE vs_obj){
   partition->volume_part = vp_ptr;
   printf("vp_ptr assigned to return of tsk_vs_part_get\n");
   printf("table number: %d\n", vp_ptr->table_num);
-//  rb_iv_set(self, "@length", vp_ptr->len);
-//  
-//  TSK_DADDR_T start;      ///< Sector offset of start of partition
-//  TSK_DADDR_T len;        ///< Number of sectors in partition
-//  char *desc;             ///< UTF-8 description of partition (volume system type-specific)
-//  int8_t table_num;       ///< Table address that describes this partition
-//  int8_t slot_num;        ///< Entry in the table that describes this partition
-//  TSK_PNUM_T addr;        ///< Address of this partition
-//  TSK_VS_PART_FLAG_ENUM flags
 
   rb_iv_set(self, "@start", INT2NUM((int)vp_ptr->start));
   rb_iv_set(self, "@length", INT2NUM((int)vp_ptr->len));
