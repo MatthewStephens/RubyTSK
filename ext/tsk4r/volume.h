@@ -17,15 +17,29 @@ struct tsk4r_vs_wrapper {
   //  tsk4r_img_wrapper * disk;
 };
 
+struct tsk4r_vpart_wrapper {
+  TSK_VS_PART_INFO * volume_part;
+};
+
 //VALUE rb_cTSKImage;
 
-// Sleuthkit::Volume function declarations
-VALUE allocate_volume();
-void  deallocate_volume();
-VALUE initialize_volume(int argc, VALUE *args, VALUE self);
-VALUE open_volume(VALUE self, VALUE image_obj);
-static VALUE close_volume(VALUE self);
-static VALUE read_volume_block(int argc, VALUE *args, VALUE self);
-static VALUE walk_volume(VALUE self);
+// Sleuthkit::VolumeSystem function declarations
+VALUE allocate_volume_system(VALUE klass);
+void  deallocate_volume_system();
+VALUE initialize_volume_system(int argc, VALUE *args, VALUE self);
+VALUE open_volume_system(VALUE self, VALUE image_obj);
+static VALUE close_volume_system(VALUE self);
+static VALUE read_volume_system_block(int argc, VALUE *args, VALUE self);
+static VALUE walk_volume_system(VALUE self);
+VALUE volume_expose_part(VALUE self);
+
+// Sleuthkit::VolumePart function declarations
+VALUE allocate_volume_part(VALUE klass);
+void  deallocate_volume_part();
+VALUE initialize_volume_part(int argc, VALUE *args, VALUE self);
+VALUE open_volume_part(VALUE self, VALUE volume_obj);
+//static VALUE close_volume_part(VALUE self);
+//VALUE read_volume_part_block(int argc, VALUE *args, VALUE self);
+//static VALUE walk_volume_part(VALUE self);
 
 #endif

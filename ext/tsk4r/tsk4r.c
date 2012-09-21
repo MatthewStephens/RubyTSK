@@ -44,7 +44,7 @@ VALUE klass;
 
 
 
-static VALUE close_volume(VALUE self){
+static VALUE close_volume_system(VALUE self){
   return Qnil;
 }
 
@@ -63,13 +63,15 @@ void Init_tsk4r() {
   rb_mtsk4r = rb_define_module("Sleuthkit");
   
   // class definitions
-  rb_cTSKImage = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
-  rb_cTSKVolume = rb_define_class_under(rb_mtsk4r, "Volume", rb_cObject);
-  rb_cTSKFileSystem = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
+  rb_cTSKImage        = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
+  rb_cTSKVolumeSystem = rb_define_class_under(rb_mtsk4r, "VolumeSystem", rb_cObject);
+  rb_cTSKVolumePart   = rb_define_class_under(rb_mtsk4r, "VolumePart", rb_cObject);
+  rb_cTSKFileSystem   = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
   
   // allocation functions
   rb_define_alloc_func(rb_cTSKImage, allocate_image);
-  rb_define_alloc_func(rb_cTSKVolume, allocate_volume);
+  rb_define_alloc_func(rb_cTSKVolumeSystem, allocate_volume_system);
+  rb_define_alloc_func(rb_cTSKVolumePart, allocate_volume_part);
   rb_define_alloc_func(rb_cTSKFileSystem, allocate_filesystem);
 
 
@@ -84,7 +86,7 @@ void Init_tsk4r() {
 
   // class methods
   rb_define_module_function(rb_cTSKImage, "class_features", method_testCmethod1, 0);
-  rb_define_module_function(rb_cTSKVolume, "class_features", method_testCmethod2, 0);
+  rb_define_module_function(rb_cTSKVolumeSystem, "class_features", method_testCmethod2, 0);
 
   // object methods for FirstClass objects
   rb_define_method(rb_cTSKImage, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
@@ -102,21 +104,40 @@ void Init_tsk4r() {
 
   
   /* Sleuthkit::Volume */
-  // object methods for Volume objects
-  rb_define_method(rb_cTSKVolume, "initialize", initialize_volume, -1);
-  rb_define_method(rb_cTSKVolume, "open", open_volume, 1); // change arg1 to klass?
-  rb_define_method(rb_cTSKVolume, "close", close_volume, 1);
-  rb_define_method(rb_cTSKVolume, "read_block", read_volume_block, 3); //read block given start and no. of blocks
-  rb_define_method(rb_cTSKVolume, "walk", walk_volume, 1);
+  // object methods for VolumeSystem objects
+  rb_define_method(rb_cTSKVolumeSystem, "initialize", initialize_volume_system, -1);
+  rb_define_method(rb_cTSKVolumeSystem, "open", open_volume_system, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKVolumeSystem, "close", close_volume_system, 1);
+  rb_define_method(rb_cTSKVolumeSystem, "read_block", read_volume_block, 3); //read block given start and no. of blocks
+  rb_define_method(rb_cTSKVolumeSystem, "walk", walk_volume, 1);
+  rb_define_method(rb_cTSKVolumeSystem, "expose_part", volume_expose_part, 0);
   
   // attributes
-  rb_define_attr(rb_cTSKVolume, "partition_count", 1, 0);
-  rb_define_attr(rb_cTSKVolume, "endian", 1, 0);
-  rb_define_attr(rb_cTSKVolume, "offset", 1, 0);
-  rb_define_attr(rb_cTSKVolume, "block_size", 1, 0);
-  rb_define_attr(rb_cTSKVolume, "description", 1, 0);
-  rb_define_attr(rb_cTSKVolume, "volume_system_type", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "partition_count", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "endian", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "offset", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "block_size", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "description", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "volume_system_type", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "volume_parts", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "partition_one", 1, 0);
+
+  
+  // object methods for VolumePart objects
+  rb_define_method(rb_cTSKVolumePart, "initialize", initialize_volume_part, -1);
+  rb_define_method(rb_cTSKVolumePart, "open", open_volume_part, 1); // change arg1 to klass?
+//  rb_define_method(rb_cTSKVolumePart, "read_block", read_volume_part_block, 3); //read block given start and no. of blocks
+//  rb_define_method(rb_cTSKVolumePart, "walk", walk_volume_part, 1);
     
+  // attributes
+  rb_define_attr(rb_cTSKVolumePart, "start", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "length", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "description", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "table_number", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "slot_number", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "address", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "flags", 1, 0);
+  
   /* Sleuthkit::FileSystem */
   // object methods for FileSystem objects
   rb_define_method(rb_cTSKFileSystem, "initialize", initialize_filesystem, -1);

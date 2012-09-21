@@ -8,13 +8,13 @@ describe "spec/volume" do
 
 	describe "#new(@disk_image)" do
 		it "initializes with Sleuthkit::Image passed as param1" do
-			@volume = Sleuthkit::Volume.new(@image)
-			@volume.should be_an_instance_of Sleuthkit::Volume
+			@volume = Sleuthkit::VolumeSystem.new(@image)
+			@volume.should be_an_instance_of Sleuthkit::VolumeSystem
 		end
 	end
 	describe "#new(some_string)" do
 		it "initializes and raises exception when initialized with an object of wrong class" do
-			lambda { @volume = Sleuthkit::Volume.new(@string) }.should raise_error(TypeError)
+			lambda { @volume = Sleuthkit::VolumeSystem.new(@string) }.should raise_error(TypeError)
 		#	@volume.should raise_error( TypeError )
 		end
 	end
@@ -22,42 +22,42 @@ describe "spec/volume" do
 	# check attribute readers for volume metadata
 	describe "#block_size" do
 		it "returns the @block_size attr" do
-			@volume = Sleuthkit::Volume.new(@image)
+			@volume = Sleuthkit::VolumeSystem.new(@image)
 			@volume.block_size.should eq(512)
 		end
 	end
 
 	describe "#endian" do
 		it "returns the @endian attr" do
-			@volume = Sleuthkit::Volume.new(@image)
+			@volume = Sleuthkit::VolumeSystem.new(@image)
 			@volume.endian.should eq(2)
 		end
 	end
 
 	describe "#offset" do
 		it "returns the @offset attr" do
-			@volume = Sleuthkit::Volume.new(@image)
+			@volume = Sleuthkit::VolumeSystem.new(@image)
 			@volume.offset.should eq(0)
 		end
 	end
 
 	describe "#partition_count" do
 		it "returns the @partition_count attr" do
-			@volume = Sleuthkit::Volume.new(@image)
+			@volume = Sleuthkit::VolumeSystem.new(@image)
 			@volume.partition_count.should eq(6)
 		end
 	end
   
 	describe "#volume_system_type" do
 		it "returns the @volume_system_type attr" do
-			@volume = Sleuthkit::Volume.new(@image)
+			@volume = Sleuthkit::VolumeSystem.new(@image)
 			@volume.volume_system_type.should eq(8)
 		end
 	end
   
 	describe "#description" do
 		it "returns the @description attr" do
-			@volume = Sleuthkit::Volume.new(@image)
+			@volume = Sleuthkit::VolumeSystem.new(@image)
 			@volume.description.should eq("MAC Partition Map")
 		end
 	end
