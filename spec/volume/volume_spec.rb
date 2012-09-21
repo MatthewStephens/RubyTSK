@@ -61,6 +61,22 @@ describe "spec/volume" do
 			@volume.description.should eq("MAC Partition Map")
 		end
 	end
+	
+	# extracting and examinging VolumePart objects
+	describe "#expose_part" do
+		it "returns a VolumePart object" do
+			@volume = Sleuthkit::VolumeSystem.new(@image)
+			@part = @volume.expose_part
+			@part.flags.should eq(2)
+		end
+	end
+	describe "VolumePart#description" do
+		it "returns the @description attr" do
+			@volume = Sleuthkit::VolumeSystem.new(@image)
+			@part = @volume.expose_part
+			@part.description.should eq("Unallocated")
+		end
+	end
 end
 
 
