@@ -35,19 +35,19 @@ void deallocate_image(struct tsk4r_img_wrapper * ptr){
 }
 
 VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
-  char * filename; int * dtype;
+  char * filename; int dtype;
   struct tsk4r_img_wrapper * ptr;
   Data_Get_Struct(self, struct tsk4r_img_wrapper, ptr);
   
   VALUE img_size;
   VALUE img_sector_size;
-  fprintf(stdout, "opening %s.\n", StringValuePtr(filename_str));
+  dtype = FIX2UINT(disk_type);
+  fprintf(stdout, "opening %s. (flag=%d)\n", StringValuePtr(filename_str), dtype);
   
   Check_Type(filename_str, T_STRING);
   rb_str_modify(filename_str);
   filename=StringValuePtr(filename_str);
 
-  dtype = FIX2UINT(disk_type);
   ptr->fn_given = (char *)filename;
   ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)dtype, 0);
   fprintf(stdout, "attempt to open %s complete\n", (char *)filename);
@@ -76,7 +76,7 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   VALUE filename; VALUE disk_type; VALUE disk_type_num = INT2NUM(0);
   TSK_IMG_TYPE_ENUM flag;
   //  static struct tsk4r_img_wrapper * ptr;
-  rb_scan_args(argc, args, "02", &filename, &disk_type);
+  rb_scan_args(argc, args, "12", &filename, &disk_type);
   
   if ( ! NIL_P(filename) && ! NIL_P(disk_type) ) {
     printf("disk_type set.\n");
