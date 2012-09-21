@@ -34,8 +34,8 @@ void deallocate_image(struct tsk4r_img_wrapper * ptr){
   xfree(ptr);
 }
 
-VALUE image_open(VALUE self, VALUE filename_str) {
-  char * filename;
+VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
+  char * filename; int * dtype;
   struct tsk4r_img_wrapper * ptr;
   Data_Get_Struct(self, struct tsk4r_img_wrapper, ptr);
   
@@ -46,8 +46,10 @@ VALUE image_open(VALUE self, VALUE filename_str) {
   Check_Type(filename_str, T_STRING);
   rb_str_modify(filename_str);
   filename=StringValuePtr(filename_str);
+
+  dtype = FIX2UINT(disk_type);
   ptr->fn_given = (char *)filename;
-  ptr->image = tsk_img_open_sing(filename, TSK_IMG_TYPE_DETECT, 0);
+  ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)dtype, 0);
   fprintf(stdout, "attempt to open %s complete\n", (char *)filename);
   if (ptr->image == NULL) {
     rb_warn("unable to open disk.\n");
@@ -62,18 +64,63 @@ VALUE image_open(VALUE self, VALUE filename_str) {
     
     fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
     fprintf(stdout, "disk image has sectors %d bytes in size.\n", (int)image->sector_size ); // dev only
+    return Qtrue;
+  } else {
+    return Qfalse;
   }
-  return self;
+//  return self;
 }
 
-// init an Image object (was lacking 'static' earlier)
+// init an Image object, passing params to image_open
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
-  VALUE fn;
+  VALUE filename; VALUE disk_type; VALUE disk_type_num = INT2NUM(0);
+  TSK_IMG_TYPE_ENUM flag;
   //  static struct tsk4r_img_wrapper * ptr;
-  rb_scan_args(argc, args, "01", &fn);
-  if( ! NIL_P(fn)) {
-    image_open(self, fn);
-  } 
+  rb_scan_args(argc, args, "02", &filename, &disk_type);
+  
+  if ( ! NIL_P(filename) && ! NIL_P(disk_type) ) {
+    printf("disk_type set.\n");
+    switch (TYPE(disk_type)) {
+      case T_STRING:
+        printf("string is %s\n", StringValuePtr(disk_type));
+        flag = *StringValuePtr(disk_type);
+        //TO DO: convert string to value of Sleuthkit::Image::TSK_IMG_TYPE_ENUM[string.to_sym]
+        printf("flag is %d\n", flag);
+        break;
+        
+      case T_FIXNUM:
+        printf("disk_type is %ld\n", NUM2INT(disk_type));
+        flag = NUM2DBL(disk_type);
+        disk_type_num = disk_type;
+        printf("flag is %d\n", flag);
+        break;
+        
+      case T_SYMBOL:
+        // TO DO
+        flag = 0;
+        break;
+        
+      default:
+        flag = 0;
+        break;
+    }
+
+  } else if ( ! NIL_P(filename)) {
+    printf("No disk_type requested; defaulting to TSK_IMG_TYPE_DETECT\n");
+    disk_type = (TSK_IMG_TYPE_ENUM)"TSK_IMG_TYPE_DETECT";
+    flag = TSK_IMG_TYPE_DETECT;
+  } else {
+    rb_raise (rb_eRuntimeError, "invalid arguments");
+
+  }
+  
+  fprintf(stdout, "initializing with filename: %s\n", StringValuePtr(filename));
+  fprintf(stdout, "initializing with flag: %d\n", flag);
+  if( ! NIL_P(filename)) {
+    image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
+  } else {
+    rb_raise(rb_eArgError, "Arg1 must be filename (string)");
+  }
   return self;
 }
 
