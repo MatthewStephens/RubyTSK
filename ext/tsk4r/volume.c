@@ -114,13 +114,13 @@ VALUE volume_expose_part_by_idx(VALUE self, VALUE index) {
 // Sleuthkit::VolumePart functions
 
 VALUE open_next_volume_part(VALUE self) {
-  
+  printf("calling open_next_volume_part\n");
   VALUE next_part;
   struct tsk4r_vpart_wrapper * mydata;
   Data_Get_Struct(self, struct tsk4r_vpart_wrapper, mydata);
   next_part = Qnil;
   if (mydata->volume_part->next != NULL) {
-
+    next_part = mydata->volume_part->next;
   }
   
   return next_part;
@@ -128,7 +128,7 @@ VALUE open_next_volume_part(VALUE self) {
 
 VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   // self, vs_obj, index, e.g.
-  VALUE * vs_obj; VALUE index;
+  VALUE vs_obj; VALUE index;
   rb_scan_args(argc, args, "12", &vs_obj, &index);
   if (NIL_P(index)) { index = INT2FIX(0); }
 
@@ -140,8 +140,10 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
     rb_raise(rb_eTypeError, "Arg1 is NOT Sleuthkit::VolumeSystem\n");
   }
   
-  // open volume system
+  // open volume system, storing ID locally
   Data_Get_Struct(vs_obj, struct tsk4r_vs_wrapper, parent);
+  VALUE parent_id = rb_funcall(vs_obj, rb_intern("object_id"), 0);
+  rb_iv_set(self, "@parent", parent_id);
   
   // open self's struct and assign partition to it
   Data_Get_Struct(self, struct tsk4r_vpart_wrapper, partition);
@@ -159,6 +161,8 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   rb_iv_set(self, "@slot_number", INT2NUM((int)vp_ptr->slot_num));
   rb_iv_set(self, "@address", INT2NUM((int)vp_ptr->addr));
   rb_iv_set(self, "@flags", INT2NUM((int)vp_ptr->flags));
+//  rb_iv_set(self, "@next", );
+//  rb_iv_set(self, "@prev", );
 
   
   return self;

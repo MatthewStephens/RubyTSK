@@ -77,6 +77,13 @@ describe "spec/volume" do
 			@part.description.should eq("Unallocated")
 		end
 	end
+	describe "VolumePart#parent" do
+	  it "returns the ID of the parent VolumeSystem object" do
+	    @volume = Sleuthkit::VolumeSystem.new(@image)
+	    @part = @volume.parts.first
+	    @part.parent.should eq(@volume.object_id)
+    end
+  end
 end
 
 
