@@ -75,6 +75,7 @@ VALUE open_volume_system(VALUE self, VALUE img_obj) {
   rb_iv_set(self, "@endian", INT2NUM((int)volume_system->endian));
   rb_iv_set(self, "@offset", INT2NUM((int)volume_system->offset));
   rb_iv_set(self, "@block_size", INT2NUM((int)volume_system->block_size));
+  rb_iv_set(self, "@parts", volume_get_partitions(self));
   
   return self;
 }
@@ -89,25 +90,18 @@ VALUE volume_expose_part(VALUE self) {
   return volume_part;
 }
 
-VALUE volume_system_iterate(int argc, VALUE *args, VALUE self) {
-  VALUE block = Qnil;
-  rb_scan_args(argc, args, "0&", &block);
-
-  if(RTEST(block)) {
-    long i = 0; VALUE part_count = rb_attr_get(self, rb_intern("@partition_count"));
-    while (i < FIX2LONG(part_count)) {
-      printf("LOOPING UNTIL %ld (at %ld currently)\n", FIX2LONG(part_count), i);
-      printf("creating vpart object number: %ld\n", i);
-      VALUE vpart = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 2, self, LONG2NUM(i));
-      rb_funcall(block, rb_intern("call"), 1, vpart);
-      i++;
+VALUE volume_get_partitions(VALUE self) {
+  VALUE part_count = rb_attr_get(self, rb_intern("@partition_count"));
+  VALUE part_array = rb_ary_new2(FIX2LONG(part_count));
+  long i = 0;
+  while (i < FIX2LONG(part_count)) {
+    printf("LOOPING UNTIL %ld (at %ld currently)\n", FIX2LONG(part_count), i);
+    printf("creating vpart object number: %ld\n", i);
+    VALUE vpart = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 2, self, LONG2NUM(i));
+    rb_ary_push(part_array, vpart);
+    i++;
     }
-  } else {
-    rb_raise(rb_eArgError, "a block is required");
-  }
-  
-  return Qnil;
-
+  return part_array;
 }
 
 VALUE volume_expose_part_by_idx(VALUE self, VALUE index) {
