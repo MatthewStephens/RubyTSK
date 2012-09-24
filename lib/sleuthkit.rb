@@ -6,9 +6,14 @@ module Sleuthkit
   # tell us about yourself
 	def self.version_string
 		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION}"
-	end	
-	class Image
+	end
+  def [](sym)
+    self.instance_variable_get("@#{sym.to_s}")
+  end
+
+  class Image
     include Enumerable
+    include ::Sleuthkit
     TSK_IMG_TYPE_ENUM = {
       :TSK_IMG_TYPE_DETECT => 0x0000,   # Use autodetection methods
       
@@ -25,4 +30,17 @@ module Sleuthkit
       :TSK_IMG_TYPE_UNSUPP => 0xffff,   # Unsupported disk image type
     }
 	end
+
+  class VolumePart
+    include ::Sleuthkit
+    def metadata
+      h = Hash.new
+      self.instance_variables.each do |var|
+        h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
+      end
+      return h
+    end
+    
+
+  end
 end
