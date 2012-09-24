@@ -89,6 +89,27 @@ VALUE volume_expose_part(VALUE self) {
   return volume_part;
 }
 
+VALUE volume_system_iterate(int argc, VALUE *args, VALUE self) {
+  VALUE block = Qnil;
+  rb_scan_args(argc, args, "0&", &block);
+
+  if(RTEST(block)) {
+    long i = 0; VALUE part_count = rb_attr_get(self, rb_intern("@partition_count"));
+    while (i < FIX2LONG(part_count)) {
+      printf("LOOPING UNTIL %ld (at %ld currently)\n", FIX2LONG(part_count), i);
+      printf("creating vpart object number: %ld\n", i);
+      VALUE vpart = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 2, self, LONG2NUM(i));
+      rb_funcall(block, rb_intern("call"), 1, vpart);
+      i++;
+    }
+  } else {
+    rb_raise(rb_eArgError, "a block is required");
+  }
+  
+  return Qnil;
+
+}
+
 VALUE volume_expose_part_by_idx(VALUE self, VALUE index) {
   VALUE volume_part;
   
@@ -141,7 +162,7 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   TSK_VS_INFO * volume_system = parent->volume;
   printf("volume_system assigned to vs_ptr->volume\n");
 
-  TSK_PNUM_T idx = FIX2INT(index);
+  TSK_PNUM_T idx = FIX2LONG(index);
   vp_ptr = tsk_vs_part_get(volume_system, idx);
   partition->volume_part = vp_ptr;
   printf("vp_ptr assigned to return of tsk_vs_part_get\n");

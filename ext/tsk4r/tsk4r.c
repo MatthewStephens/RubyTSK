@@ -112,6 +112,7 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKVolumeSystem, "walk", walk_volume, 1);
   rb_define_method(rb_cTSKVolumeSystem, "expose_part", volume_expose_part, 0);
   rb_define_method(rb_cTSKVolumeSystem, "expose_part_at", volume_expose_part_by_idx, 1);
+  rb_define_method(rb_cTSKVolumeSystem, "each", volume_system_iterate, -1);
   
   // attributes
   rb_define_attr(rb_cTSKVolumeSystem, "partition_count", 1, 0);
