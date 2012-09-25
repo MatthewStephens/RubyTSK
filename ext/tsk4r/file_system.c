@@ -11,11 +11,13 @@
 #include "file_system.h"
 
 extern VALUE rb_cTSKImage;
+extern VALUE rb_cTSKVolumeSystem;
+extern VALUE rb_cTSKVolumePart;
 
-struct tsk4r_img {
-  TSK_IMG_INFO * image;
-  char * fn_given;
-};
+//struct tsk4r_img {
+//  TSK_IMG_INFO * image;
+//  char * fn_given;
+//};
 
 void deallocate_filesystem(struct tsk4r_fs_wrapper * ptr){
   TSK_FS_INFO *filesystem = ptr->filesystem;
@@ -35,8 +37,8 @@ VALUE allocate_filesystem(VALUE klass){
 
 
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
-  VALUE * img_obj;
-  rb_scan_args(argc, args, "1", &img_obj);
+  VALUE * source_obj;
+  rb_scan_args(argc, args, "1", &source_obj);
   
   printf("filesystem object init with %d args.\n", argc);
   printf("argument scan complete\n");
@@ -55,21 +57,49 @@ VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
    rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
    }
    */
-  printf("will open image object passed as arg1\n");
-  open_filesystem(self, (VALUE)img_obj);
+  open_filesystem(self, (VALUE)source_obj);
   //rb_iv_set(self, "@root_inum", INT2NUM(1968));
   return self;
 }
 
 
-VALUE open_filesystem(VALUE self, VALUE img_obj) {
+VALUE open_filesystem(VALUE self, VALUE parent_obj) {
   printf("open_filesystem here....\n");
   struct tsk4r_fs_wrapper * fs_ptr;
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
-  struct tsk4r_img * rb_image;
-  Data_Get_Struct(img_obj, struct tsk4r_img, rb_image);
-  TSK_IMG_INFO * disk = rb_image->image;
-  fs_ptr->filesystem = tsk_fs_open_img(disk, 0, TSK_FS_TYPE_DETECT);
+  
+  if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKImage)) {
+    printf("received image object.\n");
+
+    struct tsk4r_img * rb_image;
+    TSK_OFF_T offset = 0;
+    Data_Get_Struct(parent_obj, struct tsk4r_img, rb_image);
+    TSK_IMG_INFO * disk = rb_image->image;
+    fs_ptr->filesystem = tsk_fs_open_img(disk, offset, TSK_FS_TYPE_DETECT);
+
+  } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumeSystem)) {
+    printf("received volume object.\n");
+
+    struct tsk4r_vs * rb_volumesystem;
+    Data_Get_Struct(parent_obj, struct tsk4r_vs, rb_volumesystem);
+
+    TSK_PNUM_T c = 0;
+    while (c < rb_volumesystem->volume->part_count) {
+      TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
+      fs_ptr->filesystem = tsk_fs_open_vol(partition, TSK_FS_TYPE_DETECT);
+      if (fs_ptr->filesystem != NULL) { break; } else { printf("failed on index %d\n", c); }
+      c++;
+    }
+  } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumePart)) {
+    printf("received partition object.\n");
+
+    struct tsk4r_vs_part * rb_partition;
+    Data_Get_Struct(parent_obj, struct tsk4r_vs_part, rb_partition);
+    fs_ptr->filesystem = tsk_fs_open_vol(rb_partition->volume_part, TSK_FS_TYPE_DETECT);
+  } else {
+    rb_raise(rb_eTypeError, "arg1 must be a SleuthKit::Image, SleuthKit::VolumeSystem or SleuthKit::VolumePart object.");
+  }
+  
   //rb_iv_set(self, "@root_inum", INT2NUM((int)fs_ptr->filesystem->root_inum));
   TSK_INUM_T my_root_inum = 1968;
   TSK_INUM_T my_last_inum = 43;
@@ -84,6 +114,8 @@ VALUE open_filesystem(VALUE self, VALUE img_obj) {
     my_endian = fs_ptr->filesystem->endian;
     my_offset = fs_ptr->filesystem->offset;
     my_inum_count = fs_ptr->filesystem->inum_count;
+    VALUE my_description = get_filesystem_type(self);
+    rb_iv_set(self, "@description", my_description);
     printf("fs_ptr has root_inum: %d\n", (int)fs_ptr->filesystem->root_inum);
     printf("fs_ptr has last_inum: %d\n", (int)fs_ptr->filesystem->last_inum);
     printf("fs_ptr has block_size: %d\n", (int)fs_ptr->filesystem->block_size);
@@ -104,6 +136,18 @@ VALUE open_filesystem(VALUE self, VALUE img_obj) {
   rb_iv_set(self, "@offset", INT2NUM(my_offset));
   rb_iv_set(self, "@inum_count", INT2NUM(my_inum_count));
   
+  return self;
+}
+
+VALUE open_filesystem_from_img(VALUE self, VALUE img_obj) {
+  printf("open_filesystem from here....\n");
+  struct tsk4r_fs_wrapper * fs_ptr;
+  struct tsk4r_img * rb_image;
+  TSK_OFF_T offset = 0;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+  Data_Get_Struct(img_obj, struct tsk4r_img, rb_image);
+  TSK_IMG_INFO * image = rb_image->image;
+  fs_ptr->filesystem = tsk_fs_open_img(image, offset, TSK_FS_TYPE_DETECT);
   return self;
 }
 

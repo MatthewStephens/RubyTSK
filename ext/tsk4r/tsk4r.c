@@ -101,6 +101,7 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKImage, "size", 1, 0);
   rb_define_attr(rb_cTSKImage, "sec_size", 1, 0);
   rb_define_attr(rb_cTSKImage, "type", 1, 0);
+  rb_define_attr(rb_cTSKImage, "description", 1, 0);
 
   
   /* Sleuthkit::Volume */
@@ -157,6 +158,9 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKFileSystem, "offset", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "inum_count", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "name", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "ftype", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "description", 1, 0);
+
 }
 
 // methods follow here
