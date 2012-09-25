@@ -85,7 +85,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj) {
 
     TSK_PNUM_T c = 0;
     while (c < rb_volumesystem->volume->part_count) {
-      TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
+      const TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
       fs_ptr->filesystem = tsk_fs_open_vol(partition, TSK_FS_TYPE_DETECT);
       if (fs_ptr->filesystem != NULL) { break; } else { printf("failed on index %d\n", c); }
       c++;
