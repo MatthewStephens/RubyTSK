@@ -11,24 +11,11 @@
 #include "image.h"
 
 VALUE allocate_image(VALUE klass){
-  //  TSK_IMG_INFO *image = ALLOC(TSK_IMG_INFO);
-  //  TSK_IMG_INFO * image = malloc(sizeof(TSK_IMG_INFO));
-  //  fprintf(stdout, "allocation complete.\n");
-  //  return Data_Wrap_Struct(klass, 0, 0, image);
-  
-  //struct tsk4r_img_wrapper * ptr = malloc(sizeof(struct tsk4r_img_wrapper)); // worked without malloc.  Do I need this?
   struct tsk4r_img_wrapper * ptr;
-  //ptr = ALLOC(struct tsk4r_img_wrapper); // this might be improvement over previous
   return Data_Make_Struct(klass, struct tsk4r_img_wrapper, 0, deallocate_image, ptr);
-  //return Data_Wrap_Struct(klass, 0, deallocate, ptr);
-  /*
-   TSK_IMG_INFO *sval;
-   return Data_Make_Struct(klass, TSK_IMG_INFO, 0, deallocate, sval);
-   */
 }
 
 void deallocate_image(struct tsk4r_img_wrapper * ptr){
-  //xfree((TSK_IMG_INFO *)image);
   TSK_IMG_INFO *image = ptr->image;
   tsk_img_close(image);
   xfree(ptr);
@@ -51,7 +38,6 @@ VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
 
   ptr->fn_given = (char *)filename;
   ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)dtype, 0);
-  fprintf(stdout, "attempt to open %s complete\n", (char *)filename);
   if (ptr->image == NULL) {
     rb_warn("unable to open disk.\n");
   }
@@ -68,18 +54,16 @@ VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
     name = image_type_to_name(typenum);
     rb_iv_set(self, "@name", name);
     
-    fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
-    fprintf(stdout, "disk image has sectors %d bytes in size.\n", (int)image->sector_size ); // dev only
     return Qtrue;
   } else {
-    return Qfalse;
+    printf("problem opening disk\n");
+    return Qnil;
   }
-//  return self;
 }
 
 // init an Image object, passing params to image_open
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
-  VALUE filename; VALUE disk_type; VALUE disk_type_num = INT2NUM(0);
+  VALUE filename; VALUE disk_type; VALUE disk_type_num = INT2NUM(0); VALUE result;
   TSK_IMG_TYPE_ENUM flag;
   //  static struct tsk4r_img_wrapper * ptr;
   rb_scan_args(argc, args, "12", &filename, &disk_type);
@@ -123,11 +107,15 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   fprintf(stdout, "initializing with filename: %s\n", StringValuePtr(filename));
   fprintf(stdout, "initializing with flag: %d\n", flag);
   if( ! NIL_P(filename)) {
-    image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
+    result = image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
   } else {
     rb_raise(rb_eArgError, "Arg1 must be filename (string)");
   }
-  return self;
+  if (RTEST(result)) {
+    return self;
+  } else {
+    return Qnil;
+  }
 }
 
 
