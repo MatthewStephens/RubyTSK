@@ -10,6 +10,13 @@ module Sleuthkit
   def [](sym)
     self.instance_variable_get("@#{sym.to_s}")
   end
+  def inspect
+    h = Hash.new
+    self.instance_variables.each do |var|
+      h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
+    end
+    return h
+  end
 
   class Image
     include Enumerable
@@ -33,13 +40,7 @@ module Sleuthkit
 
   class VolumePart
     include ::Sleuthkit
-    def metadata
-      h = Hash.new
-      self.instance_variables.each do |var|
-        h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
-      end
-      return h
-    end
+
     
 
   end
