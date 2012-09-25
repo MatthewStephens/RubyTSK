@@ -81,7 +81,7 @@ describe "spec/volume" do
 	  it "returns the ID of the parent VolumeSystem object" do
 	    @volume = Sleuthkit::VolumeSystem.new(@image)
 	    @part = @volume.parts.first
-	    @part.parent.should eq(@volume.object_id)
+	    @part.parent.should eq(@volume)
     end
   end
 end
