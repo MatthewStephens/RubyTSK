@@ -129,7 +129,7 @@ void Init_tsk4r() {
   // object methods for VolumePart objects
   rb_define_method(rb_cTSKVolumePart, "initialize", initialize_volume_part, -1);
   rb_define_method(rb_cTSKVolumePart, "open", open_volume_part, -1); // change arg1 to klass?
-  rb_define_method(rb_cTSKVolumePart, "next", open_next_volume_part, 0);
+  
 //  rb_define_method(rb_cTSKVolumePart, "read_block", read_volume_part_block, 3); //read block given start and no. of blocks
 //  rb_define_method(rb_cTSKVolumePart, "walk", walk_volume_part, 1);
     
@@ -142,6 +142,8 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKVolumePart, "address", 1, 0);
   rb_define_attr(rb_cTSKVolumePart, "flags", 1, 0);
   rb_define_attr(rb_cTSKVolumePart, "parent", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "next", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "prev", 1, 0);
   
   /* Sleuthkit::FileSystem */
   // object methods for FileSystem objects

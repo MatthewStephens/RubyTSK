@@ -93,9 +93,14 @@ VALUE volume_expose_part(VALUE self) {
 VALUE volume_get_partitions(VALUE self) {
   VALUE part_count = rb_attr_get(self, rb_intern("@partition_count"));
   VALUE part_array = rb_ary_new2(FIX2LONG(part_count));
-  long i = 0;
+  long i = 0; VALUE prev = Qnil;
   while (i < FIX2LONG(part_count)) {
     VALUE vpart = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 2, self, LONG2NUM(i));
+    if ( rb_obj_is_kind_of(prev, rb_cTSKVolumePart) ) {
+      rb_iv_set(prev, "@next", vpart);
+    }
+    rb_iv_set(vpart, "@prev", prev);
+    prev = vpart;
     rb_ary_push(part_array, vpart);
     i++;
     }
@@ -112,19 +117,6 @@ VALUE volume_expose_part_by_idx(VALUE self, VALUE index) {
 }
 
 // Sleuthkit::VolumePart functions
-
-VALUE open_next_volume_part(VALUE self) {
-  printf("calling open_next_volume_part\n");
-  VALUE next_part;
-  struct tsk4r_vpart_wrapper * mydata;
-  Data_Get_Struct(self, struct tsk4r_vpart_wrapper, mydata);
-  next_part = Qnil;
-  if (mydata->next > 0 ) {
-    next_part = Qtrue;
-  }
-  
-  return next_part;
-}
 
 VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   // self, vs_obj, index, e.g.

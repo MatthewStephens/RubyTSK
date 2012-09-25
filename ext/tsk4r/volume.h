@@ -18,7 +18,7 @@ struct tsk4r_vs_wrapper {
 };
 
 struct tsk4r_vpart_wrapper {
-  TSK_VS_PART_INFO * volume_part;
+  const TSK_VS_PART_INFO * volume_part;
 };
 
 //VALUE rb_cTSKImage;
@@ -40,7 +40,6 @@ VALUE allocate_volume_part(VALUE klass);
 void  deallocate_volume_part();
 VALUE initialize_volume_part(int argc, VALUE *args, VALUE self);
 VALUE open_volume_part(int argc, VALUE *args, VALUE self);
-VALUE open_next_volume_part(VALUE self);
 //static VALUE close_volume_part(VALUE self);
 //VALUE read_volume_part_block(int argc, VALUE *args, VALUE self);
 //static VALUE walk_volume_part(VALUE self);
