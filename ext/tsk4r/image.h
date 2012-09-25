@@ -27,6 +27,7 @@ VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type);
 VALUE image_size(VALUE self);
 VALUE image_type(VALUE self);
 VALUE sector_size(VALUE self);
+VALUE image_type_to_name(TSK_IMG_TYPE_ENUM num);
 
 
 

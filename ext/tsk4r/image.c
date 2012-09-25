@@ -41,7 +41,8 @@ VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
   
   VALUE img_size;
   VALUE img_sector_size;
-  dtype = FIX2UINT(disk_type);
+  VALUE description = Qnil;
+  dtype = FIX2ULONG(disk_type);
   fprintf(stdout, "opening %s. (flag=%d)\n", StringValuePtr(filename_str), dtype);
   
   Check_Type(filename_str, T_STRING);
@@ -60,7 +61,10 @@ VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
     rb_iv_set(self, "@size", img_size);
     img_sector_size = INT2NUM((int)image->sector_size);
     rb_iv_set(self, "@sec_size", img_sector_size);
-    rb_iv_set(self, "@type", INT2NUM((int)image->itype));
+    TSK_IMG_TYPE_ENUM typenum = image->itype;
+    rb_iv_set(self, "@type", INT2NUM((int)typenum));
+    description = image_type_to_name(typenum);
+    rb_iv_set(self, "@description", description);
     
     fprintf(stdout, "opening disk image of %d bytes.\n", (int)image->size ); // dev only
     fprintf(stdout, "disk image has sectors %d bytes in size.\n", (int)image->sector_size ); // dev only
@@ -160,4 +164,10 @@ VALUE image_type(VALUE self){
   TSK_IMG_INFO *image;
   Data_Get_Struct(self, TSK_IMG_INFO, image);
   return INT2NUM((int)image->itype);
+}
+
+VALUE image_type_to_name(TSK_IMG_TYPE_ENUM num) {
+  const char * description;
+  description = tsk_img_type_todesc(num);
+  return rb_str_new2(description);
 }
