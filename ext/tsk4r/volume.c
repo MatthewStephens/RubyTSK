@@ -60,7 +60,7 @@ VALUE open_volume_system(VALUE self, VALUE img_obj) {
   vs_ptr->volume = tsk_vs_open(disk, 0, TSK_VS_TYPE_DETECT);
   TSK_VS_INFO * volume_system = vs_ptr->volume;
 
-
+  if (volume_system != NULL) {
 //  printf("disk has sector size: %d\n", (int)disk->sector_size );
 //  printf("N.B. vs_ptr has partition count: %d\n", (int)volume_system->part_count);
 //  printf("vs_ptr has vs_type: %d\n", (int)volume_system->vstype);
@@ -78,6 +78,10 @@ VALUE open_volume_system(VALUE self, VALUE img_obj) {
   rb_iv_set(self, "@parts", volume_get_partitions(self));
   
   return self;
+  } else {
+    rb_raise(rb_eRuntimeError, "No Volume System found!");
+    return Qnil;
+  }
 }
 
 // called on VolumeSystem, returns first VolumePart
