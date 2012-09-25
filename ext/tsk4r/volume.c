@@ -119,8 +119,8 @@ VALUE open_next_volume_part(VALUE self) {
   struct tsk4r_vpart_wrapper * mydata;
   Data_Get_Struct(self, struct tsk4r_vpart_wrapper, mydata);
   next_part = Qnil;
-  if (mydata->volume_part->next != NULL) {
-    next_part = mydata->volume_part->next;
+  if (mydata->next > 0 ) {
+    next_part = Qtrue;
   }
   
   return next_part;
@@ -161,6 +161,7 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   rb_iv_set(self, "@slot_number", INT2NUM((int)vp_ptr->slot_num));
   rb_iv_set(self, "@address", INT2NUM((int)vp_ptr->addr));
   rb_iv_set(self, "@flags", INT2NUM((int)vp_ptr->flags));
+  rb_iv_set(self, "@parent", vs_obj); // store link to parent system
 //  rb_iv_set(self, "@next", );
 //  rb_iv_set(self, "@prev", );
 
