@@ -58,7 +58,7 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
   }
   TSK_IMG_INFO *image = ptr->image;
   if (ptr->image != NULL) {
-    img_size = INT2NUM((int)image->size);
+    img_size = LONG2NUM(image->size);
     rb_iv_set(self, "@size", img_size);
     img_sector_size = INT2NUM((int)image->sector_size);
     rb_iv_set(self, "@sec_size", img_sector_size);
@@ -77,6 +77,7 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
 }
 
 // init an Image object, passing params to image_open
+// note that class of arg1, if array, will override requests for 'single' image
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   VALUE filename; VALUE disk_type; VALUE disk_type_num = INT2NUM(0); VALUE result;
   TSK_IMG_TYPE_ENUM flag;
