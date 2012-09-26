@@ -44,17 +44,25 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
 
   }
   else if (rb_obj_is_kind_of(filename_location, rb_cArray)) {
-    long i;
-    const TSK_TCHAR * images[RARRAY(filename_location)->len];
+    long i; 
+    const TSK_TCHAR ** images[RARRAY(filename_location)->len];
+    typedef TSK_TCHAR * split_list;
+    split_list image_test[255]; // to do: make array length reflect list's length
+    image_test[0]="spec/samples/tsk4r_img_01.split.aa";
+    image_test[1]="spec/samples/tsk4r_img_01.split.ab";
+    image_test[2]="spec/samples/tsk4r_img_01.split.ac";
+    image_test[3]="spec/samples/tsk4r_img_01.split.ad";
+
     for (i=0; i < RARRAY(filename_location)->len; i++) {
       VALUE rstring = rb_ary_entry(filename_location, i);
-      images[i] = StringValuePtr(rstring);
+      images[i] = (const char **)StringValuePtr(rstring);
+      printf("adding %s to array.\n", StringValuePtr(rstring));
     }
     int count = (int)RARRAY(filename_location)->len;
     long len = i;
     printf("count: %d, image->len %ld\n", count, len );
 
-    ptr->image = tsk_img_open(count, images, (TSK_IMG_TYPE_ENUM)dtype, 0); // 0=default sector size
+    ptr->image = tsk_img_open(count, (const TSK_TCHAR **)image_test, (TSK_IMG_TYPE_ENUM)type_flag_num, 0); // 0=default sector size
     
   }
   else {
