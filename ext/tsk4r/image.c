@@ -21,7 +21,7 @@ void deallocate_image(struct tsk4r_img_wrapper * ptr){
   xfree(ptr);
 }
 
-VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
+VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
   char * filename; int dtype;
   struct tsk4r_img_wrapper * ptr;
   Data_Get_Struct(self, struct tsk4r_img_wrapper, ptr);
@@ -30,14 +30,29 @@ VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type) {
   VALUE img_sector_size;
   VALUE description = Qnil; VALUE name = Qnil;
   dtype = FIX2ULONG(disk_type);
-  fprintf(stdout, "opening %s. (flag=%d)\n", StringValuePtr(filename_str), dtype);
   
-  Check_Type(filename_str, T_STRING);
-  rb_str_modify(filename_str);
-  filename=StringValuePtr(filename_str);
+  if (rb_obj_is_kind_of(filename_location, rb_cString)) {
+    fprintf(stdout, "opening %s. (flag=%d)\n", StringValuePtr(filename_location), dtype);
+    rb_str_modify(filename_location);
+    filename=StringValuePtr(filename_location);
+    ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)dtype, 0);
 
-  ptr->fn_given = (char *)filename;
-  ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)dtype, 0);
+  }
+  else if (rb_obj_is_kind_of(filename_location, rb_cArray)) {
+    long i;
+    const TSK_TCHAR * images[RARRAY(filename_location)->len];
+    for (i=0; i < RARRAY(filename_location)->len; i++) {
+      VALUE rstring;
+      rstring = rb_ary_entry(filename_location, i);
+      images[i] = StringValuePtr(rstring);
+    }
+    ptr->image = tsk_img_open((int)RARRAY(filename_location)->len, images, (TSK_IMG_TYPE_ENUM)dtype, 512);
+    
+  }
+  else {
+    rb_raise(rb_eArgError, "Arg1 should be String or Array of strings.");
+  }
+
   if (ptr->image == NULL) {
     rb_warn("unable to open disk.\n");
   }
@@ -105,8 +120,17 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   }
   
   if( ! NIL_P(filename)) {
+    // string for single image, array for split images
     rb_iv_set(self, "@path", filename);
-    result = image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
+    if (rb_obj_is_kind_of(filename, rb_cString)) {
+      printf("opening single image\n");
+      result = image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
+    } else if (rb_obj_is_kind_of(filename, rb_cArray)) {
+      printf("opening split image\n");
+      result = image_open(self, filename, disk_type_num);
+    } else {
+      rb_raise(rb_eTypeError, "arg1 must be String or Array");
+    }
   } else {
     rb_raise(rb_eArgError, "Arg1 must be filename (string)");
   }

@@ -16,7 +16,6 @@
 //extern struct tsk4r_img_wrapper tsk4r_img_wrapper;
 struct tsk4r_img_wrapper {
   TSK_IMG_INFO * image;
-  char * fn_given;
 };
 
 // Sleuthkit::Image function declarations
