@@ -19,6 +19,8 @@ struct tsk4r_img {
   char * fn_given;
 };
 
+TSK_VS_TYPE_ENUM * get_vs_flag();
+
 // Sleuthkit::VolumeSystem functions
 
 VALUE allocate_volume_system(VALUE klass){
@@ -34,10 +36,13 @@ void deallocate_volume_system(struct tsk4r_vs_wrapper * ptr){
 
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 
-  VALUE * img_obj;
-  rb_scan_args(argc, args, "11", &img_obj);
+  VALUE * img_obj; VALUE * flag;
+
+  rb_scan_args(argc, args, "11", &img_obj, &flag);
+  if (NIL_P(flag)) { flag = INT2NUM(0); }
+
   if (rb_obj_is_kind_of((VALUE)img_obj, rb_cTSKImage)) {
-    open_volume_system(self, (VALUE)img_obj);
+    open_volume_system(self, (VALUE)img_obj, (VALUE)flag);
   } else {
     rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
   }
@@ -46,41 +51,47 @@ VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 }
 
 
-VALUE open_volume_system(VALUE self, VALUE img_obj) {
+VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
 
   struct tsk4r_vs_wrapper * vs_ptr;
   Data_Get_Struct(self, struct tsk4r_vs_wrapper, vs_ptr);
-
+  TSK_VS_TYPE_ENUM * vs_type_requested;
+  vs_type_requested = get_vs_flag(flag);
+  
   // open disk image
   struct tsk4r_img * rb_image;
   Data_Get_Struct(img_obj, struct tsk4r_img, rb_image);
   TSK_IMG_INFO * disk = rb_image->image;
-
-  // open volume system and assign to data pointer
-  vs_ptr->volume = tsk_vs_open(disk, 0, TSK_VS_TYPE_DETECT);
-  TSK_VS_INFO * volume_system = vs_ptr->volume;
-
-  if (volume_system != NULL) {
-//  printf("disk has sector size: %d\n", (int)disk->sector_size );
-//  printf("N.B. vs_ptr has partition count: %d\n", (int)volume_system->part_count);
-//  printf("vs_ptr has vs_type: %d\n", (int)volume_system->vstype);
-//  printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(volume_system->vstype));
-//  printf("vs_ptr has offset: %d\n", (int)volume_system->offset);
-//  printf("vs_ptr has block size: %d\n", (int)volume_system->block_size);
-//  printf("vs_ptr has endian: %d\n", (int)volume_system->endian);
-  
-  rb_iv_set(self, "@partition_count", INT2NUM((int)volume_system->part_count));
-  rb_iv_set(self, "@volume_system_type", INT2NUM((int)volume_system->vstype));
-  rb_iv_set(self, "@description", rb_str_new2( (char *)tsk_vs_type_todesc(volume_system->vstype) ));
-  rb_iv_set(self, "@endian", INT2NUM((int)volume_system->endian));
-  rb_iv_set(self, "@offset", INT2NUM((int)volume_system->offset));
-  rb_iv_set(self, "@block_size", INT2NUM((int)volume_system->block_size));
-  rb_iv_set(self, "@parts", volume_get_partitions(self));
-  
-  return self;
+  if (disk == NULL) {
+    rb_raise(rb_eFatal, "image object had no data.");
   } else {
-    rb_raise(rb_eRuntimeError, "No Volume System found!");
-    return Qnil;
+
+    // open volume system and assign to data pointer
+    TSK_VS_INFO * volume_system = tsk_vs_open(disk, (TSK_DADDR_T)0, (TSK_VS_TYPE_ENUM)vs_type_requested);
+    vs_ptr->volume = volume_system;
+    
+    if (volume_system != NULL) {
+  //  printf("disk has sector size: %d\n", (int)disk->sector_size );
+  //  printf("N.B. vs_ptr has partition count: %d\n", (int)volume_system->part_count);
+  //  printf("vs_ptr has vs_type: %d\n", (int)volume_system->vstype);
+  //  printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(volume_system->vstype));
+  //  printf("vs_ptr has offset: %d\n", (int)volume_system->offset);
+  //  printf("vs_ptr has block size: %d\n", (int)volume_system->block_size);
+  //  printf("vs_ptr has endian: %d\n", (int)volume_system->endian);
+    
+    rb_iv_set(self, "@partition_count", INT2NUM((int)volume_system->part_count));
+    rb_iv_set(self, "@volume_system_type", INT2NUM((int)volume_system->vstype));
+    rb_iv_set(self, "@description", rb_str_new2( (char *)tsk_vs_type_todesc(volume_system->vstype) ));
+    rb_iv_set(self, "@endian", INT2NUM((int)volume_system->endian));
+    rb_iv_set(self, "@offset", INT2NUM((int)volume_system->offset));
+    rb_iv_set(self, "@block_size", INT2NUM((int)volume_system->block_size));
+    rb_iv_set(self, "@parts", volume_get_partitions(self));
+    
+    return self;
+    } else {
+      rb_raise(rb_eRuntimeError, "No Volume System found!");
+      return Qnil;
+    }
   }
 }
 
@@ -196,4 +207,35 @@ VALUE initialize_volume_part(int argc, VALUE *args, VALUE self){
 VALUE read_volume_part_block(int argc, VALUE *args, VALUE self) {
   printf("vs_part: method not built yet!\n");
   return self;
+}
+
+// helper method to convert ruby integers to TSK_VS_TYPE_ENUM values
+TSK_VS_TYPE_ENUM * get_vs_flag(VALUE rb_obj) {
+  TSK_VS_TYPE_ENUM * flag;
+  switch (TYPE(rb_obj)) {
+    case T_STRING:
+      printf("string is %s\n", StringValuePtr(rb_obj));
+      char *str = StringValuePtr(rb_obj);
+      //TO DO: convert string to value of Sleuthkit::VolumeSystem::TSK_VS_TYPE_ENUM[string.to_sym]
+      printf("flag is %s\n", str);
+      flag = (TSK_VS_TYPE_ENUM *)0;
+      break;
+      
+    case T_FIXNUM:
+      printf("disk_type is %ld\n", NUM2INT(rb_obj));
+      long num = NUM2INT(rb_obj);
+      flag = (TSK_VS_TYPE_ENUM *)num;
+      printf("flag is %ld\n", num);
+      break;
+      
+    case T_SYMBOL:
+      // TO DO
+      flag = (TSK_VS_TYPE_ENUM *)0;
+      break;
+      
+    default:
+      flag = (TSK_VS_TYPE_ENUM *)0;
+      break;
+  }
+  return flag;
 }

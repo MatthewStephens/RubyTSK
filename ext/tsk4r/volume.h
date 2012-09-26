@@ -27,7 +27,7 @@ struct tsk4r_vpart_wrapper {
 VALUE allocate_volume_system(VALUE klass);
 void  deallocate_volume_system();
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self);
-VALUE open_volume_system(VALUE self, VALUE image_obj);
+VALUE open_volume_system(VALUE self, VALUE image_obj, VALUE flag);
 static VALUE close_volume_system(VALUE self);
 static VALUE read_volume_system_block(int argc, VALUE *args, VALUE self);
 static VALUE walk_volume_system(VALUE self);

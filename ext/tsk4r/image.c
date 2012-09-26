@@ -10,6 +10,10 @@
 #include <ruby.h>
 #include "image.h"
 
+// prototypes (private)
+TSK_IMG_TYPE_ENUM * get_img_flag();
+
+// functions
 VALUE allocate_image(VALUE klass){
   struct tsk4r_img_wrapper * ptr;
   return Data_Make_Struct(klass, struct tsk4r_img_wrapper, 0, deallocate_image, ptr);
@@ -21,7 +25,7 @@ void deallocate_image(struct tsk4r_img_wrapper * ptr){
   xfree(ptr);
 }
 
-VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
+VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
   char * filename; int dtype;
   struct tsk4r_img_wrapper * ptr;
   Data_Get_Struct(self, struct tsk4r_img_wrapper, ptr);
@@ -29,24 +33,28 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
   VALUE img_size;
   VALUE img_sector_size;
   VALUE description = Qnil; VALUE name = Qnil;
-  dtype = FIX2ULONG(disk_type);
+  dtype = FIX2ULONG(disk_type_flag);
+  TSK_IMG_TYPE_ENUM * type_flag_num = get_img_flag(disk_type_flag);
   
   if (rb_obj_is_kind_of(filename_location, rb_cString)) {
     fprintf(stdout, "opening %s. (flag=%d)\n", StringValuePtr(filename_location), dtype);
     rb_str_modify(filename_location);
     filename=StringValuePtr(filename_location);
-    ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)dtype, 0);
+    ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)type_flag_num, 0); // 0=default sector size
 
   }
   else if (rb_obj_is_kind_of(filename_location, rb_cArray)) {
     long i;
     const TSK_TCHAR * images[RARRAY(filename_location)->len];
     for (i=0; i < RARRAY(filename_location)->len; i++) {
-      VALUE rstring;
-      rstring = rb_ary_entry(filename_location, i);
+      VALUE rstring = rb_ary_entry(filename_location, i);
       images[i] = StringValuePtr(rstring);
     }
-    ptr->image = tsk_img_open((int)RARRAY(filename_location)->len, images, (TSK_IMG_TYPE_ENUM)dtype, 512);
+    int count = (int)RARRAY(filename_location)->len;
+    long len = i;
+    printf("count: %d, image->len %ld\n", count, len );
+
+    ptr->image = tsk_img_open(count, images, (TSK_IMG_TYPE_ENUM)dtype, 0); // 0=default sector size
     
   }
   else {
@@ -56,6 +64,7 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
   if (ptr->image == NULL) {
     rb_warn("unable to open disk.\n");
   }
+  
   TSK_IMG_INFO *image = ptr->image;
   if (ptr->image != NULL) {
     img_size = LONG2NUM(image->size);
@@ -80,42 +89,18 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
 // init an Image object, passing params to image_open
 // note that class of arg1, if array, will override requests for 'single' image
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
-  VALUE filename; VALUE disk_type; VALUE disk_type_num = INT2NUM(0); VALUE result;
-  TSK_IMG_TYPE_ENUM flag;
+  VALUE filename; VALUE flag; VALUE result;
+
   //  static struct tsk4r_img_wrapper * ptr;
-  rb_scan_args(argc, args, "12", &filename, &disk_type);
-  
-  if ( ! NIL_P(filename) && ! NIL_P(disk_type) ) {
+  rb_scan_args(argc, args, "12", &filename, &flag);
+  if (NIL_P(flag)) { flag = INT2NUM(0); }
+
+  if ( ! NIL_P(filename) && ! NIL_P(flag) ) {
     printf("disk_type set.\n");
-    switch (TYPE(disk_type)) {
-      case T_STRING:
-        printf("string is %s\n", StringValuePtr(disk_type));
-        flag = *StringValuePtr(disk_type);
-        //TO DO: convert string to value of Sleuthkit::Image::TSK_IMG_TYPE_ENUM[string.to_sym]
-        printf("flag is %d\n", flag);
-        break;
-        
-      case T_FIXNUM:
-        printf("disk_type is %ld\n", NUM2INT(disk_type));
-        flag = NUM2DBL(disk_type);
-        disk_type_num = disk_type;
-        printf("flag is %d\n", flag);
-        break;
-        
-      case T_SYMBOL:
-        // TO DO
-        flag = 0;
-        break;
-        
-      default:
-        flag = 0;
-        break;
-    }
 
   } else if ( ! NIL_P(filename)) {
     printf("No disk_type requested; defaulting to TSK_IMG_TYPE_DETECT\n");
-    disk_type = (TSK_IMG_TYPE_ENUM)"TSK_IMG_TYPE_DETECT";
-    flag = TSK_IMG_TYPE_DETECT;
+    flag = (TSK_IMG_TYPE_ENUM)"TSK_IMG_TYPE_DETECT";
   } else {
     rb_raise (rb_eRuntimeError, "invalid arguments");
 
@@ -126,10 +111,10 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
     rb_iv_set(self, "@path", filename);
     if (rb_obj_is_kind_of(filename, rb_cString)) {
       printf("opening single image\n");
-      result = image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
+      result = image_open(self, filename, flag); // passing flag (disk_type) as ruby FIXNUM
     } else if (rb_obj_is_kind_of(filename, rb_cArray)) {
-      printf("opening split image\n");
-      result = image_open(self, filename, disk_type_num);
+      printf("opening split image (flag=%ld)\n", FIX2LONG(flag));
+      result = image_open(self, filename, flag);
     } else {
       rb_raise(rb_eTypeError, "arg1 must be String or Array");
     }
@@ -191,4 +176,35 @@ VALUE image_type_to_name(TSK_IMG_TYPE_ENUM num) {
   const char * name;
   name = tsk_img_type_toname(num);
   return rb_str_new2(name);
+}
+
+// helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values
+TSK_IMG_TYPE_ENUM * get_img_flag(VALUE rb_obj) {
+  TSK_IMG_TYPE_ENUM * flag;
+  switch (TYPE(rb_obj)) {
+    case T_STRING:
+      printf("string is %s\n", StringValuePtr(rb_obj));
+      char *str = StringValuePtr(rb_obj);
+      //TO DO: convert string to value of Sleuthkit::VolumeSystem::TSK_VS_TYPE_ENUM[string.to_sym]
+      printf("flag is %s\n", str);
+      flag = (TSK_IMG_TYPE_ENUM *)0;
+      break;
+      
+    case T_FIXNUM:
+      printf("disk_type is %ld\n", NUM2INT(rb_obj));
+      long num = NUM2INT(rb_obj);
+      flag = (TSK_IMG_TYPE_ENUM *)num;
+      printf("flag is %ld\n", num);
+      break;
+      
+    case T_SYMBOL:
+      // TO DO
+      flag = (TSK_IMG_TYPE_ENUM *)0;
+      break;
+      
+    default:
+      flag = (TSK_IMG_TYPE_ENUM *)0;
+      break;
+  }
+  return flag;
 }

@@ -109,7 +109,7 @@ void Init_tsk4r() {
   /* Sleuthkit::Volume */
   // object methods for VolumeSystem objects
   rb_define_method(rb_cTSKVolumeSystem, "initialize", initialize_volume_system, -1);
-  rb_define_method(rb_cTSKVolumeSystem, "open", open_volume_system, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKVolumeSystem, "open", open_volume_system, 2); // change arg1 to klass?
   rb_define_method(rb_cTSKVolumeSystem, "close", close_volume_system, 1);
   rb_define_method(rb_cTSKVolumeSystem, "read_block", read_volume_block, 3); //read block given start and no. of blocks
   rb_define_method(rb_cTSKVolumeSystem, "walk", walk_volume, 1);
