@@ -28,3 +28,6 @@ namespace :spec do
     end
   end
 end
+
+# add other tasks found in lib/tasks/*.rake
+Dir.glob('tasks/*.rake').each { |r| import r }
