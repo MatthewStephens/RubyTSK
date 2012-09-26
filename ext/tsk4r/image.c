@@ -51,11 +51,8 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
     for (i=0; i < RARRAY(filename_location)->len; i++) {
       VALUE rstring = rb_ary_entry(filename_location, i);
       images[i] = StringValuePtr(rstring);
-      printf("adding %s to array.\n", StringValuePtr(rstring));
     }
     int count = (int)RARRAY(filename_location)->len;
-    long len = i;
-    printf("count: %d, image->len %ld\n", count, len );
 
     ptr->image = tsk_img_open(count, (const TSK_TCHAR **)images, (TSK_IMG_TYPE_ENUM)type_flag_num, 0); // 0=default sector size
     
@@ -97,13 +94,15 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   //  static struct tsk4r_img_wrapper * ptr;
   rb_scan_args(argc, args, "12", &filename, &flag);
   if (NIL_P(flag)) { flag = INT2NUM(0); }
-
-  if ( ! NIL_P(filename) && ! NIL_P(flag) ) {
-    printf("disk_type set.\n");
+  
+  TSK_IMG_TYPE_ENUM * flag_num = get_img_flag(flag);
+  if ( (! NIL_P(filename)) && (flag_num > 0)  ) {
+    rb_iv_set(self, "@auto_detect", Qfalse);
 
   } else if ( ! NIL_P(filename)) {
-    printf("No disk_type requested; defaulting to TSK_IMG_TYPE_DETECT\n");
-    flag = (TSK_IMG_TYPE_ENUM)"TSK_IMG_TYPE_DETECT";
+    flag = INT2FIX((TSK_IMG_TYPE_ENUM)0); // auto-detect
+    rb_iv_set(self, "@auto_detect", Qtrue);
+
   } else {
     rb_raise (rb_eRuntimeError, "invalid arguments");
 

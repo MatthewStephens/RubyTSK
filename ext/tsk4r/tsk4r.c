@@ -104,6 +104,7 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKImage, "type", 1, 0);
   rb_define_attr(rb_cTSKImage, "description", 1, 0);
   rb_define_attr(rb_cTSKImage, "name", 1, 0);
+  rb_define_attr(rb_cTSKImage, "auto_detect", 1, 0);
 
   
   /* Sleuthkit::Volume */
