@@ -104,9 +104,8 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
 
   }
   
-  fprintf(stdout, "initializing with filename: %s\n", StringValuePtr(filename));
-  fprintf(stdout, "initializing with flag: %d\n", flag);
   if( ! NIL_P(filename)) {
+    rb_iv_set(self, "@path", filename);
     result = image_open(self, filename, disk_type_num); // passing flag (disk_type) as ruby FIXNUM
   } else {
     rb_raise(rb_eArgError, "Arg1 must be filename (string)");

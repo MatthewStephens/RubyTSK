@@ -98,6 +98,7 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKImage, "image_type", image_type, 0);
 
   // attributes (read only)
+  rb_define_attr(rb_cTSKImage, "path", 1, 0);
   rb_define_attr(rb_cTSKImage, "size", 1, 0);
   rb_define_attr(rb_cTSKImage, "sec_size", 1, 0);
   rb_define_attr(rb_cTSKImage, "type", 1, 0);
