@@ -59,14 +59,15 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type) {
   TSK_IMG_INFO *image = ptr->image;
   if (ptr->image != NULL) {
     img_size = LONG2NUM(image->size);
-    rb_iv_set(self, "@size", img_size);
     img_sector_size = INT2NUM((int)image->sector_size);
-    rb_iv_set(self, "@sec_size", img_sector_size);
     TSK_IMG_TYPE_ENUM typenum = image->itype;
-    rb_iv_set(self, "@type", INT2NUM((int)typenum));
     description = image_type_to_desc(typenum);
-    rb_iv_set(self, "@description", description);
     name = image_type_to_name(typenum);
+
+    rb_iv_set(self, "@size", img_size);
+    rb_iv_set(self, "@sec_size", img_sector_size);
+    rb_iv_set(self, "@type", INT2NUM((int)typenum));
+    rb_iv_set(self, "@description", description);
     rb_iv_set(self, "@name", name);
     
     return Qtrue;
