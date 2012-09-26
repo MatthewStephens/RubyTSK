@@ -185,18 +185,12 @@ TSK_IMG_TYPE_ENUM * get_img_flag(VALUE rb_obj) {
   TSK_IMG_TYPE_ENUM * flag;
   switch (TYPE(rb_obj)) {
     case T_STRING:
-      printf("string is %s\n", StringValuePtr(rb_obj));
-      char *str = StringValuePtr(rb_obj);
       //TO DO: convert string to value of Sleuthkit::VolumeSystem::TSK_VS_TYPE_ENUM[string.to_sym]
-      printf("flag is %s\n", str);
       flag = (TSK_IMG_TYPE_ENUM *)0;
       break;
       
     case T_FIXNUM:
-      printf("disk_type is %ld\n", NUM2INT(rb_obj));
-      long num = NUM2INT(rb_obj);
-      flag = (TSK_IMG_TYPE_ENUM *)num;
-      printf("flag is %ld\n", num);
+      flag = (TSK_IMG_TYPE_ENUM *)NUM2INT(rb_obj);
       break;
       
     case T_SYMBOL:

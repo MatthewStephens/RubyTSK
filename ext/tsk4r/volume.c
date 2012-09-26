@@ -66,7 +66,6 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
   if (disk == NULL) {
     rb_raise(rb_eFatal, "image object had no data.");
   } else {
-    printf("attempting to open OK disk and get vs...\n");
     // open volume system and assign to data pointer
     TSK_VS_INFO * volume_system = tsk_vs_open(disk, imgaddr * disk->sector_size, (TSK_VS_TYPE_ENUM)vs_type_requested);
     vs_ptr->volume = volume_system;
@@ -208,18 +207,12 @@ TSK_VS_TYPE_ENUM * get_vs_flag(VALUE rb_obj) {
   TSK_VS_TYPE_ENUM * flag;
   switch (TYPE(rb_obj)) {
     case T_STRING:
-      printf("string is %s\n", StringValuePtr(rb_obj));
-      char *str = StringValuePtr(rb_obj);
       //TO DO: convert string to value of Sleuthkit::VolumeSystem::TSK_VS_TYPE_ENUM[string.to_sym]
-      printf("flag is %s\n", str);
       flag = (TSK_VS_TYPE_ENUM *)0;
       break;
       
     case T_FIXNUM:
-      printf("disk_type is %ld\n", NUM2INT(rb_obj));
-      long num = NUM2INT(rb_obj);
-      flag = (TSK_VS_TYPE_ENUM *)num;
-      printf("flag is %ld\n", num);
+      flag = (TSK_VS_TYPE_ENUM *)NUM2INT(rb_obj);
       break;
       
     case T_SYMBOL:
