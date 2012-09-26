@@ -36,7 +36,7 @@ void deallocate_volume_system(struct tsk4r_vs_wrapper * ptr){
 
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 
-  VALUE * img_obj; VALUE * flag;
+  VALUE img_obj; VALUE flag;
 
   rb_scan_args(argc, args, "11", &img_obj, &flag);
   if (NIL_P(flag)) { flag = INT2NUM(0); }
@@ -56,6 +56,7 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
   struct tsk4r_vs_wrapper * vs_ptr;
   Data_Get_Struct(self, struct tsk4r_vs_wrapper, vs_ptr);
   TSK_VS_TYPE_ENUM * vs_type_requested;
+  TSK_OFF_T imgaddr = 0;
   vs_type_requested = get_vs_flag(flag);
   
   // open disk image
@@ -65,29 +66,22 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
   if (disk == NULL) {
     rb_raise(rb_eFatal, "image object had no data.");
   } else {
-
+    printf("attempting to open OK disk and get vs...\n");
     // open volume system and assign to data pointer
-    TSK_VS_INFO * volume_system = tsk_vs_open(disk, (TSK_DADDR_T)0, (TSK_VS_TYPE_ENUM)vs_type_requested);
+    TSK_VS_INFO * volume_system = tsk_vs_open(disk, imgaddr * disk->sector_size, (TSK_VS_TYPE_ENUM)vs_type_requested);
     vs_ptr->volume = volume_system;
     
-    if (volume_system != NULL) {
-  //  printf("disk has sector size: %d\n", (int)disk->sector_size );
-  //  printf("N.B. vs_ptr has partition count: %d\n", (int)volume_system->part_count);
-  //  printf("vs_ptr has vs_type: %d\n", (int)volume_system->vstype);
-  //  printf("vs_ptr type description: %s\n", (char *)tsk_vs_type_todesc(volume_system->vstype));
-  //  printf("vs_ptr has offset: %d\n", (int)volume_system->offset);
-  //  printf("vs_ptr has block size: %d\n", (int)volume_system->block_size);
-  //  printf("vs_ptr has endian: %d\n", (int)volume_system->endian);
+    if (vs_ptr->volume != NULL) {
     
-    rb_iv_set(self, "@partition_count", INT2NUM((int)volume_system->part_count));
-    rb_iv_set(self, "@volume_system_type", INT2NUM((int)volume_system->vstype));
-    rb_iv_set(self, "@description", rb_str_new2( (char *)tsk_vs_type_todesc(volume_system->vstype) ));
-    rb_iv_set(self, "@endian", INT2NUM((int)volume_system->endian));
-    rb_iv_set(self, "@offset", INT2NUM((int)volume_system->offset));
-    rb_iv_set(self, "@block_size", INT2NUM((int)volume_system->block_size));
-    rb_iv_set(self, "@parts", volume_get_partitions(self));
-    
-    return self;
+      rb_iv_set(self, "@partition_count", INT2NUM((int)volume_system->part_count));
+      rb_iv_set(self, "@volume_system_type", INT2NUM((int)volume_system->vstype));
+      rb_iv_set(self, "@description", rb_str_new2( (char *)tsk_vs_type_todesc(volume_system->vstype) ));
+      rb_iv_set(self, "@endian", INT2NUM((int)volume_system->endian));
+      rb_iv_set(self, "@offset", INT2NUM((int)volume_system->offset));
+      rb_iv_set(self, "@block_size", INT2NUM((int)volume_system->block_size));
+      rb_iv_set(self, "@parts", volume_get_partitions(self));
+      return self;
+      
     } else {
       rb_raise(rb_eRuntimeError, "No Volume System found!");
       return Qnil;
