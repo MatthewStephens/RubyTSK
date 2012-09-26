@@ -10,12 +10,12 @@ module Sleuthkit
   def [](sym)
     self.instance_variable_get("@#{sym.to_s}")
   end
-  def inspect
+  def inspect_object
     h = Hash.new
     self.instance_variables.each do |var|
       h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
     end
-    return h
+    h
   end
 
   class Image
@@ -36,12 +36,28 @@ module Sleuthkit
         
       :TSK_IMG_TYPE_UNSUPP => 0xffff,   # Unsupported disk image type
     }
+
+    def number_of_sectors
+      div = self.size / self.sector_size
+      mod = self.size % self.sector_size
+      if mod > 0
+        @number_of_sectors = div + 1
+      else
+        @number_of_sectors = div
+      end
+    end
+
+
 	end
 
+  class VolumeSystem
+    include ::Sleuthkit
+  end
   class VolumePart
     include ::Sleuthkit
-
-    
-
   end
+  class FileSystem
+    include ::Sleuthkit
+  end
+
 end
