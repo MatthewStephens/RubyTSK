@@ -18,6 +18,10 @@ extern VALUE rb_cTSKVolumePart;
 //  TSK_IMG_INFO * image;
 //  char * fn_given;
 //};
+// prototypes (private)
+TSK_FS_TYPE_ENUM * get_fs_flag();
+
+// functions
 
 void deallocate_filesystem(struct tsk4r_fs_wrapper * ptr){
   TSK_FS_INFO *filesystem = ptr->filesystem;
@@ -37,9 +41,10 @@ VALUE allocate_filesystem(VALUE klass){
 
 
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
-  VALUE * source_obj;
-  rb_scan_args(argc, args, "1", &source_obj);
-  
+  VALUE * source_obj; VALUE * flag;
+  rb_scan_args(argc, args, "1", &source_obj, &flag);
+  if (NIL_P(flag)) { flag = INT2NUM(0); }
+
   printf("filesystem object init with %d args.\n", argc);
   printf("argument scan complete\n");
   /*
@@ -57,15 +62,17 @@ VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
    rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
    }
    */
-  open_filesystem(self, (VALUE)source_obj);
+  open_filesystem(self, (VALUE)source_obj, (VALUE)flag);
   //rb_iv_set(self, "@root_inum", INT2NUM(1968));
   return self;
 }
 
 
-VALUE open_filesystem(VALUE self, VALUE parent_obj) {
+VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE fs_type_flag) {
   printf("open_filesystem here....\n");
   struct tsk4r_fs_wrapper * fs_ptr;
+  TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
+  
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   
   if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKImage)) {
@@ -75,7 +82,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj) {
     TSK_OFF_T offset = 0;
     Data_Get_Struct(parent_obj, struct tsk4r_img, rb_image);
     TSK_IMG_INFO * disk = rb_image->image;
-    fs_ptr->filesystem = tsk_fs_open_img(disk, offset, TSK_FS_TYPE_DETECT);
+    fs_ptr->filesystem = tsk_fs_open_img(disk, offset, (TSK_FS_TYPE_ENUM)type_flag_num);
 
   } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumeSystem)) {
     printf("received volume object.\n");
@@ -86,7 +93,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj) {
     TSK_PNUM_T c = 0;
     while (c < rb_volumesystem->volume->part_count) {
       const TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
-      fs_ptr->filesystem = tsk_fs_open_vol(partition, TSK_FS_TYPE_DETECT);
+      fs_ptr->filesystem = tsk_fs_open_vol(partition, (TSK_FS_TYPE_ENUM)type_flag_num);
       if (fs_ptr->filesystem != NULL) { break; } else { printf("failed on index %d\n", c); }
       c++;
     }
@@ -95,7 +102,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj) {
 
     struct tsk4r_vs_part * rb_partition;
     Data_Get_Struct(parent_obj, struct tsk4r_vs_part, rb_partition);
-    fs_ptr->filesystem = tsk_fs_open_vol(rb_partition->volume_part, TSK_FS_TYPE_DETECT);
+    fs_ptr->filesystem = tsk_fs_open_vol(rb_partition->volume_part, (TSK_FS_TYPE_ENUM)type_flag_num);
   } else {
     rb_raise(rb_eTypeError, "arg1 must be a SleuthKit::Image, SleuthKit::VolumeSystem or SleuthKit::VolumePart object.");
   }
@@ -177,4 +184,35 @@ VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj) {
   }
   rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
   return self;
+}
+
+// helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values
+TSK_FS_TYPE_ENUM * get_fs_flag(VALUE rb_obj) {
+  TSK_FS_TYPE_ENUM * flag;
+  switch (TYPE(rb_obj)) {
+    case T_STRING:
+      printf("string is %s\n", StringValuePtr(rb_obj));
+      char *str = StringValuePtr(rb_obj);
+      //TO DO: convert string to value of Sleuthkit::FileSystem::TSK_FS_TYPE_ENUM[string.to_sym]
+      printf("flag is %s\n", str);
+      flag = (TSK_FS_TYPE_ENUM *)0;
+      break;
+      
+    case T_FIXNUM:
+      printf("fs_type is %ld\n", NUM2INT(rb_obj));
+      long num = NUM2INT(rb_obj);
+      flag = (TSK_FS_TYPE_ENUM *)num;
+      printf("flag is %ld\n", num);
+      break;
+      
+    case T_SYMBOL:
+      // TO DO
+      flag = (TSK_FS_TYPE_ENUM *)0;
+      break;
+      
+    default:
+      flag = (TSK_FS_TYPE_ENUM *)0;
+      break;
+  }
+  return flag;
 }

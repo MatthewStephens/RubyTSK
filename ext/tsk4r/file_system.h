@@ -30,7 +30,7 @@ struct tsk4r_img {
 // Sleuthkit::FileSystem
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self);
 VALUE allocate_filesystem(VALUE self);
-VALUE open_filesystem(VALUE self, VALUE image_obj);
+VALUE open_filesystem(VALUE self, VALUE image_obj, VALUE flag);
 VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj);
 VALUE open_filesystem_from_img(VALUE self, VALUE image_obj);
 VALUE close_filesystem(VALUE self);
