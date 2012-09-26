@@ -41,29 +41,14 @@ VALUE allocate_filesystem(VALUE klass){
 
 
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
-  VALUE * source_obj; VALUE * flag;
+  VALUE * source_obj; VALUE flag;
   rb_scan_args(argc, args, "1", &source_obj, &flag);
   if (NIL_P(flag)) { flag = INT2NUM(0); }
 
   printf("filesystem object init with %d args.\n", argc);
   printf("argument scan complete\n");
-  /*
-   printf("test1 %d\n", RTEST(rb_respond_to(img_obj, image_open)));
-   printf("test2 %d\n", RTEST(rb_respond_to(img_obj, open_volume)));
-   printf("test3 %d\n", RTEST(rb_is_instance_id(rb_cTSKImage)));
-   if (RTEST(rb_respond_to(img_obj, image_open))) {
-   printf("will open image object passed as arg1\n");
-   open_filesystem(self, (VALUE)img_obj);
-   }
-   if (RTEST(rb_respond_to((VALUE)img_obj, open_volume))) {
-   printf("will open volume object passed as arg1\n");
-   open_filesystem_from_vol(self, (VALUE)img_obj);
-   } else {
-   rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
-   }
-   */
+
   open_filesystem(self, (VALUE)source_obj, (VALUE)flag);
-  //rb_iv_set(self, "@root_inum", INT2NUM(1968));
   return self;
 }
 
