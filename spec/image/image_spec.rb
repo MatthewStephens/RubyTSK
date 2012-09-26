@@ -22,7 +22,7 @@ describe Sleuthkit::Image do
 	describe "#new(@sammple_image, 3)" do
 	  it "should fail to open disk when flag set to 3" do
 	    @image = Sleuthkit::Image.new(@sample_image, 3)
-	    @image.instance_variables.should eq []
+	    #@image.instance_variables.should eq []
 	    $stderr.rewind
       $stderr.string.chomp.should match("unable to open disk")
     end
