@@ -1,8 +1,10 @@
 describe "spec/volume" do
   before :each do
 		@sample_image = "spec/samples/tsk4r_img_01.dmg"
+		@split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")
 		puts "File #{@sample_image} not found!!" unless File.exist?(@sample_image)
 		@image = Sleuthkit::Image.new(@sample_image)
+		@split_image = Sleuthkit::Image.new(@split_image_files)
 		@string = "some string"
 	end
 
@@ -82,6 +84,13 @@ describe "spec/volume" do
 	    @volume = Sleuthkit::VolumeSystem.new(@image)
 	    @part = @volume.parts.first
 	    @part.parent.should eq(@volume)
+    end
+  end
+  describe "VolumeSystem#init from raw split images" do
+    it "returns a VolumeSystem from a split disk image, built from an array" do
+      @volume = Sleuthkit::VolumeSystem.new(@split_image)
+      puts @volume.inspect_object
+      @volume.parts.length.should eq(6)
     end
   end
 end
