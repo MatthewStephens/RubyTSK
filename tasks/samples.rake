@@ -2,6 +2,8 @@
 
 namespace :spec do
   namespace :samples do
+		SAMPLE_DIR="spec/samples"
+
     desc "Compress sample disk images"
     task :compress do
       require 'zlib'
@@ -9,6 +11,9 @@ namespace :spec do
       puts files.join("\n")
 
       name = "test.image"
+			fqname = "#{SAMPLE_DIR}/#{name}"
+			
+			# TO DO: offer some integrity checks
 			checksum = String.new
 			File.open("spec/samples/#{name}.md5") {|f|
 				while (line = f.gets)
@@ -16,14 +21,21 @@ namespace :spec do
 				end
 		 	}
 			puts "checksum for #{name} is #{checksum}"	
-      uncompressed = File.open("spec/samples/#{name}", 'r')
 
-      Zlib::GzipWriter.open("#{name}.gz") do |gz|
-        while (line = uncompressed.gets ) 
-          gz.write line
+			if File.exist?("#{SAMPLE_DIR}/#{name}")
+        uncompressed = File.open("#{fqname}", 'rb')
+  
+        Zlib::GzipWriter.open("#{fqname}.gz") do |gz|
+          while (line = uncompressed.gets ) 
+            gz.write line
+          end
         end
-      end
+				uncompressed.close
+				File.delete("#{fqname}")
 
+			else
+				raise("could not locate #{fqname}.  Perhaps it's already zipped?")
+			end
 
     end
 
@@ -31,19 +43,25 @@ namespace :spec do
     task :uncompress do
       require 'zlib'
       name = "test.image.gz"
-      compressed = File.open("spec/samples/#{name}", 'r')
-      uncompressed = File.open("#{name.gsub(/.gz$/, '')}", 'w')
+			fqname = "#{SAMPLE_DIR}/#{name}"
 
-      z=Zlib::GzipReader.new(file)
-      
-      uncompressed << z.read
-      uncompressed.close
+			if File.exist?("#{SAMPLE_DIR}/#{name}")
+        compressed = File.open("#{fqname}", 'rb')
+        uncompressed = File.open("#{fqname.gsub(/.gz$/, '')}", 'wb')
+  
+        z=Zlib::GzipReader.new(compressed)
+        
+        uncompressed << z.read
+        uncompressed.close
+				File.delete("#{fqname}")
+			else
+				raise("could not locate #{fqname}.  Perhaps its already unzipped?")
+			end
     end
 
     desc "splits a sample for use in tests"
     task :split do
 			# dd if=spec/samples/tsk4r_img_01.dmg | split -b 10m - tsk4r_img_01.split.
-			SAMPLE_DIR="spec/samples"
 			filename = "tsk4r_img_01.dmg"
 			MEGABYTE = 1024 * 1024
 			file = File.open("#{SAMPLE_DIR}/#{filename}", 'rb')
