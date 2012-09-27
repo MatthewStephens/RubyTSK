@@ -89,8 +89,11 @@ describe "spec/volume" do
   describe "VolumeSystem#init from raw split images" do
     it "returns a VolumeSystem from a split disk image, built from an array" do
       @volume = Sleuthkit::VolumeSystem.new(@split_image)
-      #puts @volume.inspect_object
+      #pp @volume.inspect_object
+      pp @split_image.inspect_object
       @volume.parts.length.should eq(6)
+      pp "Tests ran with the following gems loaded"
+      pp Gem.loaded_specs.values.map {|x| "#{x.name} #{x.version}"}
     end
   end
 end

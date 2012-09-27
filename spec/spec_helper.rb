@@ -23,6 +23,7 @@ if $LOADED_FEATURES.grep(/spec\/spec_helper\.rb/).any?
 
 require 'rspec'
 require 'sleuthkit'
+require 'pp'
 
 
 
