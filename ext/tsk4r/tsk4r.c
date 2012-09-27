@@ -62,6 +62,8 @@ static VALUE walk_volume(VALUE self){
 void Init_tsk4r() {
   rb_mtsk4r = rb_define_module("Sleuthkit");
   
+  rb_const_set(rb_mtsk4r, rb_intern("TSK_VERSION"), rb_str_new2(tsk_version_get_str()));
+  
   // class definitions
   rb_cTSKImage        = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
   rb_cTSKVolumeSystem = rb_define_class_under(rb_mtsk4r, "VolumeSystem", rb_cObject);

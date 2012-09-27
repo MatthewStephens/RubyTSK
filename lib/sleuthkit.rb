@@ -5,7 +5,7 @@ require 'tsk4r/tsk4r'
 module Sleuthkit
   # tell us about yourself
 	def self.version_string
-		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION}"
+		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION} (TSK version: #{Sleuthkit::TSK_VERSION})"
 	end
   def [](sym)
     self.instance_variable_get("@#{sym.to_s}")
