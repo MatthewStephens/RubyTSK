@@ -67,9 +67,9 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
     rb_raise(rb_eFatal, "image object had no data.");
   } else {
     // open volume system and assign to data pointer
-    TSK_VS_INFO * volume_system = tsk_vs_open(disk, imgaddr * disk->sector_size, (TSK_VS_TYPE_ENUM)vs_type_requested);
+    TSK_VS_INFO * volume_system = tsk_vs_open(disk, (TSK_DADDR_T)( imgaddr * (TSK_DADDR_T)disk->sector_size ), (TSK_VS_TYPE_ENUM)vs_type_requested);
+
     vs_ptr->volume = volume_system;
-    
     if (vs_ptr->volume != NULL) {
     
       rb_iv_set(self, "@partition_count", INT2NUM((int)volume_system->part_count));
