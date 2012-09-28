@@ -11,7 +11,7 @@ describe Sleuthkit::FileSystem do
     @linux_image = Sleuthkit::Image.new(@linux_image_path)
     @mac_image = Sleuthkit::Image.new(@mac_image_path)
     
-    #@volume = Sleuthkit::Volume.new(@image)
+    @volume = Sleuthkit::VolumeSystem.new(@mac_image)
     @string = "some string"
   end
   # check opening routines
@@ -38,14 +38,12 @@ describe Sleuthkit::FileSystem do
   end
   describe "new#([volume_system])" do
     it "initializes with Sleuthkit::VolumeSystem passed as param1" do
-      @volume = Sleuthkit::VolumeSystem.new(@mac_image)
       @filesystem = Sleuthkit::FileSystem.new(@volume)
       @filesystem.description.should eq "hfs"
     end
   end
   describe "new#([volume_partition]" do
     it "initializes with Sleuthkit::VolumePart passed as param1" do
-      @volume = Sleuthkit::VolumeSystem.new(@mac_image)
       @partition = @volume.parts[3]
       @filesystem = Sleuthkit::FileSystem.new(@partition)
       @filesystem.description.should eq "hfs"
@@ -59,34 +57,143 @@ describe Sleuthkit::FileSystem do
   end
     
   # check attribute readers for filesystem metadata
-  describe "#block_size" do
-    it "returns the @block_size attr" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
-      @filesystem.block_size.should eq(2048)
+  
+  describe "#block_count" do
+    it "returns the @block_count attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.block_count.should eq(5004)
     end
   end
-    
+  describe "#block_post_size" do
+    it "returns the @block_post_size attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.block_post_size.should eq(0)
+    end
+  end
+  describe "#block_pre_size" do
+    it "returns the @block_pre_size attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.block_pre_size.should eq(0)
+    end
+  end
+  describe "#block_size" do
+    it "returns the @block_size attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.block_size.should eq(4096)
+    end
+  end
+  describe "#dev_bsize" do
+    it "returns the @dev_bsize attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.dev_bsize.should eq(4096)
+    end
+  end  
+  describe "#data_unit_name" do
+    it "prints out the filesystem data unit name as a string" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.data_unit_name.should eq("Allocation Block")
+    end
+  end
   describe "#endian" do
     it "returns the @endian attr" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
       @filesystem.endian.should eq(2)
     end
   end
-    
-  describe "#offset" do
-    it "returns the @offset attr" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
-      @filesystem.offset.should eq(0)
+  describe "#first_block" do
+    it "returns the @first_block attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.first_block.should eq(0)
     end
   end
-    
+  describe "#first_inum" do
+    it "returns the @first_inum attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.first_inum.should eq(2)
+    end
+  end
+  describe "#flags" do
+    it "returns the @flags attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.flags.should eq(0)
+    end
+  end
+  describe "#fs_id" do
+    it "returns the @fs_id attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.fs_id.should eq(132)
+    end
+  end
+  describe "#fs_id_used" do
+    it "returns the @fs_id_used attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.fs_id_used.should eq(16)
+    end
+  end
+  describe "#ftype" do
+    it "returns the @ftype attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.ftype.should eq(4096)
+    end
+  end
   describe "#inum_count" do
     it "returns the @inum_count attr" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
-      @filesystem.inum_count.should eq(4)
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.inum_count.should eq(39)
     end
   end
-  
+  describe "#isOrphanHunting" do
+    it "returns the @isOrphanHunting attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.isOrphanHunting.should eq(0)
+    end
+  end
+  describe "#journ_inum" do
+    it "returns the @journ_inum attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.journ_inum.should eq(0)
+    end
+  end
+  describe "#last_block" do
+    it "returns the @last_block attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.last_block.should eq(5003)
+    end
+  end
+  describe "#last_block_act" do
+    it "returns the @last_block_act attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.last_block_act.should eq(5003)
+    end
+  end
+  describe "#last_inum" do
+    it "returns the @last_inum attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.last_inum.should eq(38)
+    end
+  end
+  describe "#offset" do
+    it "returns the @offset attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.offset.should eq(32768)
+    end
+  end
+  # TO DO: "orphan_dir"
+  describe "#root_inum" do
+    it "returns the @root_inum attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.root_inum.should eq(2)
+    end
+  end
+  describe "#tag" do
+    it "returns the @tag attr" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @filesystem.tag.should eq(269488144)
+    end
+  end
+    
+
+  # other attributes
   describe "#get_filesystem_type" do
     it "prints out the filesystem type as a string" do
       @filesystem = Sleuthkit::FileSystem.new(@linux_image)
@@ -94,13 +201,6 @@ describe Sleuthkit::FileSystem do
     end
   end
 
-  describe "#data_unit_name" do
-    it "prints out the filesystem data unit name as a string" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
-      @filesystem.data_unit_name.should eq("Block")
-    end
-  end
-  
   describe "#parent" do
     it "ensures the FS has a reference to the object it came from" do
       @filesystem = Sleuthkit::FileSystem.new(@linux_image)

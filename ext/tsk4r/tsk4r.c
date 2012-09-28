@@ -56,6 +56,33 @@ static VALUE walk_volume(VALUE self){
   return Qnil;
 }
 
+// constants
+#define TSK4R_FS_ATTRS_COUNT 24
+const char * TSK4R_FS_ATTRS[TSK4R_FS_ATTRS_COUNT] = { "block_count",
+  "block_post_size",
+  "block_pre_size",
+  "block_size",
+  "dev_bsize",
+  "data_unit_name",
+  "endian",
+  "first_inum",
+  "first_block",
+  "flags",
+  "fs_id",
+  "fs_id_used",
+  "ftype",
+  "inum_count",
+  "isOrphanHunting",
+  "journ_inum",
+  "last_block",
+  "last_block_act",
+  "last_inum",
+  "list_inum_named",
+  "offset",
+  "orphan_dir",
+  "root_inum",
+  "tag" };
+
 
 
 // The initialization method for this module
@@ -129,6 +156,8 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKVolumeSystem, "volume_system_type", 1, 0);
   rb_define_attr(rb_cTSKVolumeSystem, "parts", 1, 0);
   rb_define_attr(rb_cTSKVolumeSystem, "partition_one", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "parent", 1, 0);
+
 
   
   // object methods for VolumePart objects
@@ -157,17 +186,15 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKFileSystem, "system_name", get_filesystem_type, 0);
   
   
-  // attributes
-  rb_define_attr(rb_cTSKFileSystem, "root_inum", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "last_inum", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "block_size", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "endian", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "offset", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "inum_count", 1, 0);
+  // attributes based on TSK struct
+
+  int i;
+  for (i = 0; i < TSK4R_FS_ATTRS_COUNT; i++) {
+    rb_define_attr(rb_cTSKFileSystem, TSK4R_FS_ATTRS[i], 1, 0);
+  }
+  // extra attributes
   rb_define_attr(rb_cTSKFileSystem, "name", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "ftype", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "description", 1, 0);
-  rb_define_attr(rb_cTSKFileSystem, "data_unit_name", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "parent", 1, 0);
 
 }
