@@ -79,6 +79,8 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
       rb_iv_set(self, "@offset", INT2NUM((int)volume_system->offset));
       rb_iv_set(self, "@block_size", INT2NUM((int)volume_system->block_size));
       rb_iv_set(self, "@parts", volume_get_partitions(self));
+      rb_iv_set(self, "@parent", img_obj); // store link to parent system
+
       return self;
       
     } else {

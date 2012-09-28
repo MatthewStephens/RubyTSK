@@ -63,6 +63,13 @@ describe "spec/volume" do
 			@volume.description.should eq("MAC Partition Map")
 		end
 	end
+  
+  describe "#parent" do
+    it "ensures the VS has a reference to the disk it came from" do
+			@volume = Sleuthkit::VolumeSystem.new(@image)
+      @volume.parent.should eq(@image)
+    end
+  end
 	
 	# extracting and examinging VolumePart objects
 	describe "#expose_part" do

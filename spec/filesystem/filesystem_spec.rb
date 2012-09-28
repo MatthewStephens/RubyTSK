@@ -102,7 +102,7 @@ describe Sleuthkit::FileSystem do
   end
   
   describe "#parent" do
-    it "prints out the filesystem data unit name as a string" do
+    it "ensures the FS has a reference to the object it came from" do
       @filesystem = Sleuthkit::FileSystem.new(@linux_image)
       @filesystem.parent.should eq(@linux_image)
     end
