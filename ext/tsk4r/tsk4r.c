@@ -167,6 +167,7 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKFileSystem, "name", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "ftype", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "description", 1, 0);
+  rb_define_attr(rb_cTSKFileSystem, "data_unit_name", 1, 0);
 
 }
 
