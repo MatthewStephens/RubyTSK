@@ -3,14 +3,28 @@
 namespace :spec do
   namespace :samples do
 		SAMPLE_DIR="spec/samples"
-
+    desc "Globs list of disks to zip/unzip"
+    task :glob, :gz do |t, args|
+      suffix = args[:gz] || ''
+      arr = [ "#{SAMPLE_DIR}/*.dmg", "#{SAMPLE_DIR}/*.iso", "#{SAMPLE_DIR}/*.image" ]
+      arr.each {|a| a << suffix }
+      
+      @glob=Array.new
+      proc=Proc.new { |str| Dir.glob(str) }
+      arr.each {|e| @glob << proc.call(e) }
+      @glob.flatten!
+    end
+       
     desc "Compress sample disk images"
-    task :compress do
+    task :compress, [:file] do |t, args|
+      Rake::Task["spec:samples:glob"].invoke     
+
       require 'zlib'
-      files = Dir.glob("spec/samples/*")
+      files = args[:file].to_a || Dir.glob("spec/samples/*.dmg")
       puts files.join("\n")
 
-      name = "test.image"
+      # name = "test.image"
+      name = args[:files] || "tsk4r_img_01.dmg"
 			fqname = "#{SAMPLE_DIR}/#{name}"
 			
 			# TO DO: offer some integrity checks
@@ -40,8 +54,11 @@ namespace :spec do
     end
 
     desc "Uncompress sample disk images"
-    task :uncompress do
+    task :uncompress, [:file]  do |t, args|
+      Rake::Task["spec:samples:glob"].invoke('.gz')     
+      exit 1
       require 'zlib'
+      files = args[:file].to_a || Dir.glob("spec/samples/*.gz")
       name = "test.image.gz"
 			fqname = "#{SAMPLE_DIR}/#{name}"
 
