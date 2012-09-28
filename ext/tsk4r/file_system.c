@@ -7,7 +7,6 @@
 //
 
 #include <stdio.h>
-#include <inttypes.h>
 #include <ruby.h>
 #include "file_system.h"
 
