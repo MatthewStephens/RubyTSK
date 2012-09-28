@@ -109,9 +109,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE fs_type_flag) {
     rb_iv_set(self, "@first_block", ULONG2NUM((unsigned long int)fs_ptr->filesystem->first_block));
     rb_iv_set(self, "@flags", UINT2NUM((uint)fs_ptr->filesystem->flags));
 //    rb_iv_set(self, "@fread_owner_sid", fs_ptr->filesystem->fread_owner_sid); // do not impl
-    rb_iv_set(self, "@fs_id", INT2NUM((uint8_t)fs_ptr->filesystem->fs_id));
-
-
+    rb_iv_set(self, "@fs_id", rb_str_new2((char *)fs_ptr->filesystem->fs_id));
     rb_iv_set(self, "@fs_id_used", UINT2NUM((uint)fs_ptr->filesystem->fs_id_used));
 //    rb_iv_set(self, "@fscheck", fs_ptr->filesystem->fscheck); // do not impl
 //    rb_iv_set(self, "@fsstat", fs_ptr->filesystem->fsstat); // do not impl

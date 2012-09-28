@@ -121,7 +121,7 @@ describe Sleuthkit::FileSystem do
   describe "#fs_id" do
     it "returns the @fs_id attr" do
       @filesystem = Sleuthkit::FileSystem.new(@volume)
-      @filesystem.fs_id.should eq(132)
+      @filesystem.fs_id.should eq("ff83fbdcb863d7d8")
     end
   end
   describe "#fs_id_used" do
