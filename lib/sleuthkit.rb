@@ -46,6 +46,9 @@ module Sleuthkit
         @number_of_sectors = div
       end
     end
+    def pure_ruby(n)
+      puts "HEY, we got method called from C but written in Ruby!!\n"
+    end
 
 
 	end
