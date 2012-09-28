@@ -103,6 +103,8 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE fs_type_flag) {
     rb_iv_set(self, "@offset", INT2NUM((int)fs_ptr->filesystem->offset));
     rb_iv_set(self, "@inum_count", INT2NUM((int)fs_ptr->filesystem->inum_count));
     
+    rb_iv_set(self, "@parent", parent_obj);
+    
   } else {
     rb_warn("filesystem pointer is NULL\n");
   }

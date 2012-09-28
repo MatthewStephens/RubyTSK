@@ -100,6 +100,13 @@ describe Sleuthkit::FileSystem do
       @filesystem.data_unit_name.should eq("Block")
     end
   end
+  
+  describe "#parent" do
+    it "prints out the filesystem data unit name as a string" do
+      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
+      @filesystem.parent.should eq(@linux_image)
+    end
+  end
 end
 
 
