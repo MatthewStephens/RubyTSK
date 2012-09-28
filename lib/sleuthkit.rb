@@ -61,11 +61,13 @@ module Sleuthkit
   end
   class FileSystem
     include ::Sleuthkit
-    require 'stringio'
+
     def tsk_fsstat(file)
       file.puts 'Hi Matt!'
     end
     def print_tsk_fsstat(report = "")
+      require 'ruby-debug'; debugger
+      
       if report.kind_of?( IO )
         self.call_tsk_fsstat(report)
       elsif report.kind_of?(String)
