@@ -112,10 +112,10 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
     // string for single image, array for split images
     rb_iv_set(self, "@path", filename);
     if (rb_obj_is_kind_of(filename, rb_cString)) {
-      printf("opening single image\n");
+//      printf("opening single image\n");
       result = image_open(self, filename, flag); // passing flag (disk_type) as ruby FIXNUM
     } else if (rb_obj_is_kind_of(filename, rb_cArray)) {
-      printf("opening split image (flag=%ld)\n", FIX2LONG(flag));
+//      printf("opening split image (flag=%ld)\n", FIX2LONG(flag));
       result = image_open(self, filename, flag);
     } else {
       rb_raise(rb_eTypeError, "arg1 must be String or Array");
