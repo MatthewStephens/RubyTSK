@@ -35,5 +35,6 @@ VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj);
 VALUE open_filesystem_from_img(VALUE self, VALUE image_obj);
 VALUE close_filesystem(VALUE self);
 VALUE get_filesystem_type(VALUE self);
+VALUE call_tsk_fsstat(VALUE self, VALUE io);
 
 #endif

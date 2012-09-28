@@ -61,6 +61,23 @@ module Sleuthkit
   end
   class FileSystem
     include ::Sleuthkit
+    require 'stringio'
+    def tsk_fsstat(file)
+      file.puts 'Hi Matt!'
+    end
+    def print_tsk_fsstat(report = "")
+      if report.kind_of?( IO )
+        self.call_tsk_fsstat(report)
+      elsif report.kind_of?(String)
+        r, w = IO.pipe
+        self.call_tsk_fsstat(w)
+        report << r.read
+        r.close
+        return report
+      else
+        raise ArgumentError, "arg1 should be IO, File or String object."
+      end
+    end
   end
 
 end

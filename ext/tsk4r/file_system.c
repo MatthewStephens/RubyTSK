@@ -163,6 +163,31 @@ VALUE get_filesystem_type(VALUE self) {
   return rb_str_new2(mytype);
 }
 
+// want to call this function from ruby
+// uint8_t(*fsstat) (TSK_FS_INFO * fs, FILE * hFile);
+VALUE call_tsk_fsstat(VALUE self, VALUE io){
+  if (! rb_obj_is_kind_of(io, rb_cIO) ) {
+    rb_raise(rb_eArgError, "Method did not recieve IO object");
+  }
+  int fd;
+  fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0, NULL));
+  printf("io had fileno %d\n", fd);
+  FILE * hFile = fdopen(fd, "w");
+  printf("hFile->_w = %d\n", hFile->_w);
+  printf("hFile->_file = %d\n", hFile->_file);
+
+  struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+  
+  if (fs_ptr->filesystem != NULL) {
+    uint8_t (*myfunc)(TSK_FS_INFO * fs, FILE * hFile);
+    myfunc = fs_ptr->filesystem->fsstat;
+    myfunc(fs_ptr->filesystem, hFile);
+  }
+  fclose(hFile);
+  return self;
+}
+
 VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj) {
   printf("open filesystem_from_vol here...\n");
   struct tsk4r_fs_wrapper * fs_ptr;
@@ -181,6 +206,7 @@ VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj) {
   rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
   return self;
 }
+
 
 // helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values
 TSK_FS_TYPE_ENUM * get_fs_flag(VALUE rb_obj) {
