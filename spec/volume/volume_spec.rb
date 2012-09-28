@@ -1,4 +1,5 @@
 describe "spec/volume" do
+  require 'sleuthkit'
   before :each do
 		@sample_image = "spec/samples/tsk4r_img_01.dmg"
 		@split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")

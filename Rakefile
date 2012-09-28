@@ -15,7 +15,9 @@ RSpec::Core::RakeTask.new('spec')
 
 SPEC_SUITES = [
 { :id => :image, :title => 'Disk Images', :pattern => 'spec/image/image_spec.rb' },
-{ :id => :volume, :title => 'Volumes', :pattern => 'spec/volume/*_spec.rb' }
+{ :id => :volume, :title => 'Volumes', :pattern => 'spec/volume/*_spec.rb' },
+{ :id => :filesystem, :title => 'File Systems', :pattern => 'spec/filesystem/*_spec.rb' },
+{ :id => :experiments, :title => 'Experiments', :pattern => 'spec/exp/*_spec.rb' }
 ]
 namespace :spec do
   namespace :suite do

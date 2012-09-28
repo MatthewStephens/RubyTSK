@@ -1,4 +1,6 @@
-describe Sleuthkit::Image do
+describe "spec/image" do
+  require 'sleuthkit'
+  
   before :all do
     @orig_stderr = $stderr
     $stderr = StringIO.new
@@ -35,6 +37,12 @@ describe Sleuthkit::Image do
       @image = Sleuthkit::Image.new(@split_image_files)
       @image.size.should eq(40992768)
       @image.description.should eq("Split raw files")
+    end
+  end
+  describe "#pure_ruby(num)" do
+    it "should pass a number from C layer up to Ruby layer during init" do
+      @image = Sleuthkit::Image.new(@sample_filename)
+      @image.should be_an_instance_of Sleuthkit::Image
     end
   end
   

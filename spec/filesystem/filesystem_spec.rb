@@ -1,5 +1,7 @@
-describe Sleuthkit::FileSystem do
-    before :each do
+describe 'spec/filesystem' do
+  require 'sleuthkit'
+  
+  before :each do
     @linux_image_path = "spec/samples/linux.iso"
     @mac_image_path = "spec/samples/tsk4r_img_01.dmg"
     @split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")
