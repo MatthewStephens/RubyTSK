@@ -22,7 +22,7 @@ if $LOADED_FEATURES.grep(/spec\/spec_helper\.rb/).any?
     end
 
 require 'rspec'
-require 'sleuthkit'
+#require 'sleuthkit'
 require 'pp'
 
 
@@ -31,3 +31,5 @@ RSpec.configure do |config|
 	config.color_enabled = true
 	config.formatter = 'documentation'
 end
+
+puts RSpec.configure.inspect

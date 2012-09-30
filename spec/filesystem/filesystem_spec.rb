@@ -1,4 +1,4 @@
-describe 'spec/filesystem' do
+describe "spec/filesystem" do
   require 'sleuthkit'
   
   before :each do
