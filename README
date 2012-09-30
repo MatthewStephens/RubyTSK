@@ -1,1 +1,24 @@
 This is a simple ruby module to provide access to the TSK libraries.
+
+Requirements: The SleuthKit C library (install with your favorite package manager)
+
+Install (RVM https://rvm.io/ recommended for managing gems):
+
+to load ruby dependencies
+bundle
+
+rake build     (prepares the gem for installation from sleuthkit.gemspec)
+rake compile   (compiles the gem in the 'pkg' directory; handy for running tests)
+rake install   (puts the gem in your local gem repository)
+
+TESTING:
+
+rake spec
+OR
+rake -T spec:suite  (displays suites of test that can be run independently)
+
+Use:
+
+require 'sleuthkit'
+
+image=Sleuthkit::Image.new('path/to/disk.image')
