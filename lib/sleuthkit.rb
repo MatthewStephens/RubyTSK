@@ -86,8 +86,8 @@ module Sleuthkit
       elsif report.kind_of?(String)
         r, w = IO.pipe
         self.call_tsk_fsstat(w)
-        w.close_write
-        report << r.read        
+        w.close
+        report << r.read
         r.close
         return report
       else

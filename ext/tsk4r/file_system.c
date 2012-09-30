@@ -169,12 +169,8 @@ VALUE call_tsk_fsstat(VALUE self, VALUE io){
   if (! rb_obj_is_kind_of(io, rb_cIO) ) {
     rb_raise(rb_eArgError, "Method did not recieve IO object");
   }
-  int fd;
-  fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0, NULL));
-  printf("io had fileno %d\n", fd);
-  FILE * hFile = fdopen(fd, "w");
-  printf("hFile->_w = %d\n", hFile->_w);
-  printf("hFile->_file = %d\n", hFile->_file);
+  int fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0));
+  FILE * hFile = fdopen((int)fd, "w");
 
   struct tsk4r_fs_wrapper * fs_ptr;
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
@@ -183,11 +179,13 @@ VALUE call_tsk_fsstat(VALUE self, VALUE io){
   // the function dumps a status report (text)
   // to the file handle specified by hFile
   if (fs_ptr->filesystem != NULL) {
-    uint8_t (*myfunc)(TSK_FS_INFO * fs, FILE * hFile);
+    uint8_t(*myfunc) (TSK_FS_INFO * fs, FILE * hFile);
     myfunc = fs_ptr->filesystem->fsstat;
-    myfunc(fs_ptr->filesystem, hFile);
+    int r = myfunc(fs_ptr->filesystem, hFile);
+    fflush(hFile); // clear file buffer, completing write
+    if (r != 0 ) { rb_raise(rb_eRuntimeError, "TSK function: fsstat exited with an error."); }
   }
-//  fclose(hFile);
+
   return self;
 }
 
