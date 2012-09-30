@@ -15,7 +15,8 @@ module Sleuthkit
     self.instance_variables.each do |var|
       h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
     end
-    h
+    pp h
+    return self
   end
 
   class Image
@@ -66,7 +67,7 @@ module Sleuthkit
       file.puts 'Hi Matt!'
     end
     def print_tsk_fsstat(report = "")
-      require 'ruby-debug'; debugger
+      # require 'ruby-debug'; debugger
       
       if report.kind_of?( IO )
         self.call_tsk_fsstat(report)
