@@ -179,9 +179,9 @@ VALUE call_tsk_fsstat(VALUE self, VALUE io){
   struct tsk4r_fs_wrapper * fs_ptr;
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   
-  // access the function pointer in TSK_FS_INFO
-  // assign it to a pointer, then call with
-  // param1 = TSK_FS_INFO; param2 = filehandle
+  // this accesses the function pointer in TSK_FS_INFO
+  // the function dumps a status report (text)
+  // to the file handle specified by hFile
   if (fs_ptr->filesystem != NULL) {
     uint8_t (*myfunc)(TSK_FS_INFO * fs, FILE * hFile);
     myfunc = fs_ptr->filesystem->fsstat;
