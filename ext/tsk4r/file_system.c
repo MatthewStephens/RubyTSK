@@ -43,7 +43,7 @@ VALUE allocate_filesystem(VALUE klass){
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
   VALUE * source_obj; VALUE flag;
 
-  rb_scan_args(argc, args, "1", &source_obj, &flag);
+  rb_scan_args(argc, args, "11", &source_obj, &flag);
   if (NIL_P(flag)) { flag = INT2NUM(0); }
 
   open_filesystem(self, (VALUE)source_obj, (VALUE)flag);
