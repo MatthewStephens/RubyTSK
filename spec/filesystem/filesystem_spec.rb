@@ -1,7 +1,7 @@
 describe "spec/filesystem" do
   require 'sleuthkit'
   
-  before :each do
+  before :all do
     @linux_image_path = "spec/samples/linux.iso"
     @mac_image_path = "spec/samples/tsk4r_img_01.dmg"
     @split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")
@@ -141,7 +141,7 @@ describe "spec/filesystem" do
   describe "#inum_count" do
     it "returns the @inum_count attr" do
       @filesystem = Sleuthkit::FileSystem.new(@volume)
-      @filesystem.inum_count.should eq(39)
+      @filesystem.inum_count.should eq(45)
     end
   end
   describe "#isOrphanHunting" do
@@ -171,7 +171,7 @@ describe "spec/filesystem" do
   describe "#last_inum" do
     it "returns the @last_inum attr" do
       @filesystem = Sleuthkit::FileSystem.new(@volume)
-      @filesystem.last_inum.should eq(38)
+      @filesystem.last_inum.should eq(44)
     end
   end
   describe "#offset" do

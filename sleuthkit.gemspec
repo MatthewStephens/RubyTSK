@@ -21,12 +21,12 @@ Gem::Specification.new do |s|
   s.add_development_dependency  "rake", "~>0.9.2"
   s.add_development_dependency  "rake-compiler", "~>0.7.1"
   s.add_development_dependency  "rspec", "~>2.0"
-  s.add_development_dependency  "bundler", "~>1.1.3"
+  s.add_development_dependency  "bundler", "~>1"
   
   if RUBY_VERSION =~ /^1\.9/
-    s.add_development_dependency "ruby-debug19"
+    s.add_dependency "ruby-debug19"
   else
-    s.add_development_dependency "ruby-debug"
+    s.add_dependency "ruby-debug"
   end
   
   # read in the configs to build native extensions.

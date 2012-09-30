@@ -124,7 +124,7 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
     rb_raise(rb_eArgError, "Arg1 must be filename (string)");
   }
   if (RTEST(result)) {
-    rb_funcall(self, rb_intern("pure_ruby"), 1, INT2NUM(2));
+//    rb_funcall(self, rb_intern("pure_ruby"), 1, INT2NUM(2));
     return self;
   } else {
     return Qnil;

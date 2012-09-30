@@ -1,3 +1,4 @@
+require 'sleuthkit'
 require 'spec_helper'
 puts "spec_helper loaded"
 describe Sleuthkit.version_string do

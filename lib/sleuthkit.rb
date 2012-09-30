@@ -81,13 +81,13 @@ module Sleuthkit
     def print_tsk_fsstat(report = "")
       # require 'ruby-debug'; debugger
 
-      
       if report.kind_of?( IO )
         self.call_tsk_fsstat(report)
       elsif report.kind_of?(String)
         r, w = IO.pipe
         self.call_tsk_fsstat(w)
-        report << r.read
+        w.close_write
+        report << r.read        
         r.close
         return report
       else

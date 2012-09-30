@@ -29,7 +29,7 @@ describe "spec/image" do
 	    @image = Sleuthkit::Image.new(@sample_filename, 3)
 	    #@image.instance_variables.should eq []
 	    $stderr.rewind
-      $stderr.string.chomp.should match("unable to open disk")
+      $stderr.string.chomp.should match("warning: unable to open")
     end
   end
   describe "#new( *arr )" do

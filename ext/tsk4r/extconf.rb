@@ -45,7 +45,6 @@ if enable_config('debug')
 	end
 end
 
-
 # if you want to change compilers
 #Config::MAKEFILE_CONFIG["CC"]='/usr/bin/gcc'
 #puts "Creating makefile with Config::MAKEFILE_CONFIG['CC'] = #{Config::MAKEFILE_CONFIG['CC']}"

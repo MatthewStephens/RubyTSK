@@ -19,10 +19,11 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
 
   describe "Experiment 1" do
     it "Should do something funky" do
+      puts "hmm"
       @file_system = Sleuthkit::FileSystem.new(@linux_image)
       @file_system.block_size.should eq(2048)
       File.open("tempfile-#{$$}.txt", 'w') do |file|
-        file.puts @file_system.public_methods(false).sort
+        #file.puts @file_system.public_methods(false).sort
         @file_system.call_tsk_fsstat(file)
       end
       # `ls *.txt`
@@ -33,13 +34,14 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   
   describe "Experiment 2" do
     it "Should call TSK report function" do
+      puts "mmm?"
       @file_system = Sleuthkit::FileSystem.new(@linux_image)
       @file_system.block_size.should eq(2048)
       find_this = "Recording Application: MKISOFS ISO 9660/HFS FILESYSTEM BUILDER"
-      result=String.new
+      result=""
       @file_system.print_tsk_fsstat(result)
+      puts result
       result.should match(find_this)
-      #puts result
     end
   end
 end
