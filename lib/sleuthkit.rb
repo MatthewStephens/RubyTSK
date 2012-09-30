@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 require 'sleuthkit/version'
-require 'tsk4r/tsk4r'
+require 'tsk4r/tsk4r' # gem install process uses this dir
+# require 'sleuthkit/image.rb'
 
 module Sleuthkit
+  # require 'ruby-debug'
+  require 'pp'
+  
   # tell us about yourself
 	def self.version_string
 		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION} (TSK version: #{Sleuthkit::TSK_VERSION})"
@@ -11,6 +15,7 @@ module Sleuthkit
     self.instance_variable_get("@#{sym.to_s}")
   end
   def inspect_object
+    #debugger
     h = Hash.new
     self.instance_variables.each do |var|
       h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
@@ -37,6 +42,13 @@ module Sleuthkit
         
       :TSK_IMG_TYPE_UNSUPP => 0xffff,   # Unsupported disk image type
     }
+    # a little sleight of hand to add Ruby code to the #intialize written in C
+    # alias_method :old_new, :new
+    # def new(*args)
+    #   puts "Ruby before C!!"
+    #   old_new(*args)
+    # end
+    
 
     def number_of_sectors
       div = self.size / self.sector_size
@@ -68,6 +80,7 @@ module Sleuthkit
     end
     def print_tsk_fsstat(report = "")
       # require 'ruby-debug'; debugger
+
       
       if report.kind_of?( IO )
         self.call_tsk_fsstat(report)
