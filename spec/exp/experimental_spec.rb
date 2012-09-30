@@ -1,4 +1,4 @@
-describe 'spec/experiments', "Sleuthkit FileSystem Experiments" do
+describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   require 'sleuthkit'
   
   before :each do
@@ -22,12 +22,12 @@ describe 'spec/experiments', "Sleuthkit FileSystem Experiments" do
       @file_system = Sleuthkit::FileSystem.new(@linux_image)
       @file_system.block_size.should eq(2048)
       File.open("tempfile-#{$$}.txt", 'w') do |file|
-#        pp @file_system.public_methods(false).sort
+        file.puts @file_system.public_methods(false).sort
         @file_system.call_tsk_fsstat(file)
       end
-      `ls *.txt`
+      # `ls *.txt`
       #File.delete(file)
-      `ls *.txt`
+      # `ls *.txt`
     end
   end
   
