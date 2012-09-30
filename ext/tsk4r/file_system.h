@@ -2,7 +2,7 @@
 //  file_system.h
 //  RubyTSK
 //
-//  Created by ms3uf on 9/14/12.
+//  Created by Matthew Stephens on 9/14/12.
 //
 //
 

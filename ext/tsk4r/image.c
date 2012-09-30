@@ -2,7 +2,7 @@
 //  image.c
 //  RubyTSK
 //
-//  Created by ms3uf on 9/13/12.
+//  Created by Matthew Stephens on 9/13/12.
 //
 //
 
@@ -62,7 +62,7 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
   }
 
   if (ptr->image == NULL) {
-    rb_warn("unable to open disk.\n");
+    rb_warn("unable to open %s.\n", filename_location);
   }
   
   TSK_IMG_INFO *image = ptr->image;
