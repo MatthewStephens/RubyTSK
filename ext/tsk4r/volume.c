@@ -144,7 +144,7 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   
   // open volume system, storing ID locally
   Data_Get_Struct(vs_obj, struct tsk4r_vs_wrapper, parent);
-  VALUE parent_id = rb_funcall(vs_obj, rb_intern("object_id"), 0);
+  VALUE parent_id = rb_funcall(vs_obj, rb_intern("object_id"), 0, NULL);
   rb_iv_set(self, "@parent", parent_id);
   
   // open self's struct and assign partition to it
