@@ -1,27 +1,28 @@
 describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   require 'sleuthkit'
+  SAMPLE_DIR="samples"
   
   before :each do
-    @linux_image_path = "spec/samples/linux.iso"
-    @mac_image_path = "spec/samples/tsk4r_img_01.dmg"
-    @split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")
+    @mac_fs_only_image_path = "#{SAMPLE_DIR}/tsk4r_img_02.dmg"
+    @mac_partitioned_image_path = "#{SAMPLE_DIR}/tsk4r_img_01.dmg"
+    @split_image_files = Dir.glob("#{SAMPLE_DIR}/tsk4r*split*a?")
     @split_image = Sleuthkit::Image.new(@split_image_files)
     
-    puts "File #{@linux_image_path} not found!!" unless File.exist?(@linux_image_path)
-    puts "File #{@mac_image_path} not found!!" unless File.exist?(@mac_image_path)
+    puts "File #{@mac_fs_only_image_path} not found!!" unless File.exist?(@mac_fs_only_image_path)
+    puts "File #{@mac_partitioned_image_path} not found!!" unless File.exist?(@mac_partitioned_image_path)
   
-    @linux_image = Sleuthkit::Image.new(@linux_image_path)
-    @mac_image = Sleuthkit::Image.new(@mac_image_path)
+    @mac_fs_only_image = Sleuthkit::Image.new(@mac_fs_only_image_path)
+    @mac_partitioned_image = Sleuthkit::Image.new(@mac_partitioned_image_path)
   
-    @volume = Sleuthkit::VolumeSystem.new(@mac_image)
+    @volume = Sleuthkit::VolumeSystem.new(@mac_partitioned_image)
     @string = "some string"
   end
 
   describe "Experiment 1" do
     it "Should do something funky" do
       puts "hmm"
-      @file_system = Sleuthkit::FileSystem.new(@linux_image)
-      @file_system.block_size.should eq(2048)
+      @file_system = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+      @file_system.block_size.should eq(4096)
       File.open("tempfile-#{$$}.txt", 'w') do |file|
         #file.puts @file_system.public_methods(false).sort
         @file_system.call_tsk_fsstat(file)
@@ -35,9 +36,9 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   describe "Experiment 2" do
     it "Should call TSK report function" do
       puts "mmm?"
-      @file_system = Sleuthkit::FileSystem.new(@linux_image)
-      @file_system.block_size.should eq(2048)
-      find_this = "Recording Application: MKISOFS ISO 9660/HFS FILESYSTEM BUILDER"
+      @file_system = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+      @file_system.block_size.should eq(4096)
+      find_this = "Last Backup Date: 	Wed Dec 31 19:00:00 1969"
       result=""
       @file_system.print_tsk_fsstat(result)
       puts result

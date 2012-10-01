@@ -1,25 +1,26 @@
 describe "spec/filesystem" do
   require 'sleuthkit'
+  SAMPLE_DIR="samples"
   
   before :all do
-    @linux_image_path = "spec/samples/linux.iso"
-    @mac_image_path = "spec/samples/tsk4r_img_01.dmg"
-    @split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")
+    @mac_fs_only_image_path = "#{SAMPLE_DIR}/linux.iso"
+    @mac_partitioned_image_path = "#{SAMPLE_DIR}/tsk4r_img_01.dmg"
+    @split_image_files = Dir.glob("#{SAMPLE_DIR}/tsk4r*split.?")
     @split_image = Sleuthkit::Image.new(@split_image_files)
       
-    puts "File #{@linux_image_path} not found!!" unless File.exist?(@linux_image_path)
-    puts "File #{@mac_image_path} not found!!" unless File.exist?(@mac_image_path)
+    puts "File #{@mac_fs_only_image_path} not found!!" unless File.exist?(@mac_fs_only_image_path)
+    puts "File #{@mac_partitioned_image_path} not found!!" unless File.exist?(@mac_partitioned_image_path)
     
-    @linux_image = Sleuthkit::Image.new(@linux_image_path)
-    @mac_image = Sleuthkit::Image.new(@mac_image_path)
+    @mac_fs_only_image = Sleuthkit::Image.new(@mac_fs_only_image_path)
+    @mac_partitioned_image = Sleuthkit::Image.new(@mac_partitioned_image_path)
     
-    @volume = Sleuthkit::VolumeSystem.new(@mac_image)
+    @volume = Sleuthkit::VolumeSystem.new(@mac_partitioned_image)
     @string = "some string"
   end
   # check opening routines
   describe "#new([single raw image])" do
     it "initializes with Sleuthkit::Image passed as param1" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
+      @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
       @filesystem.should be_an_instance_of Sleuthkit::FileSystem
       @filesystem.description.should eq "iso9660"
     end
@@ -33,7 +34,7 @@ describe "spec/filesystem" do
   end
   describe "#new([image w/o filesystem])" do
     it "initializes with a split Sleuthkit::Image passed as param1" do
-      @filesystem = Sleuthkit::FileSystem.new(@mac_image)
+      @filesystem = Sleuthkit::FileSystem.new(@mac_partitioned_image)
       @filesystem.should be_an_instance_of Sleuthkit::FileSystem
       @filesystem.instance_variables.should eq []
     end
@@ -198,15 +199,15 @@ describe "spec/filesystem" do
   # other attributes
   describe "#get_filesystem_type" do
     it "prints out the filesystem type as a string" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
+      @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
       @filesystem.system_name.should eq("iso9660")
     end
   end
 
   describe "#parent" do
     it "ensures the FS has a reference to the object it came from" do
-      @filesystem = Sleuthkit::FileSystem.new(@linux_image)
-      @filesystem.parent.should eq(@linux_image)
+      @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+      @filesystem.parent.should eq(@mac_fs_only_image)
     end
   end
 end
