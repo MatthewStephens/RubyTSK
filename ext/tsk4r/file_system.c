@@ -13,6 +13,8 @@
 extern VALUE rb_cTSKImage;
 extern VALUE rb_cTSKVolumeSystem;
 extern VALUE rb_cTSKVolumePart;
+extern VALUE rb_cTSKFileSystemDir;
+
 
 //struct tsk4r_img {
 //  TSK_IMG_INFO * image;
@@ -126,6 +128,42 @@ VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
     c++;
   }
   return self;
+}
+
+// directory read functions
+VALUE open_directory_by_name(int argc, VALUE *args, VALUE self) {
+  VALUE name; VALUE opts; TSK_FS_DIR * tsk_dir; struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+
+  rb_scan_args(argc, args, "11", &name, &opts);
+  printf("C function open_directory_by_name seeking %s\n", StringValuePtr(name));
+  VALUE new_obj;
+  tsk_dir = tsk_fs_dir_open(fs_ptr->filesystem, StringValuePtr(name));
+  if (tsk_dir != NULL ) {
+    printf("We are getting somewhere (open_directory_by_name)!!\n");
+    new_obj = rb_funcall(rb_cTSKFileSystemDir, rb_intern("new"), 2, self, name);
+  } else {
+    new_obj = Qnil;
+  }
+  return new_obj;
+}
+VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self) {
+  VALUE inum; VALUE opts; TSK_FS_DIR * tsk_dir; struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+  rb_scan_args(argc, args, "11", &inum, &opts);
+  if ( ! rb_obj_is_kind_of(inum, rb_cFixnum) ) { inum = INT2FIX(0); }
+  TSK_INUM_T addr = (TSK_INUM_T)FIX2LONG(inum);
+  printf("C function open_directory_by_name seeking %ld\n", FIX2LONG(inum));
+  VALUE new_obj;
+  tsk_dir = tsk_fs_dir_open_meta(fs_ptr->filesystem, addr);
+  if (tsk_dir != NULL ) {
+    printf("We are getting somewhere open_directory_by_inum)!!\n");
+    printf("names_used = %lu\n", tsk_dir->names_used);
+    new_obj = rb_funcall(rb_cTSKFileSystemDir, rb_intern("new"), 2, self, inum);
+  } else {
+    new_obj = Qnil;
+  }
+  return new_obj;
 }
 
 
