@@ -11,19 +11,23 @@ contents.
 require 'sleuthkit'
 
 # open a disk
-tskimage = Sleuthkit::Image.new('path/to/disk.image')
-tskimage.inspect_object
+ tskimage = Sleuthkit::Image.new('path/to/disk.image')
+ tskimage.inspect_object
+
+# open a split disk image
+ tskimage = Sleuthkit::Image.new( [ 'chunk.0', 'chunk.1', 'chunk.2' ] )
 
 # open a volume within a disk
-tskvolume = Sleuthkit::Volume.new(tskimage)
+
+ tskvolume = Sleuthkit::Volume.new(tskimage)
  => #<Sleuthkit::VolumeSystem:0x104f051b8>
 
-#display specific volume system information
-tskvolume.partition_count
+# display specific volume system information
+ tskvolume.partition_count
  => 6 
 
 #grab a partition
-tskvolume.volume.partition[0]
+ tskvolume.volume.partition[0]
  => #<Sleuthkit::VolumePart:0x1094d3618> 
 
 
@@ -40,9 +44,9 @@ rake install   (puts the gem in your local gem repository)
 == Dependencies
 
 Requirements: The SleuthKit C library (install with your favorite package manager)
-Mac:      'brew install sleuthkit'
-Linux:
-Windows:
+Version >= 3.2
+
+see http://www.sleuthkit.org for details.
 
 == License
 
