@@ -1,1 +1,77 @@
-This is a simple ruby module to provide access to the TSK libraries.
+= RubyTSK
+
+== Description
+
+This is a simple ruby module to provide access to the The SleuthKit digital forensics libraries.
+The library offers methods to safely examine disk images, volume systems, partitions, file systems and their
+contents.
+
+== Examples
+
+require 'sleuthkit'
+
+# open a disk
+tskimage = Sleuthkit::Image.new('path/to/disk.image')
+tskimage.inspect_object
+
+# open a volume within a disk
+tskvolume = Sleuthkit::Volume.new(tskimage)
+ => #<Sleuthkit::VolumeSystem:0x104f051b8>
+
+#display specific volume system information
+tskvolume.partition_count
+ => 6 
+
+#grab a partition
+tskvolume.volume.partition[0]
+ => #<Sleuthkit::VolumePart:0x1094d3618> 
+
+
+== Installation
+
+Install (RVM https://rvm.io/ recommended for managing gems):
+
+to load ruby dependencies: 'bundle'
+
+rake build     (prepares the gem for installation from sleuthkit.gemspec)
+rake compile   (compiles the gem in the 'pkg' directory; handy for running tests)
+rake install   (puts the gem in your local gem repository)
+
+== Dependencies
+
+Requirements: The SleuthKit C library (install with your favorite package manager)
+Mac:      'brew install sleuthkit'
+Linux:
+Windows:
+
+== License
+
+Created by Matthew H. Stephens.
+Copyright 2011,2012 Matthew H. Stephens.  All rights reserved. 
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+== TESTING
+
+RubyTSK is built using the RSpec testing DSL, available via the Rake build tool.
+
+rake spec
+OR
+rake -T spec:suite  (displays suites of test that can be run independently)
+
+Compressed test images are found in the 'samples' directory, to unpack:
+
+rake spec:samples:split             # splits a sample for use in tests
+rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
+
