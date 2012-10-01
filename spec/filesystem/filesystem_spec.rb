@@ -19,6 +19,7 @@ describe "spec/filesystem" do
     @string = "some string"
   end
   # check opening routines
+  # simple open
   describe "#new([single raw image])" do
     it "initializes with Sleuthkit::Image passed as param1" do
       @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
@@ -46,7 +47,7 @@ describe "spec/filesystem" do
       @filesystem.description.should eq "hfs"
     end
   end
-  describe "new#([volume_partition]" do
+  describe "new#([volume_partition])" do
     it "initializes with Sleuthkit::VolumePart passed as param1" do
       @partition = @volume.parts[3]
       @filesystem = Sleuthkit::FileSystem.new(@partition)
@@ -59,7 +60,31 @@ describe "spec/filesystem" do
             #  @filesystem.should raise_error( TypeError )
     end
   end
-    
+  # open with :type_flag => TSK_FS_TYPE_ENUM (testing on 0 for now)
+  describe "#new([single raw image], opts)" do
+    it "initializes with Sleuthkit::Image passed as param1, with opts" do
+      opts = { :type_flag => 0 }
+      @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image, opts)
+      @filesystem.should be_an_instance_of Sleuthkit::FileSystem
+      @filesystem.description.should eq "hfs"
+    end
+  end
+  describe "new#([volume_system], opts)" do
+    it "initializes with Sleuthkit::VolumeSystem passed as param1, with opts" do
+      opts = { :type_flag => 0 }
+      @filesystem = Sleuthkit::FileSystem.new(@volume, opts)
+      @filesystem.description.should eq "hfs"
+    end
+  end
+  describe "new#([volume_partition], opts)" do
+    it "initializes with Sleuthkit::VolumePart passed as param1, with opts" do
+      opts = { :type_flag => 0 }
+      @partition = @volume.parts[3]
+      @filesystem = Sleuthkit::FileSystem.new(@partition, opts)
+      @filesystem.description.should eq "hfs"
+    end
+  end
+  
   # check attribute readers for filesystem metadata
   
   describe "#block_count" do

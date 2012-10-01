@@ -47,12 +47,11 @@ VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
   if ( RTEST(opts) != rb_cHash){
     printf("opts failed test!!\n");
     opts = rb_hash_new();
-    rb_hash_aset(opts, rb_str_new2("type_flag"), INT2FIX(0));
+    rb_hash_aset(opts, rb_symname_p("type_flag"), INT2FIX(0));
   }
-  VALUE dbg = rb_funcall(opts, rb_intern("inspect"), 0, NULL);
-  VALUE optsclass = rb_funcall(rb_funcall(opts, rb_intern("class"), 0, NULL), rb_intern("to_s"), 0, NULL);
-  printf("opts:::%s\n", StringValuePtr(dbg)  );
-  printf("opts.class == %s\n", StringValuePtr(optsclass) );
+
+  opts = rb_funcall(self, rb_intern("parse_opts"), 1, opts);
+  
   open_filesystem(self, source_obj, opts);
   
   return self;
@@ -65,15 +64,12 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   
   if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKImage)) {
-    printf("received image object.\n");
     open_fs_from_image(self, parent_obj, opts);
 
   } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumeSystem)) {
-    printf("received volume object.\n");
     open_fs_from_volume(self, parent_obj, opts);
     
   } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumePart)) {
-    printf("received partition object.\n");
     open_fs_from_partition(self, parent_obj, opts);
     
   } else {
@@ -134,7 +130,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
 VALUE open_fs_from_image(VALUE self, VALUE image_obj, VALUE opts) {
   struct tsk4r_img * rb_image; struct tsk4r_fs_wrapper * my_pointer;
   TSK_OFF_T offset = 0;
-  VALUE fs_type_flag = rb_hash_aref(opts, rb_str_new2("type_flag"));
+  VALUE fs_type_flag = rb_hash_aref(opts, rb_symname_p("type_flag"));
   TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
 
   Data_Get_Struct(image_obj, struct tsk4r_img, rb_image);
@@ -148,7 +144,7 @@ VALUE open_fs_from_partition(VALUE self, VALUE vpart_obj, VALUE opts) {
   Data_Get_Struct(vpart_obj, struct tsk4r_vs_part, rb_partition);
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, my_pointer);
 
-  VALUE fs_type_flag = rb_hash_aref(opts, rb_str_new2("type_flag"));
+  VALUE fs_type_flag = rb_hash_aref(opts, rb_symname_p("type_flag"));
   TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
   
   my_pointer->filesystem = tsk_fs_open_vol(rb_partition->volume_part, (TSK_FS_TYPE_ENUM)type_flag_num);
@@ -160,7 +156,7 @@ VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
   Data_Get_Struct(vs_obj, struct tsk4r_vs, rb_volumesystem);
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, my_pointer);
 
-  VALUE fs_type_flag = rb_hash_aref(opts, rb_str_new2("type_flag"));
+  VALUE fs_type_flag = rb_hash_aref(opts, rb_symname_p("type_flag"));
   TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
   
   TSK_PNUM_T c = 0;
@@ -226,7 +222,6 @@ TSK_FS_TYPE_ENUM * get_fs_flag(VALUE rb_obj) {
       printf("fs_type is %ld\n", NUM2INT(rb_obj));
       long num = NUM2INT(rb_obj);
       flag = (TSK_FS_TYPE_ENUM *)num;
-      printf("flag is %ld\n", num);
       break;
       
     case T_SYMBOL:

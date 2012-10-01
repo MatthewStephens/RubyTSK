@@ -22,5 +22,14 @@ module Sleuthkit
         raise ArgumentError, "arg1 should be IO, File or String object."
       end
     end
+    
+    private
+    def parse_opts(opts)
+      presets = { :type_flag => 0 }      
+      presets.each_pair do |key, val|
+        unless opts.has_key?(key) then opts[key] = val end
+      end
+      return opts
+    end
   end
 end
