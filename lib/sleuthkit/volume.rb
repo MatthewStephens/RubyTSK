@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-class VolumeSystem
-  include ::Sleuthkit
-  def my_method(p)
-    p * 2
+module Sleuthkit
+  class VolumeSystem
+    include ::Sleuthkit
+
   end
 end
