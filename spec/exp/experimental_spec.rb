@@ -24,10 +24,10 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
       puts "hmm"
       @file_system = Sleuthkit::FileSystem.new(@mac_fs_only_image)
       @file_system.block_size.should eq(4096)
-      File.open("tempfile-#{$$}.txt", 'w') do |file|
-        #file.puts @file_system.public_methods(false).sort
-        @file_system.call_tsk_fsstat(file)
-      end
+      # File.open("tempfile-#{$$}.txt", 'w') do |file|
+      #   #file.puts @file_system.public_methods(false).sort
+      #   @file_system.call_tsk_fsstat(file)
+      # end
       # `ls *.txt`
       #File.delete(file)
       # `ls *.txt`
