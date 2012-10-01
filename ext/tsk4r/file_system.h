@@ -30,11 +30,11 @@ struct tsk4r_img {
 // Sleuthkit::FileSystem
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self);
 VALUE allocate_filesystem(VALUE self);
+void  deallocate_filesystem(struct tsk4r_fs_wrapper * ptr);
 VALUE open_filesystem(VALUE self, VALUE source, VALUE opts);
 VALUE open_fs_from_image(VALUE self, VALUE image_obj, VALUE opts);
 VALUE open_fs_from_volume(VALUE self, VALUE vol_obj, VALUE opts);
 VALUE open_fs_from_partition(VALUE self, VALUE partition, VALUE opts);
-VALUE close_filesystem(VALUE self);
 VALUE get_filesystem_type(VALUE self);
 VALUE call_tsk_fsstat(VALUE self, VALUE io);
 

@@ -24,14 +24,6 @@ void populate_instance_variables(VALUE self);
 
 // functions
 
-void deallocate_filesystem(struct tsk4r_fs_wrapper * ptr){
-  TSK_FS_INFO *filesystem = ptr->filesystem;
-  tsk_fs_close(filesystem);
-  xfree(ptr);
-}
-
-
-
 VALUE allocate_filesystem(VALUE klass){
   printf("allocate_filesystem starting...\n");
   struct tsk4r_fs_wrapper * ptr;
@@ -40,17 +32,19 @@ VALUE allocate_filesystem(VALUE klass){
   return Data_Make_Struct(klass, struct tsk4r_fs_wrapper, 0, deallocate_filesystem, ptr);
 }
 
+void deallocate_filesystem(struct tsk4r_fs_wrapper * ptr){
+  TSK_FS_INFO *filesystem = ptr->filesystem;
+  tsk_fs_close(filesystem);
+  xfree(ptr);
+}
 
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
   VALUE source_obj; VALUE opts;
   rb_scan_args(argc, args, "11", &source_obj, &opts);
   
   if ( RTEST(opts) != rb_cHash){
-    printf("opts failed test!!\n");
     opts = rb_hash_new();
-    rb_hash_aset(opts, rb_symname_p("type_flag"), INT2FIX(0));
   }
-
   opts = rb_funcall(self, rb_intern("parse_opts"), 1, opts);
   
   open_filesystem(self, source_obj, opts);
@@ -102,6 +96,7 @@ VALUE open_fs_from_image(VALUE self, VALUE image_obj, VALUE opts) {
   my_pointer->filesystem = tsk_fs_open_img(disk, offset, (TSK_FS_TYPE_ENUM)type_flag_num);
   return self;
 }
+
 VALUE open_fs_from_partition(VALUE self, VALUE vpart_obj, VALUE opts) {
   struct tsk4r_vs_part * rb_partition; struct tsk4r_fs_wrapper * my_pointer;
   Data_Get_Struct(vpart_obj, struct tsk4r_vs_part, rb_partition);
@@ -114,6 +109,7 @@ VALUE open_fs_from_partition(VALUE self, VALUE vpart_obj, VALUE opts) {
   
   return self;
 }
+
 VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
   struct tsk4r_vs * rb_volumesystem; struct tsk4r_fs_wrapper * my_pointer;
   Data_Get_Struct(vs_obj, struct tsk4r_vs, rb_volumesystem);
@@ -133,7 +129,7 @@ VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
 }
 
 
-
+// utility functions
 VALUE get_filesystem_type(VALUE self) {
   const char * mytype;
   struct tsk4r_fs_wrapper * fs_ptr;
