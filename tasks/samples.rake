@@ -2,7 +2,7 @@
 
 namespace :spec do
   namespace :samples do
-		SAMPLE_DIR="data"
+		SAMPLE_DIR="samples"
     desc "Globs list of disks to zip/unzip"
     task :glob, :gz do |t, args|
       suffix = args[:gz] || ''
