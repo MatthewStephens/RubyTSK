@@ -1,11 +1,12 @@
 describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   require 'sleuthkit'
-  SAMPLE_DIR="samples"
   
   before :each do
-    @mac_fs_only_image_path = "#{SAMPLE_DIR}/tsk4r_img_02.dmg"
-    @mac_partitioned_image_path = "#{SAMPLE_DIR}/tsk4r_img_01.dmg"
-    @split_image_files = Dir.glob("#{SAMPLE_DIR}/tsk4r*split*a?")
+    @sample_dir="samples"
+    
+    @mac_fs_only_image_path = "#{@sample_dir}/tsk4r_img_02.dmg"
+    @mac_partitioned_image_path = "#{@sample_dir}/tsk4r_img_01.dmg"
+    @split_image_files = Dir.glob("#{@sample_dir}/tsk4r*split*a?")
     @split_image = Sleuthkit::Image.new(@split_image_files)
     
     puts "File #{@mac_fs_only_image_path} not found!!" unless File.exist?(@mac_fs_only_image_path)

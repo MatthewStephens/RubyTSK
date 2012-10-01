@@ -1,11 +1,12 @@
 describe "spec/filesystem" do
   require 'sleuthkit'
-  SAMPLE_DIR="samples"
   
   before :all do
-    @mac_fs_only_image_path = "#{SAMPLE_DIR}/linux.iso"
-    @mac_partitioned_image_path = "#{SAMPLE_DIR}/tsk4r_img_01.dmg"
-    @split_image_files = Dir.glob("#{SAMPLE_DIR}/tsk4r*split.?")
+    @sample_dir="samples"
+    
+    @mac_fs_only_image_path = "#{@sample_dir}/tsk4r_img_02.dmg"
+    @mac_partitioned_image_path = "#{@sample_dir}/tsk4r_img_01.dmg"
+    @split_image_files = Dir.glob("#{@sample_dir}/tsk4r*split.?")
     @split_image = Sleuthkit::Image.new(@split_image_files)
       
     puts "File #{@mac_fs_only_image_path} not found!!" unless File.exist?(@mac_fs_only_image_path)
@@ -22,7 +23,7 @@ describe "spec/filesystem" do
     it "initializes with Sleuthkit::Image passed as param1" do
       @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
       @filesystem.should be_an_instance_of Sleuthkit::FileSystem
-      @filesystem.description.should eq "iso9660"
+      @filesystem.description.should eq "hfs"
     end
   end
   describe "#new([split raw image])" do
@@ -200,7 +201,7 @@ describe "spec/filesystem" do
   describe "#get_filesystem_type" do
     it "prints out the filesystem type as a string" do
       @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
-      @filesystem.system_name.should eq("iso9660")
+      @filesystem.system_name.should eq("hfs")
     end
   end
 

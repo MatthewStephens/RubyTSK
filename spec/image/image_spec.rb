@@ -1,12 +1,13 @@
 describe "spec/image" do
   require 'sleuthkit'
-  
   before :all do
+    @sample_dir="samples"
+    
     @orig_stderr = $stderr
     $stderr = StringIO.new
       
-		@sample_filename = "spec/samples/tsk4r_img_01.dmg"
-		@split_image_files = Dir.glob("spec/samples/tsk4r*split*a?")
+		@sample_filename = "#{@sample_dir}/tsk4r_img_01.dmg"
+		@split_image_files = Dir.glob("#{@sample_dir}/tsk4r_img_01.dmg.split.?")
 		
 		puts "File #{@sample_image} not found!!" unless File.exist?(@sample_filename)
 	end
@@ -34,6 +35,7 @@ describe "spec/image" do
   end
   describe "#new( *arr )" do
     it "should open a split raw image from array of filenames" do
+      puts @split_image_files
       @image = Sleuthkit::Image.new(@split_image_files)
       @image.size.should eq(40992768)
       @image.description.should eq("Split raw files")

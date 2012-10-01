@@ -1,10 +1,11 @@
 describe "spec/volume" do
   require 'sleuthkit'
-  SAMPLE_DIR="samples"
   
   before :each do
-		@mac_partitioned_image = "#{SAMPLE_DIR}/tsk4r_img_01.dmg"
-		@split_image_files = Dir.glob("#{SAMPLE_DIR}/tsk4r*split*a?")
+    @sample_dir="samples"
+    
+		@mac_partitioned_image = "#{@sample_dir}/tsk4r_img_01.dmg"
+		@split_image_files = Dir.glob("#{@sample_dir}/tsk4r_img_01.dmg.split*?")
 		puts "File #{@mac_partitioned_image} not found!!" unless File.exist?(@mac_partitioned_image)
 		@partitioned_image = Sleuthkit::Image.new(@mac_partitioned_image)
 		@split_image = Sleuthkit::Image.new(@split_image_files) # split version of above
