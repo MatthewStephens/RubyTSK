@@ -182,7 +182,7 @@ void Init_tsk4r() {
   /* Sleuthkit::FileSystem */
   // object methods for FileSystem objects
   rb_define_method(rb_cTSKFileSystem, "initialize", initialize_filesystem, -1);
-  rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, 1); // change arg1 to klass?
+  rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, -1); // change arg1 to klass?
   rb_define_method(rb_cTSKFileSystem, "system_name", get_filesystem_type, 0);
   rb_define_method(rb_cTSKFileSystem, "call_tsk_fsstat", call_tsk_fsstat, 1);
   
