@@ -2,78 +2,83 @@
 
 namespace :spec do
   namespace :samples do
-		SAMPLE_DIR="spec/samples"
+		SAMPLE_DIR="data"
     desc "Globs list of disks to zip/unzip"
     task :glob, :gz do |t, args|
       suffix = args[:gz] || ''
+			puts "suffix: #{suffix}"
       arr = [ "#{SAMPLE_DIR}/*.dmg", "#{SAMPLE_DIR}/*.iso", "#{SAMPLE_DIR}/*.image" ]
       arr.each {|a| a << suffix }
-      
+     puts arr.inspect 
       @glob=Array.new
       proc=Proc.new { |str| Dir.glob(str) }
       arr.each {|e| @glob << proc.call(e) }
       @glob.flatten!
+			puts @glob
     end
        
     desc "Compress sample disk images"
     task :compress, [:file] do |t, args|
-      Rake::Task["spec:samples:glob"].invoke     
-
       require 'zlib'
-      files = args[:file].to_a || Dir.glob("spec/samples/*.dmg")
-      puts files.join("\n")
+      Rake::Task["spec:samples:glob"].invoke     
+      args[:file].nil? ? files = @glob : files = args[:file].to_a 
 
-      # name = "test.image"
-      name = args[:files] || "tsk4r_img_01.dmg"
-			fqname = "#{SAMPLE_DIR}/#{name}"
-			
-			# TO DO: offer some integrity checks
-			checksum = String.new
-			File.open("spec/samples/#{name}.md5") {|f|
-				while (line = f.gets)
-					checksum << line
-				end
-		 	}
-			puts "checksum for #{name} is #{checksum}"	
+			files.each {|e| e.gsub!(/\.?\/?#{SAMPLE_DIR}\//, '') }
+      puts "compressing " + files.join("\n")
 
-			if File.exist?("#{SAMPLE_DIR}/#{name}")
-        uncompressed = File.open("#{fqname}", 'rb')
-  
-        Zlib::GzipWriter.open("#{fqname}.gz") do |gz|
-          while (line = uncompressed.gets ) 
-            gz.write line
+			files.each do |name|
+  			fqname = "#{SAMPLE_DIR}/#{name}"
+  			
+				puts "fqname: #{fqname}"
+  			if File.exist?("#{fqname}")
+          uncompressed = File.open("#{fqname}", 'rb')
+    
+          Zlib::GzipWriter.open("#{fqname}.gz") do |gz|
+            while (line = uncompressed.gets ) 
+              gz.write line
+            end
           end
-        end
-				uncompressed.close
-				File.delete("#{fqname}")
-
-			else
-				raise("could not locate #{fqname}.  Perhaps it's already zipped?")
+  				uncompressed.close
+  				File.delete("#{fqname}")
+  
+  			else
+  				raise("could not locate #{fqname}.  Perhaps it's already zipped?")
+  			end
 			end
 
     end
 
     desc "Uncompress sample disk images"
     task :uncompress, [:file]  do |t, args|
-      Rake::Task["spec:samples:glob"].invoke('.gz')     
-      exit 1
+			require 'digest/md5'
       require 'zlib'
-      files = args[:file].to_a || Dir.glob("spec/samples/*.gz")
-      name = "test.image.gz"
-			fqname = "#{SAMPLE_DIR}/#{name}"
 
-			if File.exist?("#{SAMPLE_DIR}/#{name}")
-        compressed = File.open("#{fqname}", 'rb')
-        uncompressed = File.open("#{fqname.gsub(/.gz$/, '')}", 'wb')
+      Rake::Task["spec:samples:glob"].invoke('.gz')     
+      args[:file].nil? ? files = @glob : files = args[:file].to_a 
+
+			files.each {|e| e.gsub!(/\.?\/?#{SAMPLE_DIR}\//, '') }
+
+			files.each do |name|
+  			fqname = "#{SAMPLE_DIR}/#{name}"
+				new_name = fqname.gsub(/\.gz$/, '')
+        puts "uncompressing #{fqname}"
   
-        z=Zlib::GzipReader.new(compressed)
-        
-        uncompressed << z.read
-        uncompressed.close
-				File.delete("#{fqname}")
-			else
-				raise("could not locate #{fqname}.  Perhaps its already unzipped?")
+  			if File.exist?("#{fqname}")
+          compressed = File.open("#{fqname}", 'rb')
+          uncompressed = File.open("#{new_name}", 'wb')
+    
+          z=Zlib::GzipReader.new(compressed)
+          
+          uncompressed << z.read
+          uncompressed.close
+  				File.delete("#{fqname}")
+  			else
+  				raise("could not locate #{fqname}.  Perhaps its already unzipped?")
+  			end
+  			# finish with some integrity checking
+				verify("#{fqname.gsub(/\.gz/, '')}")
 			end
+
     end
 
     desc "splits a sample for use in tests"
@@ -91,6 +96,23 @@ namespace :spec do
 			end
 
     end
+		
+		def verify(filename)
+			require 'digest/md5'
+  			checksum_report = String.new
+  			digest = Digest::MD5.hexdigest(File.read(filename))
+  			File.open("#{SAMPLE_DIR}/keys/#{File.basename(filename)}.md5") {|f|
+  				while (line = f.gets)
+  					checksum_report << line
+  				end
+  		 	}
+				expected = checksum_report.match(/#{digest}/)
+				if expected.to_s == digest
+					puts "#{filename} checksum verified"
+				else
+  			  puts "checksum_report for #{filename} is #{digest}, expected #{checksum_report}"	
+				end
+		end
 
   end
 end
