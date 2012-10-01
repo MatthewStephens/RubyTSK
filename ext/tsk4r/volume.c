@@ -36,13 +36,13 @@ void deallocate_volume_system(struct tsk4r_vs_wrapper * ptr){
 
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 
-  VALUE img_obj; VALUE flag;
+  VALUE img_obj; VALUE idx; VALUE flag;
 
-  rb_scan_args(argc, args, "11", &img_obj, &flag);
+  rb_scan_args(argc, args, "12", &img_obj, &idx, &flag);
   if (NIL_P(flag)) { flag = INT2NUM(0); }
 
   if (rb_obj_is_kind_of((VALUE)img_obj, rb_cTSKImage)) {
-    open_volume_system(self, (VALUE)img_obj, (VALUE)flag);
+    open_volume_system(self, (VALUE)img_obj, (VALUE)idx, (VALUE)flag);
   } else {
     rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
   }
@@ -51,12 +51,12 @@ VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 }
 
 
-VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE flag) {
+VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE index, VALUE flag) {
 
   struct tsk4r_vs_wrapper * vs_ptr;
   Data_Get_Struct(self, struct tsk4r_vs_wrapper, vs_ptr);
   TSK_VS_TYPE_ENUM * vs_type_requested;
-  TSK_OFF_T imgaddr = 0;
+  TSK_OFF_T imgaddr = FIX2LONG(index); // sector number at which to open vs
   vs_type_requested = get_vs_flag(flag);
   
   // open disk image
