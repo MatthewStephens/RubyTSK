@@ -122,14 +122,11 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKImage, "object_hello", method_hello_world, 0); // change arg1 to klass?
   rb_define_method(rb_cTSKImage, "initialize", initialize_disk_image, -1);
   rb_define_method(rb_cTSKImage, "image_open", image_open, 2);
-  rb_define_method(rb_cTSKImage, "image_size", image_size, 0);
-  rb_define_method(rb_cTSKImage, "sector_size", sector_size, 0);
-  rb_define_method(rb_cTSKImage, "image_type", image_type, 0);
 
   // attributes (read only)
   rb_define_attr(rb_cTSKImage, "path", 1, 0);
   rb_define_attr(rb_cTSKImage, "size", 1, 0);
-  rb_define_attr(rb_cTSKImage, "sec_size", 1, 0);
+  rb_define_attr(rb_cTSKImage, "sector_size", 1, 0);
   rb_define_attr(rb_cTSKImage, "type", 1, 0);
   rb_define_attr(rb_cTSKImage, "description", 1, 0);
   rb_define_attr(rb_cTSKImage, "name", 1, 0);

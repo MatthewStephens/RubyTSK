@@ -74,7 +74,7 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
     name = image_type_to_name(typenum);
 
     rb_iv_set(self, "@size", img_size);
-    rb_iv_set(self, "@sec_size", img_sector_size);
+    rb_iv_set(self, "@sector_size", img_sector_size);
     rb_iv_set(self, "@type", INT2NUM((int)typenum));
     rb_iv_set(self, "@description", description);
     rb_iv_set(self, "@name", name);
@@ -112,10 +112,8 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
     // string for single image, array for split images
     rb_iv_set(self, "@path", filename);
     if (rb_obj_is_kind_of(filename, rb_cString)) {
-//      printf("opening single image\n");
       result = image_open(self, filename, flag); // passing flag (disk_type) as ruby FIXNUM
     } else if (rb_obj_is_kind_of(filename, rb_cArray)) {
-//      printf("opening split image (flag=%ld)\n", FIX2LONG(flag));
       result = image_open(self, filename, flag);
     } else {
       rb_raise(rb_eTypeError, "arg1 must be String or Array");
@@ -131,44 +129,7 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   }
 }
 
-
-VALUE sector_size(VALUE self){
-  struct tsk4r_img_wrapper * new_ptr;
-  Data_Get_Struct(self, struct tsk4r_img_wrapper, new_ptr);
-  
-  TSK_IMG_INFO * image = new_ptr->image;
-  //  char * orig_fn = new_ptr->fn_given;
-  //  fprintf(stdout, "struct stored filename: >%s<\n", orig_fn);
-  VALUE s_size;
-  if (image != NULL) {
-    unsigned int sss = image->sector_size;
-    s_size = INT2FIX(sss);
-  } else {
-    s_size = INT2FIX(22);
-  }
-  //  fprintf(stdout, "disk size: %d\n", (int)image->size);
-  //  fprintf(stdout, "sector size: %d\n", sss);
-  //  FIXNUM_P(s_size);
-  return s_size;
-}
-
-VALUE image_size(VALUE self){
-  TSK_IMG_INFO* image;
-  fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
-  
-  Data_Get_Struct(self, TSK_IMG_INFO, image);
-  fprintf(stdout, "DATA_PTR(self): %lu\n", (long)DATA_PTR(self));
-  
-  //fprintf(stdout, "image size: %d\n", (int)image->size);
-  return INT2NUM((int)image->size);
-}
-
-VALUE image_type(VALUE self){
-  TSK_IMG_INFO *image;
-  Data_Get_Struct(self, TSK_IMG_INFO, image);
-  return INT2NUM((int)image->itype);
-}
-
+// helper methods
 VALUE image_type_to_desc(TSK_IMG_TYPE_ENUM num) {
   const char * description;
   description = tsk_img_type_todesc(num);
