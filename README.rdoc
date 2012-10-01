@@ -51,13 +51,14 @@ see http://www.sleuthkit.org for details.
 == License
 
 Created by Matthew H. Stephens.
+
 Copyright 2011, 2012 Matthew H. Stephens.  All rights reserved. 
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
  
- http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
  
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -70,12 +71,12 @@ limitations under the License.
 
 RubyTSK is built using the RSpec testing DSL, available via the Rake build tool.
 
-rake spec
+ rake spec
 OR
-rake -T spec:suite  (displays suites of test that can be run independently)
+ rake -T spec:suite  # displays suites of test that can be run independently
 
 Compressed test images are found in the 'samples' directory, to unpack:
 
-rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
-rake spec:samples:split             # splits a sample for use in tests
+ rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
+ rake spec:samples:split             # splits a sample for use in tests
 
