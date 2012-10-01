@@ -29,7 +29,7 @@ tskvolume.volume.partition[0]
 
 == Installation
 
-Install (RVM https://rvm.io/ recommended for managing gems):
+Install (RVM https://rvm.io is recommended for managing gems):
 
 to load ruby dependencies: 'bundle'
 
@@ -47,7 +47,7 @@ Windows:
 == License
 
 Created by Matthew H. Stephens.
-Copyright 2011,2012 Matthew H. Stephens.  All rights reserved. 
+Copyright 2011, 2012 Matthew H. Stephens.  All rights reserved. 
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,6 +72,6 @@ rake -T spec:suite  (displays suites of test that can be run independently)
 
 Compressed test images are found in the 'samples' directory, to unpack:
 
-rake spec:samples:split             # splits a sample for use in tests
 rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
+rake spec:samples:split             # splits a sample for use in tests
 
