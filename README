@@ -70,8 +70,8 @@ rake spec
 OR
 rake -T spec:suite  (displays suites of test that can be run independently)
 
-Compressed test images are found in the 'data' directory, to unpack:
+Compressed test images are found in the 'samples' directory, to unpack:
 
 rake spec:samples:split             # splits a sample for use in tests
-rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'data')
+rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
 
