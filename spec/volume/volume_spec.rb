@@ -18,10 +18,17 @@ describe "spec/volume" do
 			@volume.should be_an_instance_of Sleuthkit::VolumeSystem
 		end
 	end
-	describe "#new(@disk_image, @idx)" do
+	describe "#new(@disk_image, {:offset => 0} )" do
 		it "returns VolumeSystem found in Sleuthkit::Image @disk_image at offset #idx" do
-		  @idx = 0 # TO DO
-			@volume = Sleuthkit::VolumeSystem.new(@partitioned_image, @idx)
+		  @opts = {:offset => 0} # TO DO
+			@volume = Sleuthkit::VolumeSystem.new(@partitioned_image, @opts)
+			@volume.offset.should eq(0)
+		end
+	end
+	describe "#new(@disk_image, {:offset => 0, :type_flag => 0})" do
+		it "returns VolumeSystem found in Sleuthkit::Image with 2 opts selected" do
+		  @opts = {:offset => 0, :type_flag => 0}
+			@volume = Sleuthkit::VolumeSystem.new(@partitioned_image, @opts)
 			@volume.offset.should eq(0)
 		end
 	end

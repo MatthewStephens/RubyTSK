@@ -36,13 +36,25 @@ void deallocate_volume_system(struct tsk4r_vs_wrapper * ptr){
 
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 
-  VALUE img_obj; VALUE idx; VALUE flag;
+  VALUE img_obj; VALUE opts;
 
-  rb_scan_args(argc, args, "12", &img_obj, &idx, &flag);
-  if (NIL_P(flag)) { flag = INT2NUM(0); }
+  rb_scan_args(argc, args, "11", &img_obj, &opts);
+  if ( RTEST(opts) != rb_cHash){
+    printf("opts failed test!!\n");
+    opts = rb_hash_new();
+    rb_hash_aset(opts, rb_symname_p("type_flag"), INT2FIX(0));
+    rb_hash_aset(opts, rb_symname_p("offset"), INT2FIX(0));
+  }
+  opts = rb_funcall(self, rb_intern("parse_opts"), 1, opts);
+
+  VALUE dbg = rb_funcall(opts, rb_intern("inspect"), 0, NULL);
+  VALUE optsclass = rb_funcall(rb_funcall(opts, rb_intern("class"), 0, NULL), rb_intern("to_s"), 0, NULL);
+  printf("opts:::%s\n", StringValuePtr(dbg)  );
+  printf("opts.class == %s\n", StringValuePtr(optsclass) );
+
 
   if (rb_obj_is_kind_of((VALUE)img_obj, rb_cTSKImage)) {
-    open_volume_system(self, (VALUE)img_obj, (VALUE)idx, (VALUE)flag);
+    open_volume_system(self, (VALUE)img_obj, (VALUE)opts);
   } else {
     rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
   }
@@ -51,13 +63,13 @@ VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 }
 
 
-VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE index, VALUE flag) {
+VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE opts) {
 
   struct tsk4r_vs_wrapper * vs_ptr;
   Data_Get_Struct(self, struct tsk4r_vs_wrapper, vs_ptr);
   TSK_VS_TYPE_ENUM * vs_type_requested;
-  TSK_OFF_T imgaddr = FIX2LONG(index); // sector number at which to open vs
-  vs_type_requested = get_vs_flag(flag);
+  TSK_OFF_T imgaddr = FIX2LONG(rb_hash_aref(opts, rb_symname_p("offset"))); // sector number at which to open vs
+  vs_type_requested = get_vs_flag(rb_hash_aref(opts, rb_symname_p("type_flag")));
   
   // open disk image
   struct tsk4r_img * rb_image;
