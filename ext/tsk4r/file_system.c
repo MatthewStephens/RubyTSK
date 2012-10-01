@@ -41,52 +41,41 @@ VALUE allocate_filesystem(VALUE klass){
 
 
 VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
-  VALUE * source_obj; VALUE flag;
-
-  rb_scan_args(argc, args, "11", &source_obj, &flag);
-  if (NIL_P(flag)) { flag = INT2NUM(0); }
-
-  open_filesystem(self, (VALUE)source_obj, (VALUE)flag);
+  VALUE source_obj; VALUE opts;
+  rb_scan_args(argc, args, "11", &source_obj, &opts);
+  
+  if ( RTEST(opts) != rb_cHash){
+    printf("opts failed test!!\n");
+    opts = rb_hash_new();
+    rb_hash_aset(opts, rb_str_new2("type_flag"), INT2FIX(0));
+  }
+  VALUE dbg = rb_funcall(opts, rb_intern("inspect"), 0, NULL);
+  VALUE optsclass = rb_funcall(rb_funcall(opts, rb_intern("class"), 0, NULL), rb_intern("to_s"), 0, NULL);
+  printf("opts:::%s\n", StringValuePtr(dbg)  );
+  printf("opts.class == %s\n", StringValuePtr(optsclass) );
+  open_filesystem(self, source_obj, opts);
   
   return self;
 }
 
 
-VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE fs_type_flag) {
+VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
   printf("open_filesystem here....\n");
   struct tsk4r_fs_wrapper * fs_ptr;
-  TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
-  
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   
   if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKImage)) {
     printf("received image object.\n");
-
-    struct tsk4r_img * rb_image;
-    TSK_OFF_T offset = 0;
-    Data_Get_Struct(parent_obj, struct tsk4r_img, rb_image);
-    TSK_IMG_INFO * disk = rb_image->image;
-    fs_ptr->filesystem = tsk_fs_open_img(disk, offset, (TSK_FS_TYPE_ENUM)type_flag_num);
+    open_fs_from_image(self, parent_obj, opts);
 
   } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumeSystem)) {
     printf("received volume object.\n");
-
-    struct tsk4r_vs * rb_volumesystem;
-    Data_Get_Struct(parent_obj, struct tsk4r_vs, rb_volumesystem);
-
-    TSK_PNUM_T c = 0;
-    while (c < rb_volumesystem->volume->part_count) {
-      const TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
-      fs_ptr->filesystem = tsk_fs_open_vol(partition, (TSK_FS_TYPE_ENUM)type_flag_num);
-      if (fs_ptr->filesystem != NULL) { break; } else { printf("failed on index %d\n", c); }
-      c++;
-    }
+    open_fs_from_volume(self, parent_obj, opts);
+    
   } else if (rb_obj_is_kind_of((VALUE)parent_obj, rb_cTSKVolumePart)) {
     printf("received partition object.\n");
-
-    struct tsk4r_vs_part * rb_partition;
-    Data_Get_Struct(parent_obj, struct tsk4r_vs_part, rb_partition);
-    fs_ptr->filesystem = tsk_fs_open_vol(rb_partition->volume_part, (TSK_FS_TYPE_ENUM)type_flag_num);
+    open_fs_from_partition(self, parent_obj, opts);
+    
   } else {
     rb_raise(rb_eTypeError, "arg1 must be a SleuthKit::Image, SleuthKit::VolumeSystem or SleuthKit::VolumePart object.");
   }
@@ -142,17 +131,49 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE fs_type_flag) {
   return self;
 }
 
-VALUE open_filesystem_from_img(VALUE self, VALUE img_obj) {
-  printf("open_filesystem from here....\n");
-  struct tsk4r_fs_wrapper * fs_ptr;
-  struct tsk4r_img * rb_image;
+VALUE open_fs_from_image(VALUE self, VALUE image_obj, VALUE opts) {
+  struct tsk4r_img * rb_image; struct tsk4r_fs_wrapper * my_pointer;
   TSK_OFF_T offset = 0;
-  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
-  Data_Get_Struct(img_obj, struct tsk4r_img, rb_image);
-  TSK_IMG_INFO * image = rb_image->image;
-  fs_ptr->filesystem = tsk_fs_open_img(image, offset, TSK_FS_TYPE_DETECT);
+  VALUE fs_type_flag = rb_hash_aref(opts, rb_str_new2("type_flag"));
+  TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
+
+  Data_Get_Struct(image_obj, struct tsk4r_img, rb_image);
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, my_pointer);
+  TSK_IMG_INFO * disk = rb_image->image;
+  my_pointer->filesystem = tsk_fs_open_img(disk, offset, (TSK_FS_TYPE_ENUM)type_flag_num);
   return self;
 }
+VALUE open_fs_from_partition(VALUE self, VALUE vpart_obj, VALUE opts) {
+  struct tsk4r_vs_part * rb_partition; struct tsk4r_fs_wrapper * my_pointer;
+  Data_Get_Struct(vpart_obj, struct tsk4r_vs_part, rb_partition);
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, my_pointer);
+
+  VALUE fs_type_flag = rb_hash_aref(opts, rb_str_new2("type_flag"));
+  TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
+  
+  my_pointer->filesystem = tsk_fs_open_vol(rb_partition->volume_part, (TSK_FS_TYPE_ENUM)type_flag_num);
+  
+  return self;
+}
+VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
+  struct tsk4r_vs * rb_volumesystem; struct tsk4r_fs_wrapper * my_pointer;
+  Data_Get_Struct(vs_obj, struct tsk4r_vs, rb_volumesystem);
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, my_pointer);
+
+  VALUE fs_type_flag = rb_hash_aref(opts, rb_str_new2("type_flag"));
+  TSK_FS_TYPE_ENUM * type_flag_num = get_fs_flag(fs_type_flag);
+  
+  TSK_PNUM_T c = 0;
+  while (c < rb_volumesystem->volume->part_count) {
+    const TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
+    my_pointer->filesystem = tsk_fs_open_vol(partition, (TSK_FS_TYPE_ENUM)type_flag_num);
+    if (my_pointer->filesystem != NULL) { break; } else { printf("failed on index %d\n", c); }
+    c++;
+  }
+  return self;
+}
+
+
 
 VALUE get_filesystem_type(VALUE self) {
   const char * mytype;
@@ -188,26 +209,6 @@ VALUE call_tsk_fsstat(VALUE self, VALUE io){
 
   return self;
 }
-
-VALUE open_filesystem_from_vol(VALUE self, VALUE vol_obj) {
-  printf("open filesystem_from_vol here...\n");
-  struct tsk4r_fs_wrapper * fs_ptr;
-  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
-  struct tsk4r_vs * rb_volume;
-  Data_Get_Struct(vol_obj, struct tsk4r_vs, rb_volume);
-  //    TSK_VS_INFO * volume = rb_volume->volume;
-  TSK_VS_PART_INFO * partition1 = rb_volume->volume->part_list;
-  fs_ptr->filesystem = tsk_fs_open_vol(partition1, TSK_FS_TYPE_DETECT);
-  TSK_INUM_T my_root_inum = 1976;
-  if (fs_ptr->filesystem != NULL) {
-    my_root_inum = fs_ptr->filesystem->root_inum;
-  } else {
-    my_root_inum = 444;
-  }
-  rb_iv_set(self, "@root_inum", INT2NUM(my_root_inum));
-  return self;
-}
-
 
 // helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values
 TSK_FS_TYPE_ENUM * get_fs_flag(VALUE rb_obj) {
