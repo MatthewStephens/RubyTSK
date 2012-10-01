@@ -18,6 +18,13 @@ describe "spec/volume" do
 			@volume.should be_an_instance_of Sleuthkit::VolumeSystem
 		end
 	end
+	describe "#new(@disk_image, @idx)" do
+		it "returns VolumeSystem found in Sleuthkit::Image @disk_image at offset #idx" do
+		  @idx = 0 # TO DO
+			@volume = Sleuthkit::VolumeSystem.new(@partitioned_image, @idx)
+			@volume.offset.should eq(0)
+		end
+	end
 	describe "#new(some_string)" do
 		it "initializes and raises exception when initialized with an object of wrong class" do
 			lambda { @volume = Sleuthkit::VolumeSystem.new(@string) }.should raise_error(TypeError)
@@ -101,12 +108,20 @@ describe "spec/volume" do
     it "returns a VolumeSystem from a split disk image, built from an array" do
       @volume = Sleuthkit::VolumeSystem.new(@split_image)
       #pp @volume.inspect_object
-      pp @split_image.inspect_object
+      #pp @split_image.inspect_object
       @volume.parts.length.should eq(6)
-      pp "Tests ran with the following gems loaded"
-      pp Gem.loaded_specs.values.map {|x| "#{x.name} #{x.version}"}
+      #pp "Tests ran with the following gems loaded"
+      #pp Gem.loaded_specs.values.map {|x| "#{x.name} #{x.version}"}
     end
   end
+  describe "#inspect_object" do
+    it "returns the instance variables as a hash" do
+      @volume = Sleuthkit::VolumeSystem.new(@partitioned_image)
+      @volume.inspect_object.should be_an_instance_of(Hash)
+      @volume.inspect_object[:description].should eq @volume.description
+    end
+  end
+  
 end
 
 
