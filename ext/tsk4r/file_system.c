@@ -20,6 +20,7 @@ extern VALUE rb_cTSKVolumePart;
 //};
 // prototypes (private)
 TSK_FS_TYPE_ENUM * get_fs_flag();
+void populate_instance_variables(VALUE self);
 
 // functions
 
@@ -78,46 +79,8 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
   
   if (fs_ptr->filesystem != NULL) {
 
+    populate_instance_variables(self);
     VALUE my_description = get_filesystem_type(self);
-    rb_iv_set(self, "@block_count", ULONG2NUM((unsigned long long)fs_ptr->filesystem->block_count));
-//    rb_iv_set(self, "@block_getflags", INT2NUM((int)fs_ptr->filesystem->block_getflags)); // do not impl
-    rb_iv_set(self, "@block_post_size", UINT2NUM((uint)fs_ptr->filesystem->block_post_size));
-    rb_iv_set(self, "@block_pre_size", UINT2NUM((uint)fs_ptr->filesystem->block_pre_size));
-    rb_iv_set(self, "@block_size", UINT2NUM((uint)fs_ptr->filesystem->block_size));
-//    rb_iv_set(self, "@block_walk", fs_ptr->filesystem->block_walk);// no
-    rb_iv_set(self, "@dev_bsize", UINT2NUM((uint)fs_ptr->filesystem->dev_bsize));
-    rb_iv_set(self, "@data_unit_name", rb_str_new2(fs_ptr->filesystem->duname));
-    rb_iv_set(self, "@endian", UINT2NUM((uint)fs_ptr->filesystem->endian));
-    rb_iv_set(self, "@first_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->first_inum));
-//    rb_iv_set(self, "@file_add_meta", fs_ptr->filesystem->file_add_meta); // do not impl
-    rb_iv_set(self, "@first_block", ULONG2NUM((unsigned long int)fs_ptr->filesystem->first_block));
-    rb_iv_set(self, "@flags", UINT2NUM((uint)fs_ptr->filesystem->flags));
-//    rb_iv_set(self, "@fread_owner_sid", fs_ptr->filesystem->fread_owner_sid); // do not impl
-    rb_iv_set(self, "@fs_id", rb_str_new2((char *)fs_ptr->filesystem->fs_id));
-    rb_iv_set(self, "@fs_id_used", UINT2NUM((uint)fs_ptr->filesystem->fs_id_used));
-//    rb_iv_set(self, "@fscheck", fs_ptr->filesystem->fscheck); // do not impl
-//    rb_iv_set(self, "@fsstat", fs_ptr->filesystem->fsstat); // do not impl
-    rb_iv_set(self, "@ftype", UINT2NUM((uint)fs_ptr->filesystem->ftype));
-//    rb_iv_set(self, "@get_default_attr_type", fs_ptr->filesystem->get_default_attr_type); // do not impl
-//    rb_iv_set(self, "@inode_walk", fs_ptr->filesystem->inode_walk);//no
-    rb_iv_set(self, "@inum_count", ULONG2NUM((unsigned long int)fs_ptr->filesystem->inum_count));
-    rb_iv_set(self, "@isOrphanHunting", UINT2NUM((uint)fs_ptr->filesystem->isOrphanHunting));
-//    rb_iv_set(self, "@istat", fs_ptr->filesystem->istat); // do not impl
-//    rb_iv_set(self, "@jblk_walk", fs_ptr->filesystem->jblk_walk);//no
-//    rb_iv_set(self, "@jentry_walk", fs_ptr->filesystem->jentry_walk);//no
-//    rb_iv_set(self, "@jopen", fs_ptr->filesystem->jopen);//no
-    rb_iv_set(self, "@journ_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->journ_inum));
-    rb_iv_set(self, "@last_block", ULONG2NUM((unsigned long int)fs_ptr->filesystem->last_block));
-    rb_iv_set(self, "@last_block_act", ULONG2NUM((unsigned long int)fs_ptr->filesystem->last_block_act));
-    rb_iv_set(self, "@last_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->last_inum));
-//    rb_iv_set(self, "@list_inum_named", fs_ptr->filesystem->list_inum_named); // to do
-//    rb_iv_set(self, "@load_attrs", fs_ptr->filesystem->load_attrs); // do not impl
-//    rb_iv_set(self, "@name_cmp", fs_ptr->filesystem->name_cmp); // do no impl
-    rb_iv_set(self, "@offset", LONG2NUM((long int)fs_ptr->filesystem->offset));
-//    rb_iv_set(self, "@orphan_dir", fs_ptr->filesystem->orphan_dir); // to do
-    rb_iv_set(self, "@root_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->root_inum));
-    rb_iv_set(self, "@tag", INT2NUM(fs_ptr->filesystem->tag));
-    
     rb_iv_set(self, "@description", my_description);
     rb_iv_set(self, "@parent", parent_obj);
     
@@ -204,6 +167,51 @@ VALUE call_tsk_fsstat(VALUE self, VALUE io){
   }
 
   return self;
+}
+
+// assigns numerous TSK_FS_INFO values to ruby instance variables
+void populate_instance_variables(VALUE self) {
+  struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+
+  rb_iv_set(self, "@block_count", ULONG2NUM((unsigned long long)fs_ptr->filesystem->block_count));
+  //    rb_iv_set(self, "@block_getflags", INT2NUM((int)fs_ptr->filesystem->block_getflags)); // do not impl
+  rb_iv_set(self, "@block_post_size", UINT2NUM((uint)fs_ptr->filesystem->block_post_size));
+  rb_iv_set(self, "@block_pre_size", UINT2NUM((uint)fs_ptr->filesystem->block_pre_size));
+  rb_iv_set(self, "@block_size", UINT2NUM((uint)fs_ptr->filesystem->block_size));
+  //    rb_iv_set(self, "@block_walk", fs_ptr->filesystem->block_walk);// no
+  rb_iv_set(self, "@dev_bsize", UINT2NUM((uint)fs_ptr->filesystem->dev_bsize));
+  rb_iv_set(self, "@data_unit_name", rb_str_new2(fs_ptr->filesystem->duname));
+  rb_iv_set(self, "@endian", UINT2NUM((uint)fs_ptr->filesystem->endian));
+  rb_iv_set(self, "@first_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->first_inum));
+  //    rb_iv_set(self, "@file_add_meta", fs_ptr->filesystem->file_add_meta); // do not impl
+  rb_iv_set(self, "@first_block", ULONG2NUM((unsigned long int)fs_ptr->filesystem->first_block));
+  rb_iv_set(self, "@flags", UINT2NUM((uint)fs_ptr->filesystem->flags));
+  //    rb_iv_set(self, "@fread_owner_sid", fs_ptr->filesystem->fread_owner_sid); // do not impl
+  rb_iv_set(self, "@fs_id", rb_str_new2((char *)fs_ptr->filesystem->fs_id));
+  rb_iv_set(self, "@fs_id_used", UINT2NUM((uint)fs_ptr->filesystem->fs_id_used));
+  //    rb_iv_set(self, "@fscheck", fs_ptr->filesystem->fscheck); // do not impl
+  //    rb_iv_set(self, "@fsstat", fs_ptr->filesystem->fsstat); // do not impl
+  rb_iv_set(self, "@ftype", UINT2NUM((uint)fs_ptr->filesystem->ftype));
+  //    rb_iv_set(self, "@get_default_attr_type", fs_ptr->filesystem->get_default_attr_type); // do not impl
+  //    rb_iv_set(self, "@inode_walk", fs_ptr->filesystem->inode_walk);//no
+  rb_iv_set(self, "@inum_count", ULONG2NUM((unsigned long int)fs_ptr->filesystem->inum_count));
+  rb_iv_set(self, "@isOrphanHunting", UINT2NUM((uint)fs_ptr->filesystem->isOrphanHunting));
+  //    rb_iv_set(self, "@istat", fs_ptr->filesystem->istat); // do not impl
+  //    rb_iv_set(self, "@jblk_walk", fs_ptr->filesystem->jblk_walk);//no
+  //    rb_iv_set(self, "@jentry_walk", fs_ptr->filesystem->jentry_walk);//no
+  //    rb_iv_set(self, "@jopen", fs_ptr->filesystem->jopen);//no
+  rb_iv_set(self, "@journ_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->journ_inum));
+  rb_iv_set(self, "@last_block", ULONG2NUM((unsigned long int)fs_ptr->filesystem->last_block));
+  rb_iv_set(self, "@last_block_act", ULONG2NUM((unsigned long int)fs_ptr->filesystem->last_block_act));
+  rb_iv_set(self, "@last_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->last_inum));
+  //    rb_iv_set(self, "@list_inum_named", fs_ptr->filesystem->list_inum_named); // to do
+  //    rb_iv_set(self, "@load_attrs", fs_ptr->filesystem->load_attrs); // do not impl
+  //    rb_iv_set(self, "@name_cmp", fs_ptr->filesystem->name_cmp); // do no impl
+  rb_iv_set(self, "@offset", LONG2NUM((long int)fs_ptr->filesystem->offset));
+  //    rb_iv_set(self, "@orphan_dir", fs_ptr->filesystem->orphan_dir); // to do
+  rb_iv_set(self, "@root_inum", ULONG2NUM((unsigned long int)fs_ptr->filesystem->root_inum));
+  rb_iv_set(self, "@tag", INT2NUM(fs_ptr->filesystem->tag));
 }
 
 // helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values
