@@ -40,18 +40,11 @@ VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
 
   rb_scan_args(argc, args, "11", &img_obj, &opts);
   if ( RTEST(opts) != rb_cHash){
-    printf("opts failed test!!\n");
     opts = rb_hash_new();
     rb_hash_aset(opts, rb_symname_p("type_flag"), INT2FIX(0));
     rb_hash_aset(opts, rb_symname_p("offset"), INT2FIX(0));
   }
   opts = rb_funcall(self, rb_intern("parse_opts"), 1, opts);
-
-  VALUE dbg = rb_funcall(opts, rb_intern("inspect"), 0, NULL);
-  VALUE optsclass = rb_funcall(rb_funcall(opts, rb_intern("class"), 0, NULL), rb_intern("to_s"), 0, NULL);
-  printf("opts:::%s\n", StringValuePtr(dbg)  );
-  printf("opts.class == %s\n", StringValuePtr(optsclass) );
-
 
   if (rb_obj_is_kind_of((VALUE)img_obj, rb_cTSKImage)) {
     open_volume_system(self, (VALUE)img_obj, (VALUE)opts);
@@ -140,6 +133,34 @@ VALUE volume_expose_part_by_idx(VALUE self, VALUE index) {
 
 // Sleuthkit::VolumePart functions
 
+VALUE allocate_volume_part(VALUE klass){
+  struct tsk4r_vpart_wrapper * ptr;
+  return Data_Make_Struct(klass, struct tsk4r_vpart_wrapper, 0, deallocate_volume_part, ptr);
+}
+
+// this deallocate might need further work
+void deallocate_volume_part(struct tsk4r_vpart_wrapper * ptr){
+  xfree(ptr);
+}
+
+VALUE initialize_volume_part(int argc, VALUE *args, VALUE self){
+  VALUE * vs_obj; VALUE index;
+  
+  rb_scan_args(argc, args, "11", &vs_obj, &index);
+  if (NIL_P(index)) { index = INT2FIX(0); }
+  
+  if (rb_obj_is_kind_of((VALUE)vs_obj, rb_cTSKVolumeSystem)) {
+    rb_funcall(self, rb_intern("open"), 2, (VALUE)vs_obj, (VALUE)index);
+  } else if (rb_obj_is_kind_of((VALUE)vs_obj, rb_cTSKVolumePart)) {
+    rb_funcall(self, rb_intern("open"), 2, (VALUE)vs_obj, (VALUE)index);
+  }
+  else {
+    rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::VolumeSystem expected)");
+  }
+  
+  return self;
+}
+
 VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   // self, vs_obj, index, e.g.
   VALUE vs_obj; VALUE index;
@@ -176,40 +197,10 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
   rb_iv_set(self, "@address", INT2NUM((int)vp_ptr->addr));
   rb_iv_set(self, "@flags", INT2NUM((int)vp_ptr->flags));
   rb_iv_set(self, "@parent", vs_obj); // store link to parent system
-//  rb_iv_set(self, "@next", );
-//  rb_iv_set(self, "@prev", );
-
   
   return self;
 }
 
-VALUE allocate_volume_part(VALUE klass){
-  struct tsk4r_vpart_wrapper * ptr;
-  return Data_Make_Struct(klass, struct tsk4r_vpart_wrapper, 0, deallocate_volume_part, ptr);
-}
-
-// this deallocate might need further work
-void deallocate_volume_part(struct tsk4r_vpart_wrapper * ptr){
-  xfree(ptr);
-}
-
-VALUE initialize_volume_part(int argc, VALUE *args, VALUE self){
-  VALUE * vs_obj; VALUE index;
-
-  rb_scan_args(argc, args, "11", &vs_obj, &index);
-  if (NIL_P(index)) { index = INT2FIX(0); }
-
-  if (rb_obj_is_kind_of((VALUE)vs_obj, rb_cTSKVolumeSystem)) {
-    rb_funcall(self, rb_intern("open"), 2, (VALUE)vs_obj, (VALUE)index);
-  } else if (rb_obj_is_kind_of((VALUE)vs_obj, rb_cTSKVolumePart)) {
-    rb_funcall(self, rb_intern("open"), 2, (VALUE)vs_obj, (VALUE)index);
-  }
-  else {
-    rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::VolumeSystem expected)");
-  }
-  
-  return self;
-}
 
 VALUE read_volume_part_block(int argc, VALUE *args, VALUE self) {
   printf("vs_part: method not built yet!\n");
