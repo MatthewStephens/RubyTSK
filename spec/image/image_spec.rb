@@ -41,6 +41,16 @@ describe "spec/image" do
       @image.description.should eq("Split raw files")
     end
   end
+  # attribute test
+  describe "#new(@sample_image)" do
+		it "initializes with #{@sample_image} passed as arg1" do
+			@image = Sleuthkit::Image.new(@sample_filename)
+			@image.should be_an_instance_of Sleuthkit::Image
+			@image.sector_size.should eq(512)
+			@image.size.should eq(40992768)
+		end
+	end
+  # other
   describe "#pure_ruby(num)" do
     it "should pass a number from C layer up to Ruby layer during init" do
       @image = Sleuthkit::Image.new(@sample_filename)
