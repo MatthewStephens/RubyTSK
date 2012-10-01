@@ -3,3 +3,5 @@
 pkg/*
 refresh.sh
 .*.swp
+*/.DS_STORE
+.DS_STORE
