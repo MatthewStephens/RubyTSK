@@ -90,17 +90,17 @@ describe "spec/volume" do
   end
 	
 	# extracting and examinging VolumePart objects
-	describe "#expose_part" do
-		it "returns a VolumePart object" do
+	describe "#[0]" do
+		it "returns the first VolumePart object" do
 			@volume = Sleuthkit::VolumeSystem.new(@partitioned_image)
-			@part = @volume.expose_part
+			@part = @volume[0]
 			@part.flags.should eq(2)
 		end
 	end
 	describe "VolumePart#description" do
 		it "returns the @description attr" do
 			@volume = Sleuthkit::VolumeSystem.new(@partitioned_image)
-			@part = @volume.expose_part
+			@part = @volume.parts.first
 			@part.description.should eq("Unallocated")
 		end
 	end
