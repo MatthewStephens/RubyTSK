@@ -133,13 +133,13 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKImage, "image_open", image_open, 2);
 
   // attributes (read only)
-  rb_define_attr(rb_cTSKImage, "path", 1, 0);
-  rb_define_attr(rb_cTSKImage, "size", 1, 0);
-  rb_define_attr(rb_cTSKImage, "sector_size", 1, 0);
-  rb_define_attr(rb_cTSKImage, "type", 1, 0);
+  rb_define_attr(rb_cTSKImage, "auto_detect", 1, 0);
   rb_define_attr(rb_cTSKImage, "description", 1, 0);
   rb_define_attr(rb_cTSKImage, "name", 1, 0);
-  rb_define_attr(rb_cTSKImage, "auto_detect", 1, 0);
+  rb_define_attr(rb_cTSKImage, "path", 1, 0);
+  rb_define_attr(rb_cTSKImage, "sector_size", 1, 0);
+  rb_define_attr(rb_cTSKImage, "size", 1, 0);
+  rb_define_attr(rb_cTSKImage, "type", 1, 0);
 
   
   /* Sleuthkit::Volume */
@@ -149,20 +149,18 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKVolumeSystem, "close", close_volume_system, 1);
   rb_define_method(rb_cTSKVolumeSystem, "read_block", read_volume_block, 3); //read block given start and no. of blocks
   rb_define_method(rb_cTSKVolumeSystem, "walk", walk_volume, 1);
-  rb_define_method(rb_cTSKVolumeSystem, "expose_part", volume_expose_part, 0);
   rb_define_method(rb_cTSKVolumeSystem, "expose_part_at", volume_expose_part_by_idx, 1);
   rb_define_private_method(rb_cTSKVolumeSystem, "get_partitions", volume_get_partitions, 1);
   
   // attributes
-  rb_define_attr(rb_cTSKVolumeSystem, "partition_count", 1, 0);
-  rb_define_attr(rb_cTSKVolumeSystem, "endian", 1, 0);
-  rb_define_attr(rb_cTSKVolumeSystem, "offset", 1, 0);
   rb_define_attr(rb_cTSKVolumeSystem, "block_size", 1, 0);
   rb_define_attr(rb_cTSKVolumeSystem, "description", 1, 0);
-  rb_define_attr(rb_cTSKVolumeSystem, "volume_system_type", 1, 0);
-  rb_define_attr(rb_cTSKVolumeSystem, "parts", 1, 0);
-  rb_define_attr(rb_cTSKVolumeSystem, "partition_one", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "endian", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "offset", 1, 0);
   rb_define_attr(rb_cTSKVolumeSystem, "parent", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "partition_count", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "parts", 1, 0);
+  rb_define_attr(rb_cTSKVolumeSystem, "volume_system_type", 1, 0);
 
 
   
@@ -174,16 +172,16 @@ void Init_tsk4r() {
 //  rb_define_method(rb_cTSKVolumePart, "walk", walk_volume_part, 1);
     
   // attributes
-  rb_define_attr(rb_cTSKVolumePart, "start", 1, 0);
-  rb_define_attr(rb_cTSKVolumePart, "length", 1, 0);
-  rb_define_attr(rb_cTSKVolumePart, "description", 1, 0);
-  rb_define_attr(rb_cTSKVolumePart, "table_number", 1, 0);
-  rb_define_attr(rb_cTSKVolumePart, "slot_number", 1, 0);
   rb_define_attr(rb_cTSKVolumePart, "address", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "description", 1, 0);
   rb_define_attr(rb_cTSKVolumePart, "flags", 1, 0);
-  rb_define_attr(rb_cTSKVolumePart, "parent", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "length", 1, 0);
   rb_define_attr(rb_cTSKVolumePart, "next", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "parent", 1, 0);
   rb_define_attr(rb_cTSKVolumePart, "prev", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "slot_number", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "start", 1, 0);
+  rb_define_attr(rb_cTSKVolumePart, "table_number", 1, 0);
   
   /* Sleuthkit::FileSystem */
   // object methods for FileSystem objects
@@ -220,9 +218,9 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKFileSystemFileData, "initialize", initialize_fs_file, -1);
   rb_define_method(rb_cTSKFileSystemFileData, "open_fs_file", open_fs_file, -1);
   // attributes
-  rb_define_attr(rb_cTSKFileSystemFileData, "parent", 1, 0);
-  rb_define_attr(rb_cTSKFileSystemFileData, "content_len", 1, 0);
   rb_define_attr(rb_cTSKFileSystemFileData, "address", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileData, "content_len", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileData, "parent", 1, 0);
 
   
   /* Sleuthkit::FileSystemFileMeta */
