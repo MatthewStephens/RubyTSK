@@ -4,7 +4,7 @@ module Sleuthkit
     include ::Sleuthkit
 
     def tsk_fsstat(file)
-      file.puts 'Hi Matt!'
+      file.puts 'Method returns.'
     end
     def print_tsk_fsstat(report = "")
       # require 'ruby-debug'; debugger

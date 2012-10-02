@@ -19,4 +19,8 @@ module Sleuthkit
       return opts
     end
   end
+  
+  class VolumePart
+    include ::Sleuthkit
+  end
 end
