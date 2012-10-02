@@ -81,6 +81,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
     rb_iv_set(self, "@parent", parent_obj);
     
   } else {
+    rb_funcall(self, rb_intern("taint"), 0, NULL);
     rb_warn("filesystem pointer is NULL\n");
   }
   return self;

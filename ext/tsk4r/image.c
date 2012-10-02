@@ -65,6 +65,8 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
   }
 
   if (ptr->image == NULL) {
+    rb_funcall(self, rb_intern("taint"), 0, NULL);
+
     return Qnil;
     
   } else {

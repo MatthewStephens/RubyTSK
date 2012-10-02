@@ -11,21 +11,46 @@ module Sleuthkit
   require 'pp'
   
   def self.open(path, opts={})
-    @image = nil
+    image = nil
     case path
     when String
-      @image = Sleuthkit::Image.new(path, opts)
+      image = Sleuthkit::Image.new(path, opts)
     when Array
-      @image = Sleuthkit::Image.new(path, opts)
+      image = Sleuthkit::Image.new(path, opts)
     else
+      return nil
     end
-    
+    if image == nil
+      return nil
+    else
+      volume = Sleuthkit::VolumeSystem.new(image)
+      if ! volume.tainted?
+        image.volumes = []
+        image.volumes << volume
+        filesystem = Sleuthkit::FileSystem.new(volume)
+        if ! filesystem.tainted?
+          image.filesystems = []
+          image.filesystems << filesystem
+        end
+      else
+        image.volumes = nil
+        filesystem = Sleuthkit::FileSystem.new(image)
+        if ! filesystem.tainted?
+          image.filesystems = []
+          image.filesystems << filesystem
+        else
+          image.filesystems = nil
+          # more to do here
+        end
+      end
+    end
+    return image
   end
   
   # tell us about yourself
-	def self.version_string
-		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION} (TSK version: #{Sleuthkit::TSK_VERSION})"
-	end
+  def self.version_string
+    "Sleuthkit Ruby Binding version #{Sleuthkit::VERSION} (TSK version: #{Sleuthkit::TSK_VERSION})"
+  end
   def [](sym)
     self.instance_variable_get("@#{sym.to_s}")
   end

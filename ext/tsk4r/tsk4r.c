@@ -140,6 +140,11 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKImage, "sector_size", 1, 0);
   rb_define_attr(rb_cTSKImage, "size", 1, 0);
   rb_define_attr(rb_cTSKImage, "type", 1, 0);
+  
+  // attributes for linking RubyTSK objects
+  rb_define_attr(rb_cTSKImage, "volumes", 1, 1);
+  rb_define_attr(rb_cTSKImage, "filesystems", 1, 1);
+
 
   
   /* Sleuthkit::Volume */

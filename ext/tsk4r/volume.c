@@ -51,7 +51,6 @@ VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
   } else {
     rb_raise(rb_eTypeError, "Wrong argument type for arg1: (Sleuthkit::Image expected)");
   }
-  
   return self;
 }
 
@@ -89,8 +88,9 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE opts) {
       return self;
       
     } else {
-      rb_raise(rb_eRuntimeError, "No Volume System found!");
-      return Qnil;
+      rb_warn( "No Volume System found!");
+      rb_funcall(self, rb_intern("taint"), 0, NULL);
+      return self;
     }
   }
 }
