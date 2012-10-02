@@ -21,7 +21,7 @@ module Sleuthkit
     #debugger
     h = Hash.new
     self.instance_variables.each do |var|
-      h[var.gsub(/@/, '').to_sym] = instance_variable_get(var)
+      h[var.to_s.gsub(/@/, '').to_sym] = instance_variable_get(var)
     end
     h
   end
