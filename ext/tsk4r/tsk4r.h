@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-#define VERSION "0.0.2"
+#define VERSION "0.0.3"
 #ifndef TSK4R_H
 #define TSK4R_H
 
