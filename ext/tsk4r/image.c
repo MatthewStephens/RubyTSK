@@ -41,6 +41,7 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
     rb_str_modify(filename_location);
     filename=StringValuePtr(filename_location);
     ptr->image = tsk_img_open_sing(filename, (TSK_IMG_TYPE_ENUM)type_flag_num, 0); // 0=default sector size
+    if (ptr->image == NULL) rb_warn("unable to open image %s.\n", StringValuePtr(filename_location));
 
   }
   else if (rb_obj_is_kind_of(filename_location, rb_cArray)) {
@@ -48,25 +49,27 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
     typedef TSK_TCHAR * split_list;
     split_list images[255]; // to do: make array length reflect list's length
 
-    for (i=0; i < RARRAY(filename_location)->len; i++) {
+    for (i=0; i < RARRAY_LEN(filename_location); i++) {
       VALUE rstring = rb_ary_entry(filename_location, i);
       images[i] = StringValuePtr(rstring);
     }
-    int count = (int)RARRAY(filename_location)->len;
+    int count = (int)RARRAY_LEN(filename_location);
 
     ptr->image = tsk_img_open(count, (const TSK_TCHAR **)images, (TSK_IMG_TYPE_ENUM)type_flag_num, 0); // 0=default sector size
-    
+    VALUE arr_to_s = rb_funcall(filename_location, rb_intern("to_s"), 0, NULL);
+    if (ptr->image == NULL) rb_warn("unable to open images %s.\n", StringValuePtr(arr_to_s));
+
   }
   else {
     rb_raise(rb_eArgError, "Arg1 should be String or Array of strings.");
   }
 
   if (ptr->image == NULL) {
-    rb_warn("unable to open %s.\n", filename_location);
-  }
-  
-  TSK_IMG_INFO *image = ptr->image;
-  if (ptr->image != NULL) {
+    return Qnil;
+    
+  } else {
+    TSK_IMG_INFO *image = ptr->image;
+
     img_size = LONG2NUM(image->size);
     img_sector_size = INT2NUM((int)image->sector_size);
     TSK_IMG_TYPE_ENUM typenum = image->itype;
@@ -79,17 +82,15 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
     rb_iv_set(self, "@description", description);
     rb_iv_set(self, "@name", name);
     
-    return Qtrue;
-  } else {
-    printf("problem opening disk\n");
-    return Qnil;
+    return self;
   }
 }
 
 // init an Image object, passing params to image_open
 // note that class of arg1, if array, will override requests for 'single' image
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
-  VALUE filename; VALUE flag; VALUE result;
+  VALUE filename; VALUE flag;
+  struct tsk4r_img_wrapper * ptr;
 
   //  static struct tsk4r_img_wrapper * ptr;
   rb_scan_args(argc, args, "11", &filename, &flag);
@@ -107,22 +108,23 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
     rb_raise (rb_eRuntimeError, "invalid arguments");
 
   }
-  
+
   if( ! NIL_P(filename)) {
     // string for single image, array for split images
     rb_iv_set(self, "@path", filename);
     if (rb_obj_is_kind_of(filename, rb_cString)) {
-      result = image_open(self, filename, flag); // passing flag (disk_type) as ruby FIXNUM
+      image_open(self, filename, flag); // passing flag (disk_type) as ruby FIXNUM
     } else if (rb_obj_is_kind_of(filename, rb_cArray)) {
-      result = image_open(self, filename, flag);
+      image_open(self, filename, flag);
     } else {
       rb_raise(rb_eTypeError, "arg1 must be String or Array");
     }
   } else {
     rb_raise(rb_eArgError, "Arg1 must be filename (string)");
   }
-  if (RTEST(result)) {
-//    rb_funcall(self, rb_intern("pure_ruby"), 1, INT2NUM(2));
+  
+  Data_Get_Struct(self, struct tsk4r_img_wrapper, ptr);
+  if ( ptr->image != NULL ) {
     return self;
   } else {
     return Qnil;
