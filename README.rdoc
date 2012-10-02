@@ -35,11 +35,16 @@ require 'sleuthkit'
 
 Install (RVM https://rvm.io is recommended for managing gems):
 
-to load ruby dependencies: 'bundle'
+to load ruby dependencies: run the 'bundle' command (recommended)
 
-rake build     (prepares the gem for installation from sleuthkit.gemspec)
-rake compile   (compiles the gem in the 'pkg' directory; handy for running tests)
-rake install   (puts the gem in your local gem repository)
+ bundle
+ rake build     (prepares the gem for installation from sleuthkit.gemspec)
+ rake compile   (compiles the gem in the 'pkg' directory; handy for running tests)
+ rake install   (puts the gem in your local gem repository)
+
+if you upgrade/make changes to the library:
+ rake clean
+then re-try the instructions above.
 
 == Dependencies
 
@@ -47,6 +52,8 @@ Requirements: The SleuthKit C library (install with your favorite package manage
 Version >= 3.2
 
 see http://www.sleuthkit.org for details.
+
+RubyTSK was primarily developed on Ruby 1.8.  Work on accomodating 1.9.x is progressing. ;-)
 
 == License
 
@@ -69,14 +76,19 @@ limitations under the License.
 
 == TESTING
 
+NOTE: You should open up the compressed samples before running any tests, to do so:
+
+ rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
+ rake spec:samples:split             # splits a sample for use in tests
+
+Compressed test images are found in the 'samples' directory.
+
+
 RubyTSK is built using the RSpec testing DSL, available via the Rake build tool.
 
  rake spec
 OR
  rake -T spec:suite  # displays suites of test that can be run independently
 
-Compressed test images are found in the 'samples' directory, to unpack:
 
- rake spec:samples:uncompress[file]  # Uncompress sample disk images (default = all images in 'samples')
- rake spec:samples:split             # splits a sample for use in tests
 
