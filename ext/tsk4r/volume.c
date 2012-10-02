@@ -95,16 +95,7 @@ VALUE open_volume_system(VALUE self, VALUE img_obj, VALUE opts) {
   }
 }
 
-// called on VolumeSystem, returns first VolumePart
-VALUE volume_expose_part(VALUE self) {
-  VALUE volume_part;
-  
-  // call VolumePart.new, passing self
-  volume_part = rb_funcall(rb_cTSKVolumePart, rb_intern("new"), 1, self);
-
-  return volume_part;
-}
-
+// called on VolumeSystem, returns array of VolumePart objects, assigned to @parts
 VALUE volume_get_partitions(VALUE self) {
   VALUE part_count = rb_attr_get(self, rb_intern("@partition_count"));
   VALUE part_array = rb_ary_new2(FIX2LONG(part_count));
