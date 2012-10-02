@@ -22,7 +22,6 @@ VALUE allocate_image(VALUE klass);
 void  deallocate_image(struct tsk4r_img_wrapper * ptr);
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self);
 VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type);
-VALUE image_size(VALUE self);
 VALUE image_type_to_desc(TSK_IMG_TYPE_ENUM num);
 VALUE image_type_to_name(TSK_IMG_TYPE_ENUM num);
 
