@@ -19,10 +19,10 @@ describe "spec/filesystem" do
   end
   
   describe "Directory Open by inum (inum)" do
-    it "should return a directory listing by name" do
+    it "should return a directory listing sought by inum" do
       @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
       name = '/Test_Root_Folder'
-      inum = 2
+      inum = 26
       puts inum.class
       @dir = @filesystem.find_directory_by_inum(inum)
       puts @dir.class
@@ -30,9 +30,9 @@ describe "spec/filesystem" do
     end
   end
   describe "Directory Open (name)" do
-    it "should return a directory listing by name" do
+    it "should return a directory listing sought by name" do
       @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
-      name = '/Test_Root_Folder'
+      name = 'Test_Root_Folder'
       @dir = @filesystem.find_directory_by_name(name)
       @dir.should be_an_instance_of Sleuthkit::FileSystemDirectory 
     end
