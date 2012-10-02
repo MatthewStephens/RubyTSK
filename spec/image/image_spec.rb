@@ -31,6 +31,20 @@ describe "spec/image" do
 	    @image.description.should be_nil
     end
   end
+  describe "#new(@sammple_image, :type_flag => 1)" do
+	  it "initializes with specified TSK_IMG_TYPE_ENUM value of 1" do
+	    @image = Sleuthkit::Image.new(@sample_filename, :type_flag => 1)
+	    @image.auto_detect.should eq(false)
+	    @image.size.should eq(40992768)
+    end
+  end
+  describe "#new(@sammple_image, {:type_flag => 1, :offset => 0})" do
+	  it "initializes with specified TSK_IMG_TYPE_ENUM value of 1, with extra option" do
+	    @image = Sleuthkit::Image.new(@sample_filename, {:type_flag => 1, :offset => 0})
+	    @image.auto_detect.should eq(false)
+	    @image.size.should eq(40992768)
+    end
+  end
   describe "#new( *arr )" do
     it "should open a split raw image from array of filenames" do
       puts @split_image_files
