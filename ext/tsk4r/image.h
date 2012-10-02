@@ -12,8 +12,7 @@
 #include <tsk3/libtsk.h>
 
 
-// Sleuthkit::Image struct
-//extern struct tsk4r_img_wrapper tsk4r_img_wrapper;
+// Sleuthkit::Image struct-in-ruby-object
 struct tsk4r_img_wrapper {
   TSK_IMG_INFO * image;
 };

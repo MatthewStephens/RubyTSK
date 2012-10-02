@@ -14,14 +14,12 @@
 // Sleuthkit::Volume struct
 struct tsk4r_vs_wrapper {
   TSK_VS_INFO * volume;
-  //  tsk4r_img_wrapper * disk;
 };
 
 struct tsk4r_vpart_wrapper {
   const TSK_VS_PART_INFO * volume_part;
 };
 
-//VALUE rb_cTSKImage;
 
 // Sleuthkit::VolumeSystem function declarations
 VALUE allocate_volume_system(VALUE klass);

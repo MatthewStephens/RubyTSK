@@ -92,7 +92,7 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   VALUE filename; VALUE flag; VALUE result;
 
   //  static struct tsk4r_img_wrapper * ptr;
-  rb_scan_args(argc, args, "12", &filename, &flag);
+  rb_scan_args(argc, args, "11", &filename, &flag);
   if (NIL_P(flag)) { flag = INT2NUM(0); }
   
   TSK_IMG_TYPE_ENUM * flag_num = get_img_flag(flag);
