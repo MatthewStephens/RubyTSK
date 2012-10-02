@@ -97,6 +97,10 @@ void Init_tsk4r() {
   rb_cTSKVolumePart      = rb_define_class_under(rb_mtsk4r, "VolumePart", rb_cObject);
   rb_cTSKFileSystem      = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
   rb_cTSKFileSystemDir   = rb_define_class_under(rb_mtsk4r, "FileSystemDirectory", rb_cObject);
+  rb_cTSKFileSystemFileData   = rb_define_class_under(rb_mtsk4r, "FileSystemFileData", rb_cObject);
+  rb_cTSKFileSystemFileMeta   = rb_define_class_under(rb_mtsk4r, "FileSystemFileMeta", rb_cObject);
+  rb_cTSKFileSystemFileName   = rb_define_class_under(rb_mtsk4r, "FileSystemFileName", rb_cObject);
+
   
   // allocation functions
   rb_define_alloc_func(rb_cTSKImage, allocate_image);
@@ -104,6 +108,10 @@ void Init_tsk4r() {
   rb_define_alloc_func(rb_cTSKVolumePart, allocate_volume_part);
   rb_define_alloc_func(rb_cTSKFileSystem, allocate_filesystem);
   rb_define_alloc_func(rb_cTSKFileSystemDir, allocate_fs_dir);
+  rb_define_alloc_func(rb_cTSKFileSystemFileData, allocate_fs_file);
+  rb_define_alloc_func(rb_cTSKFileSystemFileMeta, allocate_fs_meta);
+  rb_define_alloc_func(rb_cTSKFileSystemFileName, allocate_fs_name);
+
 
   // sub classes
   //rb_cTSKFileSystem = rb_define_class_under(rb_cTSKVolume, "ThirdClass", rb_cObject);
@@ -198,13 +206,40 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKFileSystem, "parent", 1, 0);
   
   
-  /* Sleuthkit::FileSystemDir */
+  /* Sleuthkit::FileSystemDirectory */
   // object methods for FileSystemDirectory objects
   rb_define_method(rb_cTSKFileSystemDir, "initialize", initialize_fs_dir, -1);
   
   // attributes
   rb_define_attr(rb_cTSKFileSystemDir, "parent", 1, 0);
   
+
+  /* Sleuthkit::FileSystemFileData */
+  
+  // object methods for FileSystemFileData objects
+  rb_define_method(rb_cTSKFileSystemFileData, "initialize", initialize_fs_file, -1);
+  rb_define_method(rb_cTSKFileSystemFileData, "open_fs_file", open_fs_file, -1);
+  // attributes
+  rb_define_attr(rb_cTSKFileSystemFileData, "parent", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileData, "content_len", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileData, "address", 1, 0);
+
+  
+  /* Sleuthkit::FileSystemFileMeta */
+  
+  // object methods for FileSystemFileMeta objects
+  rb_define_method(rb_cTSKFileSystemFileMeta, "initialize", initialize_fs_meta, -1);
+  
+  // attributes
+  rb_define_attr(rb_cTSKFileSystemFileMeta, "parent", 1, 0);
+  
+  /* Sleuthkit::FileSystemFileName */
+  
+  // object methods for FileSystemFileName objects
+  rb_define_method(rb_cTSKFileSystemFileName, "initialize", initialize_fs_name, -1);
+  
+  // attributes
+  rb_define_attr(rb_cTSKFileSystemFileName, "parent", 1, 0);
 
 
 }

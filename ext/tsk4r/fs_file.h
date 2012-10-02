@@ -40,5 +40,8 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self);
 VALUE initialize_fs_meta(int argc, VALUE *args, VALUE self);
 VALUE initialize_fs_name(int argc, VALUE *args, VALUE self);
 
+VALUE open_fs_file(int argc, VALUE *args, VALUE self);
+
+
 
 #endif
