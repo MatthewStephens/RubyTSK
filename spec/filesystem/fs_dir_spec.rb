@@ -26,16 +26,15 @@ describe "spec/filesystem" do
       puts inum.class
       @dir = @filesystem.find_directory_by_inum(inum)
       puts @dir.class
-      @dir.to_s.should be_true
+      @dir.should be_an_instance_of Sleuthkit::FileSystemDirectory 
     end
   end
   describe "Directory Open (name)" do
     it "should return a directory listing by name" do
       @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
-      # name = '/Test_Root_Folder'
-      name = "/"
-      @dir = @filesystem.find_directory(name)
-      @dir.to_s.should eq(name)
+      name = '/Test_Root_Folder'
+      @dir = @filesystem.find_directory_by_name(name)
+      @dir.should be_an_instance_of Sleuthkit::FileSystemDirectory 
     end
   end
   

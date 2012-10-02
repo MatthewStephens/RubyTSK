@@ -25,6 +25,7 @@
 #include "image.h"
 #include "volume.h"
 #include "file_system.h"
+#include "fs_dir.h"
 
 // Prototype for the initialization method - Ruby calls this, not you
 void Init_tsk4r();
@@ -35,6 +36,7 @@ VALUE rb_cTSKImage;
 VALUE rb_cTSKVolumeSystem;
 VALUE rb_cTSKVolumePart;
 VALUE rb_cTSKFileSystem;
+VALUE rb_cTSKFileSystemDir;
 
 VALUE allocate_image(VALUE klass);
 

@@ -92,17 +92,18 @@ void Init_tsk4r() {
   rb_const_set(rb_mtsk4r, rb_intern("TSK_VERSION"), rb_str_new2(tsk_version_get_str()));
   
   // class definitions
-  rb_cTSKImage        = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
-  rb_cTSKVolumeSystem = rb_define_class_under(rb_mtsk4r, "VolumeSystem", rb_cObject);
-  rb_cTSKVolumePart   = rb_define_class_under(rb_mtsk4r, "VolumePart", rb_cObject);
-  rb_cTSKFileSystem   = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
+  rb_cTSKImage           = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
+  rb_cTSKVolumeSystem    = rb_define_class_under(rb_mtsk4r, "VolumeSystem", rb_cObject);
+  rb_cTSKVolumePart      = rb_define_class_under(rb_mtsk4r, "VolumePart", rb_cObject);
+  rb_cTSKFileSystem      = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
+  rb_cTSKFileSystemDir   = rb_define_class_under(rb_mtsk4r, "FileSystemDirectory", rb_cObject);
   
   // allocation functions
   rb_define_alloc_func(rb_cTSKImage, allocate_image);
   rb_define_alloc_func(rb_cTSKVolumeSystem, allocate_volume_system);
   rb_define_alloc_func(rb_cTSKVolumePart, allocate_volume_part);
   rb_define_alloc_func(rb_cTSKFileSystem, allocate_filesystem);
-
+  rb_define_alloc_func(rb_cTSKFileSystemDir, allocate_fs_dir);
 
   // sub classes
   //rb_cTSKFileSystem = rb_define_class_under(rb_cTSKVolume, "ThirdClass", rb_cObject);
@@ -182,7 +183,8 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, -1); // change arg1 to klass?
   rb_define_method(rb_cTSKFileSystem, "system_name", get_filesystem_type, 0);
   rb_define_method(rb_cTSKFileSystem, "call_tsk_fsstat", call_tsk_fsstat, 1);
-  
+  rb_define_method(rb_cTSKFileSystem, "open_directory_by_name", open_directory_by_name, -1);
+  rb_define_method(rb_cTSKFileSystem, "open_directory_by_inum", open_directory_by_inum, -1);
   
   // attributes based on TSK struct
 
@@ -194,6 +196,16 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKFileSystem, "name", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "description", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "parent", 1, 0);
+  
+  
+  /* Sleuthkit::FileSystemDir */
+  // object methods for FileSystemDirectory objects
+  rb_define_method(rb_cTSKFileSystemDir, "initialize", initialize_fs_dir, -1);
+  
+  // attributes
+  rb_define_attr(rb_cTSKFileSystemDir, "parent", 1, 0);
+  
+
 
 }
 

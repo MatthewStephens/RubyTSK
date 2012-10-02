@@ -24,14 +24,14 @@ module Sleuthkit
     end
     
     def find_directory(name_or_inum)
-      puts "#{str.class} recieved"
+      puts "#{name_or_inum.class} recieved"
       puts "Ruby #find_directory looking for #{name}"
       result = nil
-      case str
+      case name_or_inum
         when String
-          result = self.open_directory_by_name(name_or_inum)
+          result = self.find_directory_by_name(name_or_inum)
         when Fixnum
-          result = self.open_directory_by_inum(name_or_inum)
+          result = self.find_directory_by_inum(name_or_inum)
         else
           result = nil
       end
@@ -40,7 +40,7 @@ module Sleuthkit
     
     def find_directory_by_name(name)
       puts "Ruby #find_directory_by_name looking for #{name}"
-      result = self.open_directory_by_inum(name)
+      result = self.open_directory_by_name(name)
     end
     def find_directory_by_inum(n)
       inum = n.to_i
