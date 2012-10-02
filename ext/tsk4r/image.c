@@ -89,12 +89,17 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
 // init an Image object, passing params to image_open
 // note that class of arg1, if array, will override requests for 'single' image
 VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
-  VALUE filename; VALUE flag;
+  VALUE filename; VALUE rest; VALUE parsed_opts; VALUE flag;
   struct tsk4r_img_wrapper * ptr;
 
-  //  static struct tsk4r_img_wrapper * ptr;
-  rb_scan_args(argc, args, "11", &filename, &flag);
-  if (NIL_P(flag)) { flag = INT2NUM(0); }
+  rb_scan_args(argc, args, "11", &filename, &rest);
+  if (NIL_P(rest)) rest = rb_hash_new();
+  
+  parsed_opts = rb_funcall(self, rb_intern("parse_opts"), 1, rest);
+
+  flag = rb_hash_aref(parsed_opts, ID2SYM(rb_intern("type_flag")));
+  if (! rb_obj_is_kind_of(flag, rb_cFixnum)) { flag = INT2NUM(0); }
+  printf("flag at line 103 = %lu\n", FIX2INT(flag));
   
   TSK_IMG_TYPE_ENUM * flag_num = get_img_flag(flag);
   if ( (! NIL_P(filename)) && (flag_num > 0)  ) {

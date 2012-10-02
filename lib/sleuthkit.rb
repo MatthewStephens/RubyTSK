@@ -10,6 +10,18 @@ module Sleuthkit
   # require 'ruby-debug'
   require 'pp'
   
+  def self.open(path, opts={})
+    @image = nil
+    case path
+    when String
+      @image = Sleuthkit::Image.new(path, opts)
+    when Array
+      @image = Sleuthkit::Image.new(path, opts)
+    else
+    end
+    
+  end
+  
   # tell us about yourself
 	def self.version_string
 		"Sleuthkit Ruby Binding version #{Sleuthkit::VERSION} (TSK version: #{Sleuthkit::TSK_VERSION})"

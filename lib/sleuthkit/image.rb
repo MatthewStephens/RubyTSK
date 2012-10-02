@@ -35,10 +35,17 @@ module Sleuthkit
         @number_of_sectors = div
       end
     end
-    def pure_ruby(n)
-      puts "HEY, we got method called from C but written in Ruby!!\n"
+    # private
+    def parse_opts(h={})
+      opts = h || Hash.new
+      if h.kind_of?(Fixnum) then opts = {:type_flag => h} end
+      presets = { :offset => 0, :type_flag => 0 }      
+      presets.each_pair do |key, val|
+        unless opts.has_key?(key) then opts[key] = val end
+      end
+      opts.each_pair do |k,v| puts " #{k}, #{v}" end
+      return opts
     end
-
 
   end
 end
