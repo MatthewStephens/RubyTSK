@@ -33,6 +33,9 @@ void Init_tsk4r();
 
 // Prototype for the module and classes directly below it
 VALUE rb_mtsk4r;
+VALUE rb_mtsk4r_v;
+VALUE rb_mtsk4r_fs;
+
 VALUE rb_cTSKImage;
 VALUE rb_cTSKVolumeSystem;
 VALUE rb_cTSKVolumePart;

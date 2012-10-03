@@ -88,18 +88,21 @@ const char * TSK4R_FS_ATTRS[TSK4R_FS_ATTRS_COUNT] = { "block_count",
 // The initialization method for this module
 void Init_tsk4r() {
   rb_mtsk4r = rb_define_module("Sleuthkit");
+  rb_mtsk4r_v = rb_define_module_under(rb_mtsk4r, "Volume");
+  rb_mtsk4r_fs = rb_define_module_under(rb_mtsk4r, "FileSystem");
+
   
   rb_const_set(rb_mtsk4r, rb_intern("TSK_VERSION"), rb_str_new2(tsk_version_get_str()));
   
   // class definitions
   rb_cTSKImage           = rb_define_class_under(rb_mtsk4r, "Image", rb_cObject);
-  rb_cTSKVolumeSystem    = rb_define_class_under(rb_mtsk4r, "VolumeSystem", rb_cObject);
-  rb_cTSKVolumePart      = rb_define_class_under(rb_mtsk4r, "VolumePart", rb_cObject);
-  rb_cTSKFileSystem      = rb_define_class_under(rb_mtsk4r, "FileSystem", rb_cObject);
-  rb_cTSKFileSystemDir   = rb_define_class_under(rb_mtsk4r, "FileSystemDirectory", rb_cObject);
-  rb_cTSKFileSystemFileData   = rb_define_class_under(rb_mtsk4r, "FileSystemFileData", rb_cObject);
-  rb_cTSKFileSystemFileMeta   = rb_define_class_under(rb_mtsk4r, "FileSystemFileMeta", rb_cObject);
-  rb_cTSKFileSystemFileName   = rb_define_class_under(rb_mtsk4r, "FileSystemFileName", rb_cObject);
+  rb_cTSKVolumeSystem    = rb_define_class_under(rb_mtsk4r_v, "System", rb_cObject);
+  rb_cTSKVolumePart      = rb_define_class_under(rb_mtsk4r_v, "Partition", rb_cObject);
+  rb_cTSKFileSystem      = rb_define_class_under(rb_mtsk4r_fs, "System", rb_cObject);
+  rb_cTSKFileSystemDir   = rb_define_class_under(rb_mtsk4r_fs, "Directory", rb_cObject);
+  rb_cTSKFileSystemFileData   = rb_define_class_under(rb_mtsk4r_fs, "FileData", rb_cObject);
+  rb_cTSKFileSystemFileMeta   = rb_define_class_under(rb_mtsk4r_fs, "FileMeta", rb_cObject);
+  rb_cTSKFileSystemFileName   = rb_define_class_under(rb_mtsk4r_fs, "FileName", rb_cObject);
 
   
   // allocation functions

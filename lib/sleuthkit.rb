@@ -7,6 +7,10 @@ require 'tsk4r/tsk4r' # gem install process uses this dir
 # require 'sleuthkit/image.rb'
 
 module Sleuthkit
+  module Volume
+  end
+  module FileSystem
+  end
   # require 'ruby-debug'
   require 'pp'
   
@@ -23,18 +27,18 @@ module Sleuthkit
     if image == nil
       return nil
     else
-      volume = Sleuthkit::VolumeSystem.new(image)
+      volume = Sleuthkit::Volume::System.new(image)
       if ! volume.tainted?
         image.volumes = []
         image.volumes << volume
-        filesystem = Sleuthkit::FileSystem.new(volume)
+        filesystem = Sleuthkit::FileSystem::System.new(volume)
         if ! filesystem.tainted?
           image.filesystems = []
           image.filesystems << filesystem
         end
       else
         image.volumes = nil
-        filesystem = Sleuthkit::FileSystem.new(image)
+        filesystem = Sleuthkit::FileSystem::System.new(image)
         if ! filesystem.tainted?
           image.filesystems = []
           image.filesystems << filesystem

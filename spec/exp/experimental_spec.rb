@@ -15,7 +15,7 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
     @mac_fs_only_image = Sleuthkit::Image.new(@mac_fs_only_image_path)
     @mac_partitioned_image = Sleuthkit::Image.new(@mac_partitioned_image_path)
   
-    @volume = Sleuthkit::VolumeSystem.new(@mac_partitioned_image)
+    @volume = Sleuthkit::Volume::System.new(@mac_partitioned_image)
     @string = "some string"
   end
 

@@ -15,26 +15,26 @@ describe "spec/filesystem" do
     @mac_fs_only_image = Sleuthkit::Image.new(@mac_fs_only_image_path)
     @mac_partitioned_image = Sleuthkit::Image.new(@mac_partitioned_image_path)
     
-    @volume = Sleuthkit::VolumeSystem.new(@mac_partitioned_image)
+    @volume = Sleuthkit::Volume::System.new(@mac_partitioned_image)
   end
   
   # use `icat mac_fs_only_image_path inum` to troubleshoot
   describe "File Open by inum (inum)" do
     it "should return a directory listing sought by inum" do
-      @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+      @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       inum = 35
       puts inum.class
-      @tsk_file = Sleuthkit::FileSystemFileData.new(@filesystem, inum)
+      @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, inum)
       @tsk_file.name.should match("README")
       @tsk_file.should be_an_instance_of Sleuthkit::FileSystemFileData 
     end
   end
   # describe "File Open (name)" do
   #   it "should return a directory listing sought by name" do
-  #     @filesystem = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+  #     @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
   #     name = 'Test_Root_Folder'
-  #     @tsk_file = Sleuthkit::FileSystemFileData.new(@filesystem, name)
-  #     @dir.should be_an_instance_of Sleuthkit::FileSystemFileData 
+  #     @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, name)
+  #     @dir.should be_an_instance_of Sleuthkit::FileSystem::FileData 
   #   end
   # end
   

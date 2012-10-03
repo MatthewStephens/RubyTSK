@@ -67,7 +67,7 @@ VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
     open_fs_from_partition(self, parent_obj, opts);
     
   } else {
-    rb_raise(rb_eTypeError, "arg1 must be a SleuthKit::Image, SleuthKit::VolumeSystem or SleuthKit::VolumePart object.");
+    rb_raise(rb_eTypeError, "arg1 must be a SleuthKit::Image, SleuthKit::Volume::System or SleuthKit::Volume::Partition object.");
   }
   
   if (fs_ptr->filesystem != NULL) {
