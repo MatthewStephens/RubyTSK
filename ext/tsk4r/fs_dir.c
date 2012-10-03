@@ -20,9 +20,7 @@ extern VALUE rb_cTSKFileSystemDir;
 
 // creation functions
 VALUE allocate_fs_dir(VALUE klass){
-  printf("allocate_fs_dir starting...\n");
   struct tsk4r_fs_dir_wrapper * ptr;
-  printf("finishing allocation.\n");
   return Data_Make_Struct(klass, struct tsk4r_fs_dir_wrapper, 0, deallocate_fs_dir, ptr);
 }
 

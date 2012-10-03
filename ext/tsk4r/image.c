@@ -101,7 +101,6 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
 
   flag = rb_hash_aref(parsed_opts, ID2SYM(rb_intern("type_flag")));
   if (! rb_obj_is_kind_of(flag, rb_cFixnum)) { flag = INT2NUM(0); }
-  printf("flag at line 103 = %lu\n", FIX2INT(flag));
   
   TSK_IMG_TYPE_ENUM * flag_num = get_img_flag(flag);
   if ( (! NIL_P(filename)) && (flag_num > 0)  ) {

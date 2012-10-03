@@ -43,7 +43,6 @@ module Sleuthkit
       presets.each_pair do |key, val|
         unless opts.has_key?(key) then opts[key] = val end
       end
-      opts.each_pair do |k,v| puts " #{k}, #{v}" end
       return opts
     end
 

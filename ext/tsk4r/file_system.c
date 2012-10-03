@@ -27,10 +27,8 @@ void populate_instance_variables(VALUE self);
 // functions
 
 VALUE allocate_filesystem(VALUE klass){
-  printf("allocate_filesystem starting...\n");
   struct tsk4r_fs_wrapper * ptr;
   //    ptr = ALLOC(struct tsk4r_fs_wrapper);
-  printf("finishing allocation.\n");
   return Data_Make_Struct(klass, struct tsk4r_fs_wrapper, 0, deallocate_filesystem, ptr);
 }
 
@@ -56,7 +54,6 @@ VALUE initialize_filesystem(int argc, VALUE *args, VALUE self){
 
 
 VALUE open_filesystem(VALUE self, VALUE parent_obj, VALUE opts) {
-  printf("open_filesystem here....\n");
   struct tsk4r_fs_wrapper * fs_ptr;
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   
@@ -125,7 +122,7 @@ VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
   while (c < rb_volumesystem->volume->part_count) {
     const TSK_VS_PART_INFO * partition = tsk_vs_part_get(rb_volumesystem->volume, c);
     my_pointer->filesystem = tsk_fs_open_vol(partition, (TSK_FS_TYPE_ENUM)type_flag_num);
-    if (my_pointer->filesystem != NULL) { break; } else { printf("failed on index %d\n", c); }
+    if (my_pointer->filesystem != NULL) { break; }
     c++;
   }
   return self;
