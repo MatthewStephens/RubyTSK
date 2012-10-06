@@ -1,5 +1,6 @@
 describe "spec/filesystem" do
   require 'sleuthkit'
+  require 'awesome_print'
   
   before :all do
     @sample_dir="samples"
@@ -20,17 +21,27 @@ describe "spec/filesystem" do
   
   # use `icat mac_fs_only_image_path inum` to troubleshoot
   describe "File Open by inum (inum)" do
-    it "should return a directory listing sought by inum" do
+    it "should return a file object sought by inum" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
-      inum = 35
-      puts inum.class
+      inum = 28
       @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, inum)
-      @tsk_file.name.should match("README")
-      @tsk_file.should be_an_instance_of Sleuthkit::FileSystemFileData 
+      ap @tsk_file.inspect_object
+      @tsk_file.meta.addr.should eq(inum)
+      @tsk_file.should be_an_instance_of Sleuthkit::FileSystem::FileData 
+    end
+  end
+  describe "File Open by name (absolute_name)" do
+    it "should return a file object sought by absolute path name" do
+      @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
+      inum = 28
+      @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, inum)
+      ap @tsk_file.inspect_object
+      @tsk_file.name.to_s.should match("/Test_Root_Folder/sample.txt")
+      @tsk_file.should be_an_instance_of Sleuthkit::FileSystem::FileData 
     end
   end
   # describe "File Open (name)" do
-  #   it "should return a directory listing sought by name" do
+  #   it "should return a file object sought by name" do
   #     @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
   #     name = 'Test_Root_Folder'
   #     @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, name)
