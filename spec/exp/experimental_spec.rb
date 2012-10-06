@@ -22,7 +22,7 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   describe "Experiment 1" do
     it "Should do something funky" do
       puts "hmm"
-      @file_system = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+      @file_system = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       @file_system.block_size.should eq(4096)
       # File.open("tempfile-#{$$}.txt", 'w') do |file|
       #   #file.puts @file_system.public_methods(false).sort
@@ -37,7 +37,7 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   describe "Experiment 2" do
     it "Should call TSK report function" do
       puts "mmm?"
-      @file_system = Sleuthkit::FileSystem.new(@mac_fs_only_image)
+      @file_system = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       @file_system.block_size.should eq(4096)
       find_this = "Last Backup Date: 	Wed Dec 31 19:00:00 1969"
       result=""
