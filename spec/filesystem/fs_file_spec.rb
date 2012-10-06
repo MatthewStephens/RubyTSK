@@ -33,10 +33,14 @@ describe "spec/filesystem" do
   describe "File Open by name (absolute_name)" do
     it "should return a file object sought by absolute path name" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
-      inum = 28
-      @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, inum)
+      absolute_name="/Test_Root_Folder/sample.txt"
+      @tsk_file = Sleuthkit::FileSystem::FileData.new(@filesystem, absolute_name)
       ap @tsk_file.inspect_object
-      @tsk_file.name.to_s.should match("/Test_Root_Folder/sample.txt")
+      @tsk_file.name.name.to_s.should match(File.basename(absolute_name))
+      @tsk_file.meta.addr.should eq(28)
+      @tsk_file.name.meta_addr.should eq(28)
+      @tsk_file.name.parent_addr.should eq(26)
+      @tsk_file.name.name_size.should eq(128)
       @tsk_file.should be_an_instance_of Sleuthkit::FileSystem::FileData 
     end
   end

@@ -261,7 +261,7 @@ void Init_tsk4r() {
   // object methods for FileSystemFileName objects
   rb_define_method(rb_cTSKFileSystemFileName, "initialize", initialize_fs_name, -1);
   
-  // attributes
+  // attributes (see lib/sleuthkit/file_system.rb for more)
   rb_define_attr(rb_cTSKFileSystemFileName, "parent", 1, 0);
 
 

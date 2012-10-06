@@ -88,6 +88,7 @@ module Sleuthkit
     end
     class FileName
       include ::Sleuthkit
+      attr_reader :meta_addr, :meta_seq, :name, :name_size, :parent_addr, :shrt_name, :shrt_name_size, :tag
       
     end
   end

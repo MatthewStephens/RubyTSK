@@ -90,18 +90,20 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
   } else if (rb_obj_is_kind_of(reference, rb_cFixnum)) {
     printf("building FILE object from Fixnum\n");
 
-    addr = (TSK_INUM_T)FIX2ULONG(reference);
+    addr = (TSK_INUM_T)FIX2ULONG(reference);  TSK_FS_FILE * fs_temp_file;
 
-    tsk_fs_file_open_meta(filesystem, fs_file->file, addr);
-    
+    fs_temp_file = tsk_fs_file_open_meta(filesystem, NULL, addr);
+    if (fs_temp_file != NULL ) { fs_file->file = fs_temp_file; }
+
   } else if (rb_obj_is_kind_of(reference, rb_cString)) {
     printf("building FILE object from String\n");
 
-    TSK_TCHAR * name;
+    TSK_TCHAR * name; TSK_FS_FILE * fs_temp_file;
     name = StringValuePtr(reference);
-    printf("calling tsk_fs_file_open(%s)\n", name);
-    tsk_fs_file_open(filesystem, fs_file->file, name);
-    
+    printf("calling tsk_fs_file_open('%s')\n", name);
+    fs_temp_file = tsk_fs_file_open(filesystem, NULL, name);
+    if (fs_temp_file != NULL ) { fs_file->file = fs_temp_file; }
+
   } else {
     rb_warn("arg2 should be a FileSystem::Directory object, Fixnum, or String!");
   }
@@ -109,6 +111,10 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
   if (fs_file->file != NULL) {
     printf("Successful access to TSK_FS_FILE\n");
     rb_iv_set(self, "@meta", rb_funcall(rb_cTSKFileSystemFileMeta, rb_intern("new"), 1, self));
+    // build FileName if possible
+    if (fs_file->file->name != NULL) {
+      rb_iv_set(self, "@name", rb_funcall(rb_cTSKFileSystemFileName, rb_intern("new"), 1, self));
+    }
   } else {
     rb_warn("fs_file->file is NULL!");
   }
@@ -150,16 +156,6 @@ VALUE initialize_fs_meta(int argc, VALUE *args, VALUE self){
   } else {
     rb_warn("FileMeta#new requires FileSystem::System, FileSystem::FileData or FileSystem::Directory as arg1.");
   }
-  
-//  Data_Get_Struct(thing, struct tsk4r_fs_file_wrapper, file_ptr);
-//  Data_Get_Struct(self, struct tsk4r_fs_meta_wrapper, meta_ptr);
-//  if ( file_ptr->file->meta ) {
-//    meta_ptr->metadata = file_ptr->file->meta;
-//    rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
-//    printf("access to TSK_FS_META successful!\n");
-//  } else {
-//    rb_warn("access to TSK_FS_FILE struct's meta field failed.");
-//  }
 
   return self;
 }
@@ -226,11 +222,33 @@ VALUE get_meta_from_dir(VALUE self, VALUE fs_dir)  {
 
 
 VALUE initialize_fs_name(int argc, VALUE *args, VALUE self){
-  VALUE source_obj; VALUE reference; VALUE opts;
-  rb_scan_args(argc, args, "21", &source_obj, &reference, &opts);
-  rb_iv_set(self, "@parent", source_obj);
+  VALUE file_obj; VALUE opts;
+  rb_scan_args(argc, args, "11", &file_obj, &opts);
+  rb_iv_set(self, "@file", file_obj);
   
-  open_fs_name(self, source_obj, reference);
+  struct tsk4r_fs_file_wrapper * file_ptr;
+  struct tsk4r_fs_name_wrapper * my_ptr;
+  Data_Get_Struct(file_obj, struct tsk4r_fs_file_wrapper, file_ptr);
+  Data_Get_Struct(self, struct tsk4r_fs_name_wrapper, my_ptr);
+
+  if (file_ptr->file->name != NULL) {
+    my_ptr->name = file_ptr->file->name;
+    if (my_ptr->name) {
+      TSK_FS_NAME * name = my_ptr->name;
+      rb_iv_set(self, "@meta_addr", LONG2FIX(name->meta_addr));
+      rb_iv_set(self, "@meta_seq", LONG2FIX(name->meta_seq));
+      rb_iv_set(self, "@name", rb_str_new2(name->name));
+      rb_iv_set(self, "@name_size", LONG2FIX(name->name_size));
+      rb_iv_set(self, "@parent_addr", LONG2FIX(name->par_addr));
+      rb_iv_set(self, "@shrt_name", rb_str_new2(name->shrt_name));
+      rb_iv_set(self, "@shrt_name_size", LONG2FIX(name->shrt_name_size));
+      rb_iv_set(self, "@tag", INT2FIX(name->tag));
+
+    } else { rb_warn("file_ptr->file had NULL for its name struct."); }
+  } else {
+    rb_warn("unable to access file name data!");
+  }
+  
   return self;
 }
 
@@ -238,9 +256,7 @@ VALUE initialize_fs_name(int argc, VALUE *args, VALUE self){
 // private functions
 VALUE open_fs_file(int argc, VALUE *args, VALUE self){
   VALUE inum;
-  printf("open_fs_file here\n");
   rb_scan_args(argc, args, "10", &inum);
-  printf("called with %d arguments\n", argc);
 
   struct tsk4r_fs_file_wrapper * fsfile;
   struct tsk4r_fs_wrapper * ptr;
@@ -263,11 +279,9 @@ VALUE open_fs_file(int argc, VALUE *args, VALUE self){
   TSK_FS_INFO * system  = ptr->filesystem;
   TSK_FS_FILE * tskfile = fsfile->file;
 
-//  tsk_fs_ffind(system, <#TSK_FS_FFIND_FLAG_ENUM lclflags#>, parsed_inum, TSK_FS_ATTR_TYPE_DEFAULT, <#uint8_t type_used#>, <#uint16_t id#>, <#uint8_t id_used#>, <#TSK_FS_DIR_WALK_FLAG_ENUM flags#>);
   tsk_fs_file_open_meta(system, tskfile, (TSK_INUM_T)parsed_inum);
 //
   if (tskfile != NULL) {
-    printf("recieved metadata for inum %llu\n", parsed_inum);
     rb_iv_set(self, "@content_len", LONG2FIX(tskfile->meta->content_len));
     rb_iv_set(self, "@address", INT2FIX(tskfile->meta->addr));
     rb_iv_set(self, "@uid", LONG2FIX(tskfile->meta->uid));
@@ -278,12 +292,3 @@ VALUE open_fs_file(int argc, VALUE *args, VALUE self){
 
 }
 
-
-void open_fs_name(VALUE self, VALUE fsfile, VALUE inum){
-  struct tsk4r_fs_name_wrapper * fsname;
-  struct tsk4r_fs_file_wrapper * ptr;
-  Data_Get_Struct(self, struct tsk4r_fs_name_wrapper, fsname);
-  Data_Get_Struct(fsfile, struct tsk4r_fs_file_wrapper, ptr);
-  
-  fsname->name = ptr->file->name;
-}
