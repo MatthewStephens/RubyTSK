@@ -28,6 +28,8 @@ describe "spec/filesystem" do
       puts @dir.class
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
       @dir.inum.should eq(26)
+      @dir.names[1].should match("sample.txt")
+      
     end
   end
   describe "FileSystem#find_directory_by_name (name)" do
@@ -37,7 +39,9 @@ describe "spec/filesystem" do
 
       @dir = @filesystem.find_directory_by_name(name)
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
-      @dir.name.should eq(name)
+      @dir.inum.should eq(26)
+      @dir.names[1].should match("sample.txt")
+      
     end
   end
   describe "FileSystem#find_directory (inum)" do
@@ -48,6 +52,8 @@ describe "spec/filesystem" do
       @dir = @filesystem.find_directory(inum)
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
       @dir.inum.should eq(inum)
+      @dir.names[1].should match("sample.txt")
+      
     end
   end
   describe "FileSystem#find_directory (name)" do
@@ -57,7 +63,8 @@ describe "spec/filesystem" do
 
       @dir = @filesystem.find_directory(name)
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
-      @dir.name.should eq(name)
+      @dir.inum.should eq(26)
+      @dir.names[1].should match("sample.txt")
     end
   end
   
