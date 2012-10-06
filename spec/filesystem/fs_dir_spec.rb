@@ -18,22 +18,46 @@ describe "spec/filesystem" do
     @volume = Sleuthkit::Volume::System.new(@mac_partitioned_image)
   end
   
-  describe "Directory Open by inum (inum)" do
+  describe "FileSystem#find_directory_by_inum (inum)" do
     it "should return a directory listing sought by inum" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       inum = 26
       puts inum.class
+
       @dir = @filesystem.find_directory_by_inum(inum)
       puts @dir.class
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
+      @dir.inum.should eq(26)
     end
   end
-  describe "Directory Open (name)" do
+  describe "FileSystem#find_directory_by_name (name)" do
     it "should return a directory listing sought by name" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       name = 'Test_Root_Folder'
+
       @dir = @filesystem.find_directory_by_name(name)
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
+      @dir.name.should eq(name)
+    end
+  end
+  describe "FileSystem#find_directory (inum)" do
+    it "should return a directory listing sought by name" do
+      @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
+      inum = 26
+
+      @dir = @filesystem.find_directory(inum)
+      @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
+      @dir.inum.should eq(inum)
+    end
+  end
+  describe "FileSystem#find_directory (name)" do
+    it "should return a directory listing sought by name" do
+      @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
+      name = 'Test_Root_Folder'
+
+      @dir = @filesystem.find_directory(name)
+      @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
+      @dir.name.should eq(name)
     end
   end
   
