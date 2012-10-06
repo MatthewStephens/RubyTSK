@@ -17,6 +17,10 @@ extern VALUE rb_cTSKVolumeSystem;
 extern VALUE rb_cTSKVolumePart;
 extern VALUE rb_cTSKFileSystem;
 extern VALUE rb_cTSKFileSystemDir;
+extern VALUE rb_cTSKFileSystemFileData;
+
+extern void klassify();
+
 
 // creation functions
 VALUE allocate_fs_dir(VALUE klass){
@@ -31,44 +35,96 @@ void deallocate_fs_dir(struct tsk4r_fs_dir_wrapper * ptr){
 }
 
 VALUE initialize_fs_dir(int argc, VALUE *args, VALUE self){
-  VALUE source_obj; VALUE opts; VALUE reference;
-  struct tsk4r_fs_dir_wrapper * fsdir_ptr;
-  Data_Get_Struct(self, struct tsk4r_fs_dir_wrapper, fsdir_ptr);
+  VALUE source_obj; VALUE reference; VALUE opts;
   rb_scan_args(argc, args, "21", &source_obj, &reference, &opts);
-  
-  if ( RTEST(opts) != rb_cHash){
+  const char * refstr; VALUE tmp;
+  tmp = rb_funcall(reference, rb_intern("to_s"), 0);
+  if ( rb_obj_is_kind_of(reference, rb_cFixnum) ) {
+    refstr = StringValuePtr(tmp);
+  } else { refstr = StringValuePtr(reference);
+  }
+  printf("initialize_fs_dir getting called from open_fs_directory (ref=%s)\n", refstr);
+
+  if ( ! rb_obj_is_kind_of(opts, rb_cHash) ){
     opts = rb_hash_new();
   }
-  opts = rb_funcall(self, rb_intern("parse_opts"), 1, opts);
+//  opts = rb_funcall(rb_cTSKFileSystemDir, rb_intern("parse_opts"), 1, opts);
+  printf("initialize_fs_dir options parsed\n");
+  if (rb_obj_is_kind_of(reference, rb_cFixnum) || rb_obj_is_kind_of(reference, rb_cString)) {
+    VALUE klassname;
+    klassname = rb_funcall(rb_funcall(source_obj, rb_intern("class"), 0), rb_intern("name"), 0);
+    printf("source_obj in #initialize_fs_dir was a: %s\n", StringValuePtr(klassname));
 
-  open_fs_directory(self, source_obj, reference, opts);
-  if (fsdir_ptr->directory == NULL) {
-    rb_raise(rb_eRuntimeError, "could not access directory.");
-    return Qnil;
+    rb_funcall(self, rb_intern("open_fs_directory"), 3, source_obj, reference, opts);
+    
+  } else {
+    rb_warn("Sleuthkit::FileSystem::Directory#init did not get String or Fixnum as arg2!!");
+  }
+
+  printf("returned from open_fs_directory\n");
+  if ( rb_iv_get(self, "@names_used") == Qnil ) {
+    rb_warn("could not access directory.");
+    rb_funcall(self, rb_intern("taint"), 0,NULL);
+    printf("%s#init tainting self\n", "Sleuthkit::FileSystem::Directory");
   } else {
     rb_iv_set(self, "@parent", source_obj);
-    return self;
   }
+  return self;
 }
 
-VALUE open_fs_directory(VALUE self, VALUE parent_obj, VALUE name_or_inum, VALUE opts) {
-  struct tsk4r_fs_dir_wrapper * fsdir_ptr; struct tsk4r_fs_wrapper * fs_ptr;
-  Data_Get_Struct(self, struct tsk4r_fs_dir_wrapper, fsdir_ptr);
-  Data_Get_Struct(parent_obj, struct tsk4r_fs_wrapper, fs_ptr);
+VALUE open_fs_directory(VALUE self, VALUE source_obj, VALUE reference, VALUE opts) {
+  printf("open_fs_directory responding\n");
   
-  if ( rb_obj_is_instance_of(name_or_inum, rb_cFixnum) ) {
-    printf("opening by inum: %lu\n", FIX2LONG(name_or_inum));
-    TSK_INUM_T addr = (TSK_INUM_T)FIX2LONG(name_or_inum);
-    fsdir_ptr->directory = tsk_fs_dir_open_meta(fs_ptr->filesystem, addr);
-    if (fsdir_ptr->directory == NULL) { printf("opened dir, returning to init.\n"); }
+  struct tsk4r_fs_dir_wrapper * dir_ptr;
+  struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_dir_wrapper, dir_ptr);
+  printf("Got self's struct.\n");
+  Data_Get_Struct(source_obj, struct tsk4r_fs_wrapper, fs_ptr);
+  klassify(self, "self");
+  klassify(source_obj, "source_obj");
+  klassify(reference, "reference");
+
+  
+  if (rb_obj_is_kind_of(reference, rb_cString)) {
+    dir_ptr->directory = tsk_fs_dir_open(fs_ptr->filesystem, StringValuePtr(reference));
+    if (dir_ptr->directory == NULL) {
+      printf("opened dir, got NULL, returning to init.\n");
+    } else {
+      printf("access to directory via String name was successful!\n\n");
+    }
   }
-  else if ( rb_obj_is_instance_of(name_or_inum, rb_cString) ) {
-    printf("opening by name: %s\n", StringValuePtr(name_or_inum));
-    const char *dir_pathname = StringValuePtr(name_or_inum);
-    fsdir_ptr->directory = tsk_fs_dir_open(fs_ptr->filesystem, dir_pathname);
-    // populate an iv while we have both structs
+  else if (rb_obj_is_kind_of(reference, rb_cFixnum)) {
+    TSK_INUM_T addr = (TSK_INUM_T)FIX2ULONG(reference);
+    dir_ptr->directory = tsk_fs_dir_open_meta(fs_ptr->filesystem, addr);
+    if (dir_ptr->directory == NULL) printf("opened dir, got NULL, returning to init.\n");
   } else {
-    rb_raise(rb_eTypeError, "Arg2 must be a String or Fixnum.");
+      rb_warn("arg2 is not a String or Fixnum!");
+    VALUE temp;
+    temp = rb_funcall(rb_funcall(reference, rb_intern("class"), 0), rb_intern("name"), 0);
+    printf("it was a: %s\n", StringValuePtr(temp));
+
+    }
+  // populate object attributes
+  if (dir_ptr->directory != NULL) {
+    rb_iv_set(self, "@inum", LONG2FIX(dir_ptr->directory->addr));
+    rb_iv_set(self, "@names_used", LONG2FIX(dir_ptr->directory->names_used));
+    rb_iv_set(self, "@names_alloc", LONG2FIX(dir_ptr->directory->names_alloc));
+    printf("I found %lu names used\n", dir_ptr->directory->names_used);
+    printf("I found %lu names alloc\n", dir_ptr->directory->names_alloc);
+    
+    VALUE names = rb_ary_new2(dir_ptr->directory->names_used);
+    TSK_FS_NAME * names_list = dir_ptr->directory->names;
+    int c;
+    for (c=0; c < dir_ptr->directory->names_used; c++) {
+      char * n_str = names_list[c].name;
+      rb_ary_push(names, rb_str_new2(n_str));
+    }
+    rb_iv_set(self, "@names", names);
+    
+    // build a new file object for the directory
+    // FileData#new(fs, dir)
+    VALUE directory_file = rb_funcall(rb_cTSKFileSystemFileData, rb_intern("new"), 2, source_obj, self);
+    rb_iv_set(self, "@file", directory_file);
   }
   return self;
 }

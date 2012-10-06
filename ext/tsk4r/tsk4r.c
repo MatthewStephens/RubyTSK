@@ -215,9 +215,16 @@ void Init_tsk4r() {
   /* Sleuthkit::FileSystemDirectory */
   // object methods for FileSystemDirectory objects
   rb_define_method(rb_cTSKFileSystemDir, "initialize", initialize_fs_dir, -1);
+  rb_define_private_method(rb_cTSKFileSystemDir, "open_fs_directory", open_fs_directory, 3);
   
   // attributes
   rb_define_attr(rb_cTSKFileSystemDir, "parent", 1, 0);
+//  rb_define_attr(rb_cTSKFileSystemDir, "inum", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemDir, "names_used", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemDir, "names_alloc", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemDir, "names", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemDir, "file", 1, 0);
+
   
 
   /* Sleuthkit::FileSystemFileData */
@@ -228,16 +235,26 @@ void Init_tsk4r() {
   // attributes
   rb_define_attr(rb_cTSKFileSystemFileData, "address", 1, 0);
   rb_define_attr(rb_cTSKFileSystemFileData, "content_len", 1, 0);
+  
   rb_define_attr(rb_cTSKFileSystemFileData, "parent", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileData, "meta", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileData, "name", 1, 0);
+  
+  rb_define_attr(rb_cTSKFileSystemFileData, "uid", 1, 0);
 
   
   /* Sleuthkit::FileSystemFileMeta */
   
   // object methods for FileSystemFileMeta objects
   rb_define_method(rb_cTSKFileSystemFileMeta, "initialize", initialize_fs_meta, -1);
+  rb_define_private_method(rb_cTSKFileSystemFileMeta, "get_meta_from_inum", get_meta_from_inum, 2);
+  rb_define_private_method(rb_cTSKFileSystemFileMeta, "get_meta_from_file", get_meta_from_file, 1);
+  rb_define_private_method(rb_cTSKFileSystemFileMeta, "get_meta_from_dir",  get_meta_from_dir,  1);
+
   
   // attributes
   rb_define_attr(rb_cTSKFileSystemFileMeta, "parent", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemFileMeta, "addr", 1, 0);
   
   /* Sleuthkit::FileSystemFileName */
   

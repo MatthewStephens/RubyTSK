@@ -110,6 +110,9 @@ VALUE open_fs_from_partition(VALUE self, VALUE vpart_obj, VALUE opts) {
   return self;
 }
 
+// should warn user when there is more than one partition available
+// with a readable filesystem.  Right now, this simply returns
+// the last one found.
 VALUE open_fs_from_volume(VALUE self, VALUE vs_obj, VALUE opts) {
   struct tsk4r_vs * rb_volumesystem; struct tsk4r_fs_wrapper * my_pointer;
   Data_Get_Struct(vs_obj, struct tsk4r_vs, rb_volumesystem);
@@ -146,18 +149,24 @@ VALUE open_directory_by_name(int argc, VALUE *args, VALUE self) {
   return new_obj;
 }
 VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self) {
-  VALUE inum; VALUE opts; TSK_FS_DIR * tsk_dir; struct tsk4r_fs_wrapper * fs_ptr;
+  VALUE inum; VALUE opts; struct tsk4r_fs_wrapper * fs_ptr;
+  VALUE new_obj;
+  
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   rb_scan_args(argc, args, "11", &inum, &opts);
   if ( ! rb_obj_is_kind_of(inum, rb_cFixnum) ) { inum = INT2FIX(0); }
   TSK_INUM_T addr = (TSK_INUM_T)FIX2LONG(inum);
-  printf("C function open_directory_by_name seeking %ld\n", FIX2LONG(inum));
-  VALUE new_obj;
-  tsk_dir = tsk_fs_dir_open_meta(fs_ptr->filesystem, addr);
-  if (tsk_dir != NULL ) {
+  printf("C function open_directory_by_inum seeking %ld\n", FIX2LONG(inum));
+
+  printf("rb_cTSKFileSystemDir#new(%llu)\n", addr);
+  new_obj = rb_funcall(rb_cTSKFileSystemDir, rb_intern("new"), 2, self, inum);
+  //tsk_dir = tsk_fs_dir_open_meta(fs_ptr->filesystem, addr);
+  printf("returned from rb_cTSKFileSystemDir#new\n");
+  if ( ! OBJ_TAINTED(new_obj) ) {
     printf("We are getting somewhere open_directory_by_inum)!!\n");
-    printf("names_used = %lu\n", tsk_dir->names_used);
-    new_obj = rb_funcall(rb_cTSKFileSystemDir, rb_intern("new"), 2, self, inum);
+    printf("inum = %lu\n", FIX2LONG(rb_iv_get(new_obj, "@inum")));
+    printf("names_used = %lu\n", FIX2LONG(rb_iv_get(new_obj, "@names_used")));
+    printf("names_alloc = %lu\n", FIX2LONG(rb_iv_get(new_obj, "@names_alloc")));
   } else {
     new_obj = Qnil;
   }
