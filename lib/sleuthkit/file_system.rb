@@ -2,7 +2,7 @@
 module Sleuthkit
   module FileSystem
     class System
-      # include ::Sleuthkit
+      include ::Sleuthkit
 
       def tsk_fsstat(file)
         file.puts 'Method returns.'
@@ -26,7 +26,7 @@ module Sleuthkit
     
       def find_directory(name_or_inum)
         puts "#{name_or_inum.class} recieved"
-        puts "Ruby #find_directory looking for #{name}"
+        puts "Ruby #find_directory looking for #{name_or_inum}"
         result = nil
         case name_or_inum
           when String
@@ -59,17 +59,36 @@ module Sleuthkit
       end
     end
 
-    class FileSystemDirectory
+    class Directory
       include ::Sleuthkit
+      attr_reader :name, :inum
     
-      private
-      def parse_opts(opts)
-        presets = { :type_flag => 0 }      
+      def addr
+        @inum
+      end
+      #class methods
+      #private 
+      def self.parse_opts(opts)
+        presets = { :type_flag => 0, :offset => 0 }      
         presets.each_pair do |key, val|
           unless opts.has_key?(key) then opts[key] = val end
         end
         return opts
       end
+    end
+    
+    class FileData
+      attr_reader :name
+      include ::Sleuthkit
+      
+    end
+    class FileMeta
+      include ::Sleuthkit
+      
+    end
+    class FileName
+      include ::Sleuthkit
+      
     end
   end
 end
