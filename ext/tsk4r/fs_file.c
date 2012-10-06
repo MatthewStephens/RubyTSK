@@ -62,7 +62,6 @@ void deallocate_fs_name(struct tsk4r_fs_name_wrapper * ptr){
 VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
   VALUE fs; VALUE reference; VALUE opts; TSK_INUM_T addr;
   rb_scan_args(argc, args, "21", &fs, &reference, &opts);
-  printf("initialize_fs_file here...\n");
   klassify(fs, "fs");
   klassify(reference, "reference");
   rb_iv_set(self, "@parent", fs);
@@ -83,7 +82,7 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
     Data_Get_Struct(reference, struct tsk4r_fs_dir_wrapper, fs_dir);
     addr = fs_dir->directory->addr;
 
-    printf("NOT calling tsk_fs_file_open_meta(%llu) (from a directory object)\n", addr);
+    printf("accessing file entry for (%llu) (from a directory object)\n", addr);
     // if directory already built, we should have TSK_FS_FILE pointer
     fs_file->file = fs_dir->directory->fs_file;
     
@@ -109,7 +108,6 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
   }
 
   if (fs_file->file != NULL) {
-    printf("Successful access to TSK_FS_FILE\n");
     rb_iv_set(self, "@meta", rb_funcall(rb_cTSKFileSystemFileMeta, rb_intern("new"), 1, self));
     // build FileName if possible
     if (fs_file->file->name != NULL) {
@@ -136,23 +134,16 @@ VALUE initialize_fs_meta(int argc, VALUE *args, VALUE self){
   if (rb_obj_is_kind_of(thing, rb_cTSKFileSystem)) {
     // arg2 an address?
     if (rb_obj_is_kind_of(other, rb_cFixnum)) {
-      printf("calling get_meta_from_inum(thing,other)\n");
       rb_funcall(self, rb_intern("get_meta_from_inum"), 2, thing, other);
     } else {
       rb_warn("passed FileSystem::System object, but no address to seek! Arg2 not Fixnum");
     }
   } else if (rb_obj_is_kind_of(thing, rb_cTSKFileSystemFileData)) {
-    printf("calling get_meta_from_file(thing)\n");
-
     rb_funcall(self, rb_intern("get_meta_from_file"), 1, thing);
 
-    
   } else if (rb_obj_is_kind_of(thing, rb_cTSKFileSystemDir)) {
-    printf("calling get_meta_from_dir(thing)\n");
-
     rb_funcall(self, rb_intern("get_meta_from_dir"), 1, thing);
 
-    
   } else {
     rb_warn("FileMeta#new requires FileSystem::System, FileSystem::FileData or FileSystem::Directory as arg1.");
   }
@@ -163,7 +154,6 @@ VALUE initialize_fs_meta(int argc, VALUE *args, VALUE self){
 // private functions for accessing TSK_FS_META struct
 // this first one makes a temporary TSK_FS_FILE struct to get at TSK_FS_META
 VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr) {
-  printf("get_meta_from_inum responding\n");
   struct tsk4r_fs_wrapper * fs_ptr;
   struct tsk4r_fs_meta_wrapper * meta_ptr;
   TSK_FS_FILE * fs_file;
@@ -175,7 +165,6 @@ VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr) {
   if ( fs_file->meta ) {
     meta_ptr->metadata = fs_file->meta;
     rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
-    printf("access to TSK_FS_META (from fs + inum) successful!\n");
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }
@@ -183,8 +172,6 @@ VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr) {
 }
 
 VALUE get_meta_from_file(VALUE self, VALUE fs_file) {
-  printf("get_meta_from_file responding\n");
-
   struct tsk4r_fs_file_wrapper * file_ptr;
   struct tsk4r_fs_meta_wrapper * meta_ptr;
   Data_Get_Struct(fs_file, struct tsk4r_fs_file_wrapper, file_ptr);
@@ -193,7 +180,6 @@ VALUE get_meta_from_file(VALUE self, VALUE fs_file) {
   if ( file_ptr->file->meta ) {
     meta_ptr->metadata = file_ptr->file->meta;
     rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
-    printf("access to TSK_FS_META (from file) successful!\n");
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }
@@ -201,8 +187,6 @@ VALUE get_meta_from_file(VALUE self, VALUE fs_file) {
 }
 
 VALUE get_meta_from_dir(VALUE self, VALUE fs_dir)  {
-  printf("get_meta_from_dir responding\n");
-
   struct tsk4r_fs_dir_wrapper * dir_ptr;
   struct tsk4r_fs_meta_wrapper * meta_ptr;
   TSK_FS_FILE * fs_file;
@@ -213,7 +197,6 @@ VALUE get_meta_from_dir(VALUE self, VALUE fs_dir)  {
   if ( fs_file->meta ) {
     meta_ptr->metadata = fs_file->meta;
     rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
-    printf("access to TSK_FS_META (from dir) successful!\n");
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }

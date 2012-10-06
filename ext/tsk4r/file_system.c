@@ -137,7 +137,6 @@ VALUE open_directory_by_name(int argc, VALUE *args, VALUE self) {
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
 
   rb_scan_args(argc, args, "11", &name, &opts);
-  printf("C function open_directory_by_name seeking %s\n", StringValuePtr(name));
   VALUE new_obj;
   tsk_dir = tsk_fs_dir_open(fs_ptr->filesystem, StringValuePtr(name));
   if (tsk_dir != NULL ) {
@@ -155,15 +154,10 @@ VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self) {
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   rb_scan_args(argc, args, "11", &inum, &opts);
   if ( ! rb_obj_is_kind_of(inum, rb_cFixnum) ) { inum = INT2FIX(0); }
-  TSK_INUM_T addr = (TSK_INUM_T)FIX2LONG(inum);
-  printf("C function open_directory_by_inum seeking %ld\n", FIX2LONG(inum));
 
-  printf("rb_cTSKFileSystemDir#new(%llu)\n", addr);
   new_obj = rb_funcall(rb_cTSKFileSystemDir, rb_intern("new"), 2, self, inum);
-  //tsk_dir = tsk_fs_dir_open_meta(fs_ptr->filesystem, addr);
-  printf("returned from rb_cTSKFileSystemDir#new\n");
+
   if ( ! OBJ_TAINTED(new_obj) ) {
-    printf("We are getting somewhere open_directory_by_inum)!!\n");
     printf("inum = %lu\n", FIX2LONG(rb_iv_get(new_obj, "@inum")));
     printf("names_used = %lu\n", FIX2LONG(rb_iv_get(new_obj, "@names_used")));
     printf("names_alloc = %lu\n", FIX2LONG(rb_iv_get(new_obj, "@names_alloc")));

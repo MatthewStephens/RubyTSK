@@ -24,26 +24,12 @@
 #include <ruby.h>
 #include "tsk4r.h"
 
-// method prototypes
-
-
-// Prototype for our methods - methods are prefixed by 'method_' here (static keyword encapsulates these)
-static VALUE method_hello_world(VALUE self);
-static VALUE method_testOmethod(VALUE self);
-static VALUE method_testCmethod1(VALUE self);
-static VALUE method_testCmethod2(VALUE self);
-static VALUE method_testMmethod(VALUE self);
-
-
+// internal prototypes
 
 VALUE klass;
 
 
-
-// alloc & dealloc
-
-
-
+// these functions are not yet implemented.
 static VALUE close_volume_system(VALUE self){
   return Qnil;
 }
@@ -121,17 +107,7 @@ void Init_tsk4r() {
 
   
   // some method templates
-  // a basic (module) methods -- note special function used to create
-  rb_define_module_function(rb_mtsk4r, "module_hello", method_hello_world, 0);
-  rb_define_module_function(rb_mtsk4r, "module_features", method_testMmethod, 0);
-
-  // class methods
-  rb_define_module_function(rb_cTSKImage, "class_features", method_testCmethod1, 0);
-  rb_define_module_function(rb_cTSKVolumeSystem, "class_features", method_testCmethod2, 0);
-
   // object methods for Sleuthkit::Image objects
-  rb_define_method(rb_cTSKImage, "object_method_sample", method_testOmethod, 1); // change arg1 to klass?
-  rb_define_method(rb_cTSKImage, "object_hello", method_hello_world, 0); // change arg1 to klass?
   rb_define_method(rb_cTSKImage, "initialize", initialize_disk_image, -1);
   rb_define_method(rb_cTSKImage, "image_open", image_open, 2);
 
@@ -265,33 +241,6 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKFileSystemFileName, "parent", 1, 0);
 
 
-}
-
-// methods follow here
-
-VALUE method_hello_world(VALUE klass)
-{
-  return rb_str_new2("hello world");
-}
-
-VALUE method_testMmethod(VALUE klass)
-{
-  return rb_str_new2("This is a module method responding.");
-}
-
-VALUE method_testCmethod1(VALUE klass)
-{
-  return rb_str_new2("This is class method 1 responding.  I was assigned to Image");
-}
-
-VALUE method_testCmethod2(VALUE klass)
-{
-  return rb_str_new2("This is class method 2 responding.  I was assigned to Volume");
-}
-
-VALUE method_testOmethod(VALUE klass)
-{
-  return rb_str_new2("I am simply an object method.");
 }
 
 void klassify(VALUE obj, char * name) {
