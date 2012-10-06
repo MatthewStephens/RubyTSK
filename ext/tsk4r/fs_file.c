@@ -22,6 +22,7 @@ extern void klassify();
 // internal function prototypes
 void open_fs_meta(VALUE self, VALUE source_obj, VALUE reference);
 void open_fs_name(VALUE self, VALUE source_obj, VALUE reference);
+void build_attributes(VALUE self, TSK_FS_META * ptr);
 
 
 // alloc & dealloc functions
@@ -164,7 +165,8 @@ VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr) {
   
   if ( fs_file->meta ) {
     meta_ptr->metadata = fs_file->meta;
-    rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
+    build_attributes(self, meta_ptr->metadata);
+
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }
@@ -179,7 +181,8 @@ VALUE get_meta_from_file(VALUE self, VALUE fs_file) {
 
   if ( file_ptr->file->meta ) {
     meta_ptr->metadata = file_ptr->file->meta;
-    rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
+    build_attributes(self, meta_ptr->metadata);
+
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }
@@ -196,11 +199,39 @@ VALUE get_meta_from_dir(VALUE self, VALUE fs_dir)  {
   
   if ( fs_file->meta ) {
     meta_ptr->metadata = fs_file->meta;
-    rb_iv_set(self, "@addr", LONG2FIX(meta_ptr->metadata->addr));
+    build_attributes(self, meta_ptr->metadata);
+
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }
   return self;
+}
+
+void build_attributes(VALUE self, TSK_FS_META * metadata) {
+
+  rb_iv_set(self, "@addr", LONG2FIX(metadata->addr));
+  rb_iv_set(self, "@atime", LONG2FIX(metadata->atime));
+  rb_iv_set(self, "@atime_nano", LONG2FIX(metadata->atime_nano));
+//  rb_iv_set(self, "@attr", LONG2FIX(metadata->attr));
+//  rb_iv_set(self, "@attr_state", LONG2FIX(metadata->attr_state));
+  rb_iv_set(self, "@content_len", LONG2FIX(metadata->content_len));
+  rb_iv_set(self, "@content_ptr", LONG2FIX(metadata->content_ptr));
+  rb_iv_set(self, "@crtime", LONG2FIX(metadata->crtime));
+  rb_iv_set(self, "@crtime_nano", LONG2FIX(metadata->crtime_nano));
+  rb_iv_set(self, "@ctime", LONG2FIX(metadata->ctime));
+  rb_iv_set(self, "@ctime_nano", LONG2FIX(metadata->ctime_nano));
+//  rb_iv_set(self, "@flags", LONG2FIX(metadata->flags));
+  rb_iv_set(self, "@gid", INT2FIX(metadata->gid));
+  rb_iv_set(self, "@link", LONG2FIX(metadata->link));
+  rb_iv_set(self, "@mode", LONG2FIX(metadata->mode));
+  rb_iv_set(self, "@mtime", LONG2FIX(metadata->mtime));
+  rb_iv_set(self, "@mtime_nano", LONG2FIX(metadata->mtime_nano));
+//  rb_iv_set(self, "@name2", LONG2FIX(metadata->name2));
+  rb_iv_set(self, "@nlink", LONG2FIX(metadata->nlink));
+  rb_iv_set(self, "@seq", LONG2FIX(metadata->seq));
+  rb_iv_set(self, "@size", LONG2FIX(metadata->size));
+  rb_iv_set(self, "@tag", INT2FIX(metadata->tag));
+
 }
 
 
