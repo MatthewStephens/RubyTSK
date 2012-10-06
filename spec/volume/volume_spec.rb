@@ -100,7 +100,7 @@ describe "spec/volume" do
 	describe "Volume::Partition#description" do
 		it "returns the @description attr" do
 			@volume = Sleuthkit::Volume::System.new(@partitioned_image)
-			@part = @volume.parts.firstVolume::System
+			@part = @volume.parts.first
 			@part.description.should eq("Unallocated")
 		end
 	end
