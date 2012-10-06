@@ -277,4 +277,9 @@ VALUE method_testOmethod(VALUE klass)
   return rb_str_new2("I am simply an object method.");
 }
 
+void klassify(VALUE obj, char * name) {
+  VALUE klassname;
+  klassname = rb_funcall(rb_funcall(obj, rb_intern("class"), 0), rb_intern("name"), 0);
+  printf("obj %s was a: %s\n", name, StringValuePtr(klassname));
 
+}

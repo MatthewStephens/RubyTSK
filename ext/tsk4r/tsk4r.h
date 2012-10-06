@@ -30,6 +30,8 @@
 
 // Prototype for the initialization method - Ruby calls this, not you
 void Init_tsk4r();
+void klassify(VALUE obj, char * name);
+
 
 // Prototype for the module and classes directly below it
 VALUE rb_mtsk4r;
