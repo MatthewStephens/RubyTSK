@@ -2,7 +2,7 @@
 module Sleuthkit
   module Volume 
     class System
-      # include ::Sleuthkit
+      include ::Sleuthkit
       def [](i)
         case i
         when Fixnum
@@ -22,7 +22,7 @@ module Sleuthkit
     end
   
     class Partition
-      # include ::Sleuthkit
+      include ::Sleuthkit
     end
   end
 end
