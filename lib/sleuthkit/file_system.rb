@@ -3,7 +3,45 @@ module Sleuthkit
   module FileSystem
     class System
       include ::Sleuthkit
+      SEARCH_METHODS=[ :directory, :file ]
 
+      # these procs are templates to build sets of search methods
+      find_proc=Proc.new do |att|
+        define_method "find_#{att}" do |name_or_inum|
+          result = nil
+          case name_or_inum
+          when String
+            result = self.instance_eval "open_#{att}_by_name(name_or_inum)"
+          when Integer
+            result = self.instance_eval "open_#{att}_by_inum(name_or_inum)"
+          else
+            result
+          end
+        end
+      end
+
+      inum_proc=Proc.new do |att|
+        define_method "find_#{att}_by_inum" do |inum| 
+          result = nil
+          result = self.instance_eval "open_#{att}_by_inum(inum)"
+        end
+      end
+      
+      name_proc=Proc.new do |att|
+        define_method "find_#{att}_by_name" do |name| 
+          result = nil
+          result = self.instance_eval "open_#{att}_by_name(name)"
+        end
+      end
+      
+      SEARCH_METHODS.each do |att|
+        self.instance_eval do
+          define_method "find_#{att}",         find_proc.call(att)
+          define_method "find_#{att}_by_inum", inum_proc.call(att)
+          define_method "find_#{att}_by_name", name_proc.call(att)
+        end
+      end
+      
       def tsk_fsstat(file)
         file.puts 'Method returns.'
       end
@@ -23,31 +61,7 @@ module Sleuthkit
           raise ArgumentError, "arg1 should be IO, File or String object."
         end
       end
-    
-      def find_directory(name_or_inum)
-        puts "#{name_or_inum.class} recieved"
-        puts "Ruby #find_directory looking for #{name_or_inum}"
-        result = nil
-        case name_or_inum
-          when String
-            result = self.find_directory_by_name(name_or_inum)
-          when Fixnum
-            result = self.find_directory_by_inum(name_or_inum)
-          else
-            result = nil
-        end
-        return result
-      end
-    
-      def find_directory_by_name(name)
-        puts "Ruby #find_directory_by_name looking for #{name}"
-        result = self.open_directory_by_name(name)
-      end
-      def find_directory_by_inum(n)
-        inum = n.to_i
-        puts "Ruby #find_directory_by_inum looking for #{inum}"
-        result = self.open_directory_by_inum(inum)
-      end
+      
     
       private
       def parse_opts(opts)

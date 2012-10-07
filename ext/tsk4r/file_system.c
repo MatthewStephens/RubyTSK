@@ -14,6 +14,7 @@ extern VALUE rb_cTSKImage;
 extern VALUE rb_cTSKVolumeSystem;
 extern VALUE rb_cTSKVolumePart;
 extern VALUE rb_cTSKFileSystemDir;
+extern VALUE rb_cTSKFileSystemFileData;
 
 
 //struct tsk4r_img {
@@ -164,6 +165,34 @@ VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self) {
   } else {
     new_obj = Qnil;
   }
+  return new_obj;
+}
+
+VALUE open_file_by_inum(int argc, VALUE *args, VALUE self) {
+  VALUE inum; VALUE opts; VALUE new_obj;
+  
+  rb_scan_args(argc, args, "11", &inum, &opts);
+  if ( ! rb_obj_is_kind_of(inum, rb_cInteger) ) { inum = INT2FIX(0); }
+  
+  new_obj = rb_funcall(rb_cTSKFileSystemFileData, rb_intern("new"), 2, self, inum);
+  if ( OBJ_TAINTED(new_obj)) {
+    new_obj = Qnil;
+  }
+  
+  return new_obj;
+}
+
+VALUE open_file_by_name(int argc, VALUE *args, VALUE self) {
+  VALUE name; VALUE opts; VALUE new_obj;
+  
+  rb_scan_args(argc, args, "11", &name, &opts);
+  if ( ! rb_obj_is_kind_of(name, rb_cString) ) { name = rb_funcall(name, rb_intern("to_s"), 0); }
+  
+  new_obj = rb_funcall(rb_cTSKFileSystemFileData, rb_intern("new"), 2, self, name);
+  if ( OBJ_TAINTED(new_obj)) {
+    new_obj = Qnil;
+  }
+  
   return new_obj;
 }
 
