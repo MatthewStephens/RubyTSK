@@ -297,7 +297,7 @@ VALUE open_fs_file(int argc, VALUE *args, VALUE self){
 //
   if (tskfile != NULL) {
     rb_iv_set(self, "@content_len", LONG2FIX(tskfile->meta->content_len));
-    rb_iv_set(self, "@address", INT2FIX(tskfile->meta->addr));
+    rb_iv_set(self, "@address", INT2NUM(tskfile->meta->addr));
     rb_iv_set(self, "@uid", LONG2FIX(tskfile->meta->uid));
   } else {
     rb_warn("unable to perform tsk_fs_file_open_meta");
