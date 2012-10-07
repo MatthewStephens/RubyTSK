@@ -84,6 +84,21 @@ module Sleuthkit
     end
     class FileMeta
       include ::Sleuthkit
+      FORMATTABLE_ATTRS = [ :atime, :crtime, :ctime, :mtime ]
+      attr_reader :addr, :atime, :atime_nano, :content_len, :content_ptr, :crtime, :crtime_nano, :ctime,
+      :ctime_nano, :gid, :link, :mode, :mtime, :mtime_nano, :nlink, :seq, :size, :tag
+      
+      # wrapper methods to format attributes representing times
+      FORMATTABLE_ATTRS.each do |att|
+        define_method att do |*opts|
+          opts.empty? ? opts = :cooked : opts = opts.first.to_sym
+          if (opts.to_sym == :raw)
+            instance_variable_get("@"+ att.to_s)
+          else
+            Time.at(instance_variable_get("@"+ att.to_s))
+          end
+        end
+      end
       
     end
     class FileName
