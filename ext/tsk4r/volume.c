@@ -42,7 +42,7 @@ VALUE initialize_volume_system(int argc, VALUE *args, VALUE self) {
   if ( RTEST(opts) != rb_cHash){
     opts = rb_hash_new();
     rb_hash_aset(opts, rb_symname_p("type_flag"), INT2FIX(0));
-    rb_hash_aset(opts, rb_symname_p("offset"), INT2FIX(0));
+    rb_hash_aset(opts, rb_symname_p("offset"), INT2NUM(0));
   }
   opts = rb_funcall(self, rb_intern("parse_opts"), 1, opts);
 

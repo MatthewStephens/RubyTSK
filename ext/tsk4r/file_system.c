@@ -153,7 +153,7 @@ VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self) {
   
   Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
   rb_scan_args(argc, args, "11", &inum, &opts);
-  if ( ! rb_obj_is_kind_of(inum, rb_cFixnum) ) { inum = INT2FIX(0); }
+  if ( ! rb_obj_is_kind_of(inum, rb_cInteger) ) { inum = INT2FIX(0); }
 
   new_obj = rb_funcall(rb_cTSKFileSystemDir, rb_intern("new"), 2, self, inum);
 
