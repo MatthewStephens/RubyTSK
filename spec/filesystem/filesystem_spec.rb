@@ -6,7 +6,7 @@ describe "spec/filesystem" do
     
     @mac_fs_only_image_path = "#{@sample_dir}/tsk4r_img_02.dmg"
     @mac_partitioned_image_path = "#{@sample_dir}/tsk4r_img_01.dmg"
-    @split_image_files = Dir.glob("#{@sample_dir}/tsk4r*split.?")
+    @split_image_files = Dir.glob("#{@sample_dir}/tsk4r_img_01*split.?")
     @split_image = Sleuthkit::Image.new(@split_image_files)
       
     puts "File #{@mac_fs_only_image_path} not found!!" unless File.exist?(@mac_fs_only_image_path)
