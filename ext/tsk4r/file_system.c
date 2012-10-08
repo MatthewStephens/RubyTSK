@@ -240,8 +240,11 @@ void populate_instance_variables(VALUE self) {
 
   rb_iv_set(self, "@block_count", ULONG2NUM((unsigned long long)fs_ptr->filesystem->block_count));
   //    rb_iv_set(self, "@block_getflags", INT2NUM((int)fs_ptr->filesystem->block_getflags)); // do not impl
+// These features are only in libtsk >= 3.2.2
+#ifndef TSK4R_HIDE_ADVANCED_FEATURE
   rb_iv_set(self, "@block_post_size", UINT2NUM((uint)fs_ptr->filesystem->block_post_size));
   rb_iv_set(self, "@block_pre_size", UINT2NUM((uint)fs_ptr->filesystem->block_pre_size));
+#endif
   rb_iv_set(self, "@block_size", UINT2NUM((uint)fs_ptr->filesystem->block_size));
   //    rb_iv_set(self, "@block_walk", fs_ptr->filesystem->block_walk);// no
   rb_iv_set(self, "@dev_bsize", UINT2NUM((uint)fs_ptr->filesystem->dev_bsize));
