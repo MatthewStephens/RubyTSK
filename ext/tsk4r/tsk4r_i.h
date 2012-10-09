@@ -9,7 +9,7 @@
 #ifndef RubyTSK_tsk4r_i_h
 #define RubyTSK_tsk4r_i_h
 
-#define MY_TSK_VER 0x030203ff
+#define MY_TSK_VER TSK_VERSION_NUM
 #define OLDER_TSK_VER 0x030202ff
 
 #if MY_TSK_VER < OLDER_TSK_VER
