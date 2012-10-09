@@ -11,13 +11,6 @@
 
 #include <tsk3/libtsk.h>
 
-#define MY_TSK_VER TSK_VERSION_NUM
-#define OLDER_TSK_VER 0x030202ff
-
-#if MY_TSK_VER < OLDER_TSK_VER
-#define TSK4R_HIDE_ADVANCED_FEATURE
-#endif
-
 // Sleuthkit::FileSystem struct
 struct tsk4r_fs_wrapper {
   TSK_FS_INFO * filesystem;

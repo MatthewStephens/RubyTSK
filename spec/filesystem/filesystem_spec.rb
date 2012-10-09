@@ -34,6 +34,8 @@ describe "spec/filesystem" do
       @filesystem.description.should eq "hfs"
     end
   end
+  #this test passes, but should be redesigned when method is amneded to seek
+  #filesystems from image w volume system, as this img is
   describe "#new([image w/o filesystem])" do
     it "initializes with a split Sleuthkit::Image passed as param1" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_partitioned_image)
@@ -94,15 +96,25 @@ describe "spec/filesystem" do
     end
   end
   describe "#block_post_size" do
-    it "returns the @block_post_size attr" do
-      @filesystem = Sleuthkit::FileSystem::System.new(@volume)
-      @filesystem.block_post_size.should eq(0)
+    it "returns the @block_post_size attr, if method exists" do
+      if Sleuthkit::TSK_VERSION =~ /^4/ || Sleuthkit::TSK_VERSION =~ /3\.2\.[23]/
+      then
+        @filesystem = Sleuthkit::FileSystem::System.new(@volume)
+        @filesystem.block_post_size.should eq(0)
+      else
+        @filesystem.respond_to?("block_post_size").should eq(false)
+      end
     end
   end
   describe "#block_pre_size" do
-    it "returns the @block_pre_size attr" do
-      @filesystem = Sleuthkit::FileSystem::System.new(@volume)
-      @filesystem.block_pre_size.should eq(0)
+    it "returns the @block_pre_size attr, if method exists" do
+      if Sleuthkit::TSK_VERSION =~ /^4/ || Sleuthkit::TSK_VERSION =~ /3\.2\.[23]/ 
+      then     
+        @filesystem = Sleuthkit::FileSystem::System.new(@volume)
+        @filesystem.block_pre_size.should eq(0)
+      else
+        @filesystem.respond_to?("block_pre_size").should eq(false)
+      end
     end
   end
   describe "#block_size" do
