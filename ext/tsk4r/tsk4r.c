@@ -1,9 +1,9 @@
 /*
  *  tsk4r.c
- *  tsk4r
+ *  tsk4r: The SleuthKit 4 Ruby
  *
- *  Created by Matthew H. Stephens on 9/14/11.
- *  Copyright 2011 Matthew H. Stephens.  All rights reserved. 
+ *  Created by Matthew H. Stephens
+ *  Copyright 2011,2012 Matthew H. Stephens.  All rights reserved. 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * Binding to the SleuthKit (libtsk3) library copyright 2003,2012 by Brian Carrier
  */
 
 #include <stdio.h>
