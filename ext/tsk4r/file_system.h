@@ -9,8 +9,8 @@
 #ifndef RubyTSK_file_system_h
 #define RubyTSK_file_system_h
 
-#include "tsk4r_i.h"
 #include <tsk3/libtsk.h>
+#include "tsk4r_i.h"
 
 // Sleuthkit::FileSystem struct
 struct tsk4r_fs_wrapper {
