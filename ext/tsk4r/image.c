@@ -90,8 +90,8 @@ VALUE image_open(VALUE self, VALUE filename_location, VALUE disk_type_flag) {
     img_size = LONG2NUM(image->size);
     img_sector_size = INT2NUM((int)image->sector_size);
     TSK_IMG_TYPE_ENUM typenum = image->itype;
-    description = image_type_to_desc(typenum);
-    name = image_type_to_name(typenum);
+    description = image_type_to_desc(self, INT2NUM(typenum));
+    name = image_type_to_name(self, INT2NUM(typenum));
 
     rb_iv_set(self, "@size", img_size);
     rb_iv_set(self, "@sector_size", img_sector_size);
@@ -153,15 +153,15 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
 }
 
 // helper methods
-VALUE image_type_to_desc(TSK_IMG_TYPE_ENUM num) {
+VALUE image_type_to_desc(VALUE self, VALUE num) {
   const char * description;
-  description = tsk_img_type_todesc(num);
+  description = tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)FIX2INT(num));
   return rb_str_new2(description);
 }
 
-VALUE image_type_to_name(TSK_IMG_TYPE_ENUM num) {
+VALUE image_type_to_name(VALUE self, VALUE num) {
   const char * name;
-  name = tsk_img_type_toname(num);
+  name = tsk_img_type_toname((TSK_IMG_TYPE_ENUM)FIX2INT(num));
   return rb_str_new2(name);
 }
 

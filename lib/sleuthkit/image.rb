@@ -35,6 +35,14 @@ module Sleuthkit
         @number_of_sectors = div
       end
     end
+    def self.get_image_type_name(num)
+      num = num.to_i
+      self.image_type_to_name(num)
+    end
+    def self.get_image_type_description(num)
+      num = num.to_i
+      self.image_type_to_description(num)
+    end
     # private
     def parse_opts(h={})
       opts = h || Hash.new

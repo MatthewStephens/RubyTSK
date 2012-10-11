@@ -69,6 +69,18 @@ describe "spec/image" do
       @image.should be_an_instance_of Sleuthkit::Image
     end
   end
+  describe "Image#get_image_type_name(num)" do
+    it "should return a description of a TSK Image type name, given its number" do
+      @flag = Sleuthkit::Image.get_image_type_name(4)
+      @flag.should match("aff")
+    end
+  end
+  describe "Image#get_image_type_description(num)" do
+    it "should return a description of a TSK Image type description, given its number" do
+      @flag = Sleuthkit::Image.get_image_type_description(4)
+      @flag.should match("Advanced Forensic Format")
+    end
+  end
   
   after :all do
     $stderr = @orig_stderr

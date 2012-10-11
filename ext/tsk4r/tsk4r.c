@@ -79,11 +79,13 @@ void Init_tsk4r() {
   // sub classes
   //rb_cTSKFileSystem = rb_define_class_under(rb_cTSKVolume, "ThirdClass", rb_cObject);
 
-  
+  /* Sleuthkit::Image */
   // some method templates
   // object methods for Sleuthkit::Image objects
   rb_define_method(rb_cTSKImage, "initialize", initialize_disk_image, -1);
   rb_define_method(rb_cTSKImage, "image_open", image_open, 2);
+  rb_define_module_function(rb_cTSKImage, "image_type_to_description", image_type_to_desc, 1);
+  rb_define_module_function(rb_cTSKImage, "image_type_to_name", image_type_to_name, 1);
 
   // attributes (read only)
   rb_define_attr(rb_cTSKImage, "auto_detect", 1, 0);
