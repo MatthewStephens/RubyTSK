@@ -86,6 +86,8 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKImage, "image_open", image_open, 2);
   rb_define_module_function(rb_cTSKImage, "image_type_to_description", image_type_to_desc, 1);
   rb_define_module_function(rb_cTSKImage, "image_type_to_name", image_type_to_name, 1);
+  rb_define_module_function(rb_cTSKImage, "return_tsk_img_type_supported", return_tsk_img_type_supported, 0);
+  rb_define_module_function(rb_cTSKImage, "return_type_list", return_tsk_img_type_list, -1);
 
   // attributes (read only)
   rb_define_attr(rb_cTSKImage, "auto_detect", 1, 0);
@@ -111,6 +113,8 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKVolumeSystem, "walk", walk_volume, 1);
   rb_define_method(rb_cTSKVolumeSystem, "expose_part_at", volume_expose_part_by_idx, 1);
   rb_define_private_method(rb_cTSKVolumeSystem, "get_partitions", volume_get_partitions, 1);
+  rb_define_module_function(rb_mtsk4r_v, "return_type_list", return_tsk_vol_type_list, -1);
+
   
   // attributes
   rb_define_attr(rb_cTSKVolumeSystem, "block_size", 1, 0);
@@ -154,6 +158,8 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKFileSystem, "open_directory_by_inum", open_directory_by_inum, -1);
   rb_define_method(rb_cTSKFileSystem, "open_file_by_name", open_file_by_name, -1);
   rb_define_method(rb_cTSKFileSystem, "open_file_by_inum", open_file_by_inum, -1);
+  rb_define_module_function(rb_mtsk4r_fs, "return_type_list", return_tsk_fs_type_list, -1);
+
   
   // attributes based on TSK struct
 

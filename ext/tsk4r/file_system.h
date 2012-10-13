@@ -58,5 +58,7 @@ VALUE open_directory_by_name(int argc, VALUE *args, VALUE self);
 VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self);
 VALUE open_file_by_name(int argc, VALUE *args, VALUE self);
 VALUE open_file_by_inum(int argc, VALUE *args, VALUE self);
+VALUE return_tsk_fs_type_list(int argc, VALUE *args, VALUE self);
+
 
 #endif

@@ -39,6 +39,8 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self);
 VALUE image_open(VALUE self, VALUE filename_str, VALUE disk_type);
 VALUE image_type_to_desc(VALUE self, VALUE number);
 VALUE image_type_to_name(VALUE self, VALUE number);
+VALUE return_tsk_img_type_supported(VALUE self);
+VALUE return_tsk_img_type_list(int argc, VALUE *args, VALUE self);
 
 
 

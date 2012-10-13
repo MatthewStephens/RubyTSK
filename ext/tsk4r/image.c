@@ -158,11 +158,31 @@ VALUE image_type_to_desc(VALUE self, VALUE num) {
   description = tsk_img_type_todesc((TSK_IMG_TYPE_ENUM)FIX2INT(num));
   return rb_str_new2(description);
 }
-
 VALUE image_type_to_name(VALUE self, VALUE num) {
   const char * name;
   name = tsk_img_type_toname((TSK_IMG_TYPE_ENUM)FIX2INT(num));
   return rb_str_new2(name);
+}
+VALUE return_tsk_img_type_supported(VALUE self) {
+  VALUE result;
+  result = INT2NUM(tsk_img_type_supported());
+  return result;
+}
+VALUE return_tsk_img_type_list(int argc, VALUE *args, VALUE self) {
+  VALUE io; uint fd;
+  rb_scan_args(argc, args, "01", &io);
+  if (! rb_obj_is_kind_of(io, rb_cIO) ) {
+    rb_warn("Method did not recieve IO object, using STDOUT");
+    fd = 1;
+  } else {
+    fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0));
+  }
+  
+  FILE * hFile = fdopen((int)fd, "w");
+  tsk_img_type_print(hFile);
+  fflush(hFile); // clear file buffer, completing write
+
+  return self;
 }
 
 // helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values

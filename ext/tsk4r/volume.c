@@ -213,6 +213,23 @@ VALUE read_volume_part_block(int argc, VALUE *args, VALUE self) {
   return self;
 }
 
+VALUE return_tsk_vol_type_list(int argc, VALUE *args, VALUE self) {
+  VALUE io; uint fd;
+  rb_scan_args(argc, args, "01", &io);
+  if (! rb_obj_is_kind_of(io, rb_cIO) ) {
+    rb_warn("Method did not recieve IO object, using STDOUT");
+    fd = 1;
+  } else {
+    fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0));
+  }
+  
+  FILE * hFile = fdopen((int)fd, "w");
+  tsk_vs_type_print(hFile);
+  fflush(hFile); // clear file buffer, completing write
+  
+  return self;
+}
+
 // helper method to convert ruby integers to TSK_VS_TYPE_ENUM values
 TSK_VS_TYPE_ENUM * get_vs_flag(VALUE rb_obj) {
   TSK_VS_TYPE_ENUM * flag;

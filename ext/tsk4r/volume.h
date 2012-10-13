@@ -46,6 +46,7 @@ static VALUE read_volume_system_block(int argc, VALUE *args, VALUE self);
 static VALUE walk_volume_system(VALUE self);
 VALUE volume_expose_part_by_idx(VALUE self, VALUE index);
 VALUE volume_get_partitions(VALUE self);
+VALUE return_tsk_vol_type_list(int argc, VALUE *args, VALUE self);
 
 // Sleuthkit::VolumePart function declarations
 VALUE allocate_volume_part(VALUE klass);

@@ -329,6 +329,24 @@ void populate_instance_variables(VALUE self) {
   rb_iv_set(self, "@tag", INT2NUM(fs_ptr->filesystem->tag));
 }
 
+
+VALUE return_tsk_fs_type_list(int argc, VALUE *args, VALUE self) {
+  VALUE io; uint fd;
+  rb_scan_args(argc, args, "01", &io);
+  if (! rb_obj_is_kind_of(io, rb_cIO) ) {
+    rb_warn("Method did not recieve IO object, using STDOUT");
+    fd = 1;
+  } else {
+    fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0));
+  }
+  
+  FILE * hFile = fdopen((int)fd, "w");
+  tsk_fs_type_print(hFile);
+  fflush(hFile); // clear file buffer, completing write
+  
+  return self;
+}
+
 // helper method to convert ruby integers to TSK_IMG_TYPE_ENUM values
 TSK_FS_TYPE_ENUM * get_fs_flag(VALUE rb_obj) {
   TSK_FS_TYPE_ENUM * flag;

@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 module Sleuthkit
   module FileSystem
+    def self.type_print
+      report=""
+      r, w = IO.pipe
+      self.return_type_list(w)
+      w.close
+      report << r.read
+      r.close
+      return report
+    end
     class System
       include ::Sleuthkit
       SEARCH_METHODS=[ :directory, :file ]

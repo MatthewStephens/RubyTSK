@@ -81,6 +81,14 @@ describe "spec/image" do
       @flag.should match("Advanced Forensic Format")
     end
   end
+  describe "Image#type_print" do
+    it "should return a string reporting the types supported" do
+      find_this="raw (Single raw file (dd))"
+      escaped=Regexp.escape(find_this)
+      @report = Sleuthkit::Image.type_print
+      @report.should match(escaped)
+    end
+  end
   
   after :all do
     $stderr = @orig_stderr

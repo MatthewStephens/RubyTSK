@@ -128,6 +128,15 @@ describe "spec/volume" do
       @volume.inspect_object[:description].should eq @volume.description
     end
   end
+  # module methods
+  describe "Volume#type_print" do
+    it "should return a string reporting the types supported" do
+      find_this = "dos (DOS Partition Table)"
+      escaped=Regexp.escape(find_this)
+      @report = Sleuthkit::Volume.type_print
+      @report.should match(escaped)
+    end
+  end
   
 end
 

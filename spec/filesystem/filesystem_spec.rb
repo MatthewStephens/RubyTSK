@@ -249,6 +249,16 @@ describe "spec/filesystem" do
     end
   end
   
+  # module methods
+  describe "FileSystem#type_print" do
+    it "should return a string reporting the types supported" do
+      find_this="fat (FAT (Auto Detection))"
+      escaped=Regexp.escape(find_this)
+      @report = Sleuthkit::FileSystem.type_print
+      @report.should match(escaped)
+    end
+  end
+  
   # these should only work if tsk4r was compiled against libstk >= 3.2.2
   describe "#block_post_size" do
     it "returns the block_post_size (only available on libtsk >= 3.2.2)" do

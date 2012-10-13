@@ -43,6 +43,22 @@ module Sleuthkit
       num = num.to_i
       self.image_type_to_description(num)
     end
+    def self.build_type_list
+      h={}
+      [1,2,4,8,16,32,64].each do |n|
+        h[n]=self.image_type_to_description(n)
+      end
+      return h
+    end
+    def self.type_print
+      report=""
+      r, w = IO.pipe
+      self.return_type_list(w)
+      w.close
+      report << r.read
+      r.close
+      return report
+    end
     # private
     def parse_opts(h={})
       opts = h || Hash.new
