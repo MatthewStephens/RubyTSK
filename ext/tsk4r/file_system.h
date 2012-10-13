@@ -53,6 +53,7 @@ VALUE open_fs_from_volume(VALUE self, VALUE vol_obj, VALUE opts);
 VALUE open_fs_from_partition(VALUE self, VALUE partition, VALUE opts);
 VALUE get_filesystem_type(VALUE self);
 VALUE call_tsk_fsstat(VALUE self, VALUE io);
+VALUE call_tsk_istat(int argc, VALUE *args, VALUE self);
 VALUE open_directory_by_name(int argc, VALUE *args, VALUE self);
 VALUE open_directory_by_inum(int argc, VALUE *args, VALUE self);
 VALUE open_file_by_name(int argc, VALUE *args, VALUE self);

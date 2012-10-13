@@ -149,6 +149,7 @@ void Init_tsk4r() {
   rb_define_method(rb_cTSKFileSystem, "open", open_filesystem, -1); // change arg1 to klass?
   rb_define_method(rb_cTSKFileSystem, "system_name", get_filesystem_type, 0);
   rb_define_method(rb_cTSKFileSystem, "call_tsk_fsstat", call_tsk_fsstat, 1);
+  rb_define_method(rb_cTSKFileSystem, "call_tsk_istat", call_tsk_istat, -1);
   rb_define_method(rb_cTSKFileSystem, "open_directory_by_name", open_directory_by_name, -1);
   rb_define_method(rb_cTSKFileSystem, "open_directory_by_inum", open_directory_by_inum, -1);
   rb_define_method(rb_cTSKFileSystem, "open_file_by_name", open_file_by_name, -1);

@@ -61,6 +61,25 @@ module Sleuthkit
           raise ArgumentError, "arg1 should be IO, File or String object."
         end
       end
+      alias_method :stat, :print_tsk_fsstat
+      def istat(inum, report=STDOUT, opts={})
+        # if opts were passed w/o report, assign report to STDOUT
+        if report.is_a?(Hash) && opts.empty? then opts=report; report=STDOUT end
+
+        opts ||= Hash.new
+        if report.kind_of?( IO )
+          self.call_tsk_istat(inum, report, opts)
+        elsif report.kind_of?(String)
+          r, w = IO.pipe
+          self.call_tsk_istat(inum, w, opts)
+          w.close
+          report << r.read
+          r.close
+          return report
+        else
+          raise ArgumentError, "arg2 should be IO, File or String object."
+        end
+      end
       
     
       private

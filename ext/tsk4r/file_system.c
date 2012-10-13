@@ -248,6 +248,39 @@ VALUE call_tsk_fsstat(VALUE self, VALUE io){
   return self;
 }
 
+VALUE call_tsk_istat(int argc, VALUE *args, VALUE self) {
+  VALUE io; VALUE inum; VALUE options;
+  rb_scan_args(argc, args, "21", &inum, &io, &options);
+  if (! rb_obj_is_kind_of(io, rb_cIO) ) {
+    rb_raise(rb_eArgError, "Method did not recieve IO object");
+  }
+  
+  TSK_DADDR_T numblock; int32_t sec_skew;
+  VALUE block = rb_hash_aref(options, ID2SYM(rb_intern("block")));
+  if (! NIL_P(block)) { numblock = (TSK_DADDR_T)NUM2ULL(block); } else { numblock = 0; }
+  VALUE skew = rb_hash_aref(options, rb_symname_p("skew"));
+  if (! NIL_P(skew)) {  sec_skew = (int32_t)NUM2INT(skew); } else { sec_skew = 0; }
+
+  TSK_INUM_T inum_int;
+  inum_int = NUM2INT(inum);
+  int fd = FIX2LONG(rb_funcall(io, rb_intern("fileno"), 0));
+  FILE * hFile = fdopen((int)fd, "w");
+  
+  struct tsk4r_fs_wrapper * fs_ptr;
+  Data_Get_Struct(self, struct tsk4r_fs_wrapper, fs_ptr);
+  
+  if (fs_ptr->filesystem != NULL) {
+    uint8_t(*myfunc) (TSK_FS_INFO * fs, FILE * hFile, TSK_INUM_T inum,
+                      TSK_DADDR_T numblock, int32_t sec_skew);
+    myfunc = fs_ptr->filesystem->istat;
+    int r = myfunc(fs_ptr->filesystem, hFile, inum_int, numblock, sec_skew);
+    fflush(hFile); // clear file buffer, completing write
+    if (r != 0 ) { rb_raise(rb_eRuntimeError, "TSK function: fsstat exited with an error."); }
+
+  }
+  return self;
+}
+
 // assigns numerous TSK_FS_INFO values to ruby instance variables
 void populate_instance_variables(VALUE self) {
   struct tsk4r_fs_wrapper * fs_ptr;
