@@ -63,6 +63,7 @@ void Init_tsk4r() {
   rb_cTSKFileSystemFileData   = rb_define_class_under(rb_mtsk4r_fs, "FileData", rb_cObject);
   rb_cTSKFileSystemFileMeta   = rb_define_class_under(rb_mtsk4r_fs, "FileMeta", rb_cObject);
   rb_cTSKFileSystemFileName   = rb_define_class_under(rb_mtsk4r_fs, "FileName", rb_cObject);
+  rb_cTSKFileSystemBlock      = rb_define_class_under(rb_mtsk4r_fs, "Block", rb_cObject);
 
   
   // allocation functions
@@ -74,6 +75,7 @@ void Init_tsk4r() {
   rb_define_alloc_func(rb_cTSKFileSystemFileData, allocate_fs_file);
   rb_define_alloc_func(rb_cTSKFileSystemFileMeta, allocate_fs_meta);
   rb_define_alloc_func(rb_cTSKFileSystemFileName, allocate_fs_name);
+  rb_define_alloc_func(rb_cTSKFileSystemBlock, allocate_fs_block);
 
 
   // sub classes
@@ -224,6 +226,18 @@ void Init_tsk4r() {
   
   // attributes (see lib/sleuthkit/file_system.rb for more)
   rb_define_attr(rb_cTSKFileSystemFileName, "parent", 1, 0);
+  
+  /* Sleuthkit::FileSystem::Block */
+  rb_define_method(rb_cTSKFileSystemBlock, "initialize", initialize_fs_block, -1);
+  rb_define_method(rb_cTSKFileSystemBlock, "fetch", fetch_block, 2);
+  
+  // attributes
+  rb_define_attr(rb_cTSKFileSystemBlock, "address", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemBlock, "buffer", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemBlock, "filesystem", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemBlock, "flags", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemBlock, "tag", 1, 0);
+
 
 
 }

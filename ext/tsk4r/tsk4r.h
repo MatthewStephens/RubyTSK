@@ -30,6 +30,7 @@
 #include "file_system.h"
 #include "fs_dir.h"
 #include "fs_file.h"
+#include "fs_block.h"
 
 
 const char * TSK4R_FS_ATTRS_NAMES[TSK4R_FS_ATTRS_COUNT] = {
@@ -58,6 +59,7 @@ VALUE rb_cTSKFileSystemDir;
 VALUE rb_cTSKFileSystemFileData;
 VALUE rb_cTSKFileSystemFileMeta;
 VALUE rb_cTSKFileSystemFileName;
+VALUE rb_cTSKFileSystemBlock;
 
 
 VALUE allocate_image(VALUE klass);
