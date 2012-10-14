@@ -63,6 +63,7 @@ void Init_tsk4r() {
   rb_cTSKFileSystemFileData   = rb_define_class_under(rb_mtsk4r_fs, "FileData", rb_cObject);
   rb_cTSKFileSystemFileMeta   = rb_define_class_under(rb_mtsk4r_fs, "FileMeta", rb_cObject);
   rb_cTSKFileSystemFileName   = rb_define_class_under(rb_mtsk4r_fs, "FileName", rb_cObject);
+  rb_cTSKFileSystemAttr       = rb_define_class_under(rb_mtsk4r_fs, "Attribute", rb_cObject);
   rb_cTSKFileSystemBlock      = rb_define_class_under(rb_mtsk4r_fs, "Block", rb_cObject);
 
   
@@ -75,6 +76,7 @@ void Init_tsk4r() {
   rb_define_alloc_func(rb_cTSKFileSystemFileData, allocate_fs_file);
   rb_define_alloc_func(rb_cTSKFileSystemFileMeta, allocate_fs_meta);
   rb_define_alloc_func(rb_cTSKFileSystemFileName, allocate_fs_name);
+  rb_define_alloc_func(rb_cTSKFileSystemAttr, allocate_fs_attr);
   rb_define_alloc_func(rb_cTSKFileSystemBlock, allocate_fs_block);
 
 
@@ -106,7 +108,7 @@ void Init_tsk4r() {
 
 
   
-  /* Sleuthkit::Volume */
+  /* Sleuthkit::Volume::System */
   // object methods for VolumeSystem objects
   rb_define_method(rb_cTSKVolumeSystem, "initialize", initialize_volume_system, -1);
   rb_define_method(rb_cTSKVolumeSystem, "open", open_volume_system, 2); // change arg1 to klass?
@@ -129,7 +131,7 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKVolumeSystem, "volume_system_type", 1, 0);
 
 
-  
+  /* Sleuthkit::Volume::Partition */  
   // object methods for VolumePart objects
   rb_define_method(rb_cTSKVolumePart, "initialize", initialize_volume_part, -1);
   rb_define_method(rb_cTSKVolumePart, "open", open_volume_part, -1); // change arg1 to klass?
@@ -195,6 +197,8 @@ void Init_tsk4r() {
   // object methods for FileSystemFileData objects
   rb_define_method(rb_cTSKFileSystemFileData, "initialize", initialize_fs_file, -1);
   rb_define_method(rb_cTSKFileSystemFileData, "open_fs_file", open_fs_file, -1);
+  rb_define_method(rb_cTSKFileSystemFileData, "get_number_of_attributes", get_number_of_attributes, 0);
+  
   // attributes
   rb_define_attr(rb_cTSKFileSystemFileData, "address", 1, 0);
   rb_define_attr(rb_cTSKFileSystemFileData, "content_len", 1, 0);
@@ -226,6 +230,22 @@ void Init_tsk4r() {
   
   // attributes (see lib/sleuthkit/file_system.rb for more)
   rb_define_attr(rb_cTSKFileSystemFileName, "parent", 1, 0);
+  
+  /* Sleuthkit::FileSystem:Attr */
+  rb_define_method(rb_cTSKFileSystemAttr, "initialize", initialize_fs_attr, -1);
+  rb_define_method(rb_cTSKFileSystemAttr, "fetch", fetch_attr, -1);
+  rb_define_method(rb_cTSKFileSystemAttr, "fetch_default_attribute", fetch_attr, -1);
+  rb_define_method(rb_cTSKFileSystemAttr, "fetch_attribute_by_index", fetch_attr, -1);
+
+
+  rb_define_attr(rb_cTSKFileSystemAttr, "file", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemAttr, "flags", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemAttr, "id", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemAttr, "name", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemAttr, "name_size", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemAttr, "size", 1, 0);
+  rb_define_attr(rb_cTSKFileSystemAttr, "type", 1, 0);
+
   
   /* Sleuthkit::FileSystem::Block */
   rb_define_method(rb_cTSKFileSystemBlock, "initialize", initialize_fs_block, -1);

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 describe "spec/filesystem" do
   require 'sleuthkit'
   require 'awesome_print'
@@ -92,6 +93,15 @@ describe "spec/filesystem" do
       @tsk_file.name.parent_addr.should eq(26)
       @tsk_file.name.name_size.should eq(128)
       @tsk_file.should be_an_instance_of Sleuthkit::FileSystem::FileData 
+    end
+  end
+  describe "FileSystem::File#get_number_of_attributes" do
+    it "should return the number of file system attribute objects for the file" do
+      @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
+      @file = @filesystem.find_by_inum(28)
+      @file.should be_an_instance_of Sleuthkit::FileSystem::FileData
+      num = @file.get_number_of_attributes
+      num.should eq(1)
     end
   end
   

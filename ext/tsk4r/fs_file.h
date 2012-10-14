@@ -57,6 +57,7 @@ VALUE open_fs_file(int argc, VALUE *args, VALUE self);
 VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr);
 VALUE get_meta_from_file(VALUE self, VALUE fs_file);
 VALUE get_meta_from_dir( VALUE self, VALUE fs_dir);
+VALUE get_number_of_attributes(VALUE self);
 
 
 #endif

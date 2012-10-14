@@ -30,6 +30,7 @@
 #include "file_system.h"
 #include "fs_dir.h"
 #include "fs_file.h"
+#include "fs_attr.h"
 #include "fs_block.h"
 
 
@@ -59,6 +60,7 @@ VALUE rb_cTSKFileSystemDir;
 VALUE rb_cTSKFileSystemFileData;
 VALUE rb_cTSKFileSystemFileMeta;
 VALUE rb_cTSKFileSystemFileName;
+VALUE rb_cTSKFileSystemAttr;
 VALUE rb_cTSKFileSystemBlock;
 
 

@@ -265,10 +265,10 @@ describe "spec/filesystem" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       if Sleuthkit::TSK_VERSION =~ /^4/ || Sleuthkit::TSK_VERSION =~ /3\.2\.[23]/
       then
-        puts "TESTING FOR block_post_size, a TSK_FS_INFO field avail on tsk >= 3.2.2"
+        # puts "TESTING FOR block_post_size, a TSK_FS_INFO field avail on tsk >= 3.2.2"
         @filesystem.block_post_size.should eq(0)
       else
-        puts "This feature not available on older versions of libtsk.  Upgrade perhaps?"
+        # puts "This feature not available on older versions of libtsk.  Upgrade perhaps?"
         @filesystem.respond_to?("block_post_size").should eq(false)
       end
     end

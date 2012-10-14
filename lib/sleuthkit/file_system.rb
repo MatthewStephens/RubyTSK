@@ -10,6 +10,9 @@ module Sleuthkit
       r.close
       return report
     end
+    def self.new(img)
+      return ::Sleuthkit::FileSystem::System.new(img)
+    end
     class System
       include ::Sleuthkit
       SEARCH_METHODS=[ :directory, :file ]
@@ -122,7 +125,14 @@ module Sleuthkit
     class FileData
       attr_reader :name
       include ::Sleuthkit
-      
+      def return_file_attributes
+        attrs= []
+        list = *(0..(self.get_number_of_attributes-1))
+        list.each do |attr_num|
+          attrs << Sleuthkit::FileSystem::Attribute.new(self, attr_num)
+        end
+        attrs.length == 1 ? attrs.first : attrs
+      end
     end
     class FileMeta
       include ::Sleuthkit
@@ -147,6 +157,9 @@ module Sleuthkit
       include ::Sleuthkit
       attr_reader :meta_addr, :meta_seq, :name, :name_size, :parent_addr, :shrt_name, :shrt_name_size, :tag
       
+    end
+    class Attribute
+      include ::Sleuthkit
     end
   end
 end

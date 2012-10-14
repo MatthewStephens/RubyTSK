@@ -78,8 +78,8 @@ void deallocate_fs_name(struct tsk4r_fs_name_wrapper * ptr){
 VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
   VALUE fs; VALUE reference; VALUE opts; TSK_INUM_T addr;
   rb_scan_args(argc, args, "21", &fs, &reference, &opts);
-  klassify(fs, "fs");
-  klassify(reference, "reference");
+//  klassify(fs, "fs");
+//  klassify(reference, "reference");
   rb_iv_set(self, "@parent", fs);
   
   // get filesystem, self
@@ -93,7 +93,6 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
   
   // determine if reference is a directory obj, file name, or metadata entry (e.g. inum)
   if (rb_obj_is_kind_of(reference, rb_cTSKFileSystemDir)) {
-    printf("building FILE object from Dir\n");
     struct tsk4r_fs_dir_wrapper * fs_dir;
     Data_Get_Struct(reference, struct tsk4r_fs_dir_wrapper, fs_dir);
     addr = fs_dir->directory->addr;
@@ -103,7 +102,6 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
     fs_file->file = fs_dir->directory->fs_file;
     
   } else if (rb_obj_is_kind_of(reference, rb_cFixnum)) {
-    printf("building FILE object from Fixnum\n");
 
     addr = (TSK_INUM_T)FIX2ULONG(reference);  TSK_FS_FILE * fs_temp_file;
 
@@ -111,7 +109,6 @@ VALUE initialize_fs_file(int argc, VALUE *args, VALUE self) {
     if (fs_temp_file != NULL ) { fs_file->file = fs_temp_file; }
 
   } else if (rb_obj_is_kind_of(reference, rb_cString)) {
-    printf("building FILE object from String\n");
 
     TSK_TCHAR * name; TSK_FS_FILE * fs_temp_file;
     name = StringValuePtr(reference);
@@ -220,6 +217,15 @@ VALUE get_meta_from_dir(VALUE self, VALUE fs_dir)  {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
   }
   return self;
+}
+
+VALUE get_number_of_attributes(VALUE self) {
+  VALUE number; int n; TSK_FS_FILE * fs_file; struct tsk4r_fs_file_wrapper * fwrapper;
+  Data_Get_Struct(self, struct tsk4r_fs_file_wrapper, fwrapper);
+  fs_file = fwrapper->file;
+  n = tsk_fs_file_attr_getsize(fs_file);
+  number = INT2NUM(n);
+  return number;
 }
 
 void build_attributes(VALUE self, TSK_FS_META * metadata) {
