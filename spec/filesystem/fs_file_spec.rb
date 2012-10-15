@@ -98,7 +98,7 @@ describe "spec/filesystem" do
   describe "FileSystem::File#get_number_of_attributes" do
     it "should return the number of file system attribute objects for the file" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
-      @file = @filesystem.find_by_inum(28)
+      @file = @filesystem.find_file_by_inum(28)
       @file.should be_an_instance_of Sleuthkit::FileSystem::FileData
       num = @file.get_number_of_attributes
       num.should eq(1)

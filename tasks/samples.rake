@@ -56,7 +56,8 @@ namespace :spec do
       require 'zlib'
 
       Rake::Task["spec:samples:glob"].invoke('.gz')     
-      args[:file].nil? ? files = @glob : files = args[:file].to_a 
+			files = []
+      args[:file].nil? ? files = @glob : files <<  args[:file] 
 
       files.each {|e| e.gsub!(/\.?\/?#{SAMPLE_DIR}\//, '') }
 
@@ -86,7 +87,8 @@ namespace :spec do
     desc "splits a sample for use in tests"
     task :split, [:file] do |t, args|
       Rake::Task["spec:samples:glob"].invoke     
-      args[:file].nil? ? files = @glob : files = args[:file].to_a 
+			files = []
+      args[:file].nil? ? files = @glob : files << args[:file] 
 
       # to do something similar on the command line:
       # dd if=spec/samples/tsk4r_img_01.dmg | split -b 10m - tsk4r_img_01.split.
