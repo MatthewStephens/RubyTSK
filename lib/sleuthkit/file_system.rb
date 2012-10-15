@@ -128,6 +128,7 @@ module Sleuthkit
       def return_file_attributes
         attrs= []
         list = *(0..(self.get_number_of_attributes-1))
+	      if list == 0 then list=[ 0 ] end
         list.each do |attr_num|
           attrs << Sleuthkit::FileSystem::Attribute.new(self, attr_num)
         end
