@@ -47,8 +47,8 @@ VALUE allocate_fs_file(VALUE klass){
 }
 
 VALUE allocate_fs_meta(VALUE klass){
-  struct tsk4r_fs_meta_wrapper * ptr;
-  return Data_Make_Struct(klass, struct tsk4r_fs_meta_wrapper, 0, deallocate_fs_meta, ptr);
+  TSK_FS_META * ptr;
+  return Data_Make_Struct(klass, TSK_FS_META, 0, deallocate_fs_meta, ptr);
 }
 
 VALUE allocate_fs_name(VALUE klass){
@@ -62,7 +62,7 @@ void deallocate_fs_file(struct tsk4r_fs_file_wrapper * ptr){
   xfree(ptr);
 }
 
-void deallocate_fs_meta(struct tsk4r_fs_meta_wrapper * ptr){
+void deallocate_fs_meta(TSK_FS_META * ptr){
   xfree(ptr);
 }
 
@@ -168,16 +168,16 @@ VALUE initialize_fs_meta(int argc, VALUE *args, VALUE self){
 // this first one makes a temporary TSK_FS_FILE struct to get at TSK_FS_META
 VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr) {
   struct tsk4r_fs_wrapper * fs_ptr;
-  struct tsk4r_fs_meta_wrapper * meta_ptr;
+  TSK_FS_META * meta;
   TSK_FS_FILE * fs_file;
   
   Data_Get_Struct(filesystem, struct tsk4r_fs_wrapper, fs_ptr);
-  Data_Get_Struct(self, struct tsk4r_fs_meta_wrapper, meta_ptr);
+  Data_Get_Struct(self, TSK_FS_META, meta);
   fs_file = tsk_fs_file_open_meta(fs_ptr->filesystem, NULL, (TSK_INUM_T)FIX2LONG(addr));
   
   if ( fs_file->meta ) {
-    meta_ptr->metadata = fs_file->meta;
-    build_attributes(self, meta_ptr->metadata);
+    meta = fs_file->meta;
+    build_attributes(self, meta);
 
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
@@ -187,13 +187,13 @@ VALUE get_meta_from_inum(VALUE self, VALUE filesystem, VALUE addr) {
 
 VALUE get_meta_from_file(VALUE self, VALUE fs_file) {
   struct tsk4r_fs_file_wrapper * file_ptr;
-  struct tsk4r_fs_meta_wrapper * meta_ptr;
+  TSK_FS_META * meta;
   Data_Get_Struct(fs_file, struct tsk4r_fs_file_wrapper, file_ptr);
-  Data_Get_Struct(self, struct tsk4r_fs_meta_wrapper, meta_ptr);
+  Data_Get_Struct(self, TSK_FS_META, meta);
 
   if ( file_ptr->file->meta ) {
-    meta_ptr->metadata = file_ptr->file->meta;
-    build_attributes(self, meta_ptr->metadata);
+    meta = file_ptr->file->meta;
+    build_attributes(self, meta);
 
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");
@@ -203,15 +203,15 @@ VALUE get_meta_from_file(VALUE self, VALUE fs_file) {
 
 VALUE get_meta_from_dir(VALUE self, VALUE fs_dir)  {
   struct tsk4r_fs_dir_wrapper * dir_ptr;
-  struct tsk4r_fs_meta_wrapper * meta_ptr;
+  TSK_FS_META * meta;
   TSK_FS_FILE * fs_file;
   Data_Get_Struct(fs_dir, struct tsk4r_fs_dir_wrapper, dir_ptr);
-  Data_Get_Struct(self, struct tsk4r_fs_meta_wrapper, meta_ptr);
+  Data_Get_Struct(self, TSK_FS_META, meta);
   fs_file = dir_ptr->directory->fs_file;
   
   if ( fs_file->meta ) {
-    meta_ptr->metadata = fs_file->meta;
-    build_attributes(self, meta_ptr->metadata);
+    meta = fs_file->meta;
+    build_attributes(self, meta);
 
   } else {
     rb_warn("access to TSK_FS_FILE struct's meta field failed.");

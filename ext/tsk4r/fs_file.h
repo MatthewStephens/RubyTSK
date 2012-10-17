@@ -32,9 +32,6 @@
 struct tsk4r_fs_file_wrapper {
   TSK_FS_FILE * file;
 };
-struct tsk4r_fs_meta_wrapper {
-  TSK_FS_META * metadata;
-};
 
 
 // function prototypes
@@ -43,7 +40,7 @@ VALUE allocate_fs_meta(VALUE self);
 VALUE allocate_fs_name(VALUE self);
 
 void deallocate_fs_file(struct tsk4r_fs_file_wrapper * ptr);
-void deallocate_fs_meta(struct tsk4r_fs_meta_wrapper * ptr);
+void deallocate_fs_meta(TSK_FS_META * ptr);
 void deallocate_fs_name(TSK_FS_NAME * ptr);
 
 VALUE initialize_fs_file(int argc, VALUE *args, VALUE self);
