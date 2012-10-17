@@ -52,8 +52,8 @@ VALUE allocate_fs_meta(VALUE klass){
 }
 
 VALUE allocate_fs_name(VALUE klass){
-  struct tsk4r_fs_name_wrapper * ptr;
-  return Data_Make_Struct(klass, struct tsk4r_fs_name_wrapper, 0, deallocate_fs_name, ptr);
+  TSK_FS_NAME * ptr;
+  return Data_Make_Struct(klass, TSK_FS_NAME, 0, deallocate_fs_name, ptr);
 }
 
 void deallocate_fs_file(struct tsk4r_fs_file_wrapper * ptr){
@@ -66,7 +66,7 @@ void deallocate_fs_meta(struct tsk4r_fs_meta_wrapper * ptr){
   xfree(ptr);
 }
 
-void deallocate_fs_name(struct tsk4r_fs_name_wrapper * ptr){
+void deallocate_fs_name(TSK_FS_NAME * ptr){
   xfree(ptr);
 }
 
@@ -262,14 +262,13 @@ VALUE initialize_fs_name(int argc, VALUE *args, VALUE self){
   rb_iv_set(self, "@file", file_obj);
   
   struct tsk4r_fs_file_wrapper * file_ptr;
-  struct tsk4r_fs_name_wrapper * my_ptr;
+  TSK_FS_NAME * name;
   Data_Get_Struct(file_obj, struct tsk4r_fs_file_wrapper, file_ptr);
-  Data_Get_Struct(self, struct tsk4r_fs_name_wrapper, my_ptr);
+  Data_Get_Struct(self, TSK_FS_NAME, name);
 
   if (file_ptr->file->name != NULL) {
-    my_ptr->name = file_ptr->file->name;
-    if (my_ptr->name) {
-      TSK_FS_NAME * name = my_ptr->name;
+    name = file_ptr->file->name;
+    if (name) {
       rb_iv_set(self, "@meta_addr", LONG2FIX(name->meta_addr));
       rb_iv_set(self, "@meta_seq", LONG2FIX(name->meta_seq));
       rb_iv_set(self, "@name", rb_str_new2(name->name));
