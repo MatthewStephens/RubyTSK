@@ -10,8 +10,8 @@ module Sleuthkit
       r.close
       return report
     end
-    def self.new(img)
-      return ::Sleuthkit::FileSystem::System.new(img)
+    def self.new(fs)
+      return ::Sleuthkit::FileSystem::System.new(fs)
     end
     class System
       include ::Sleuthkit
