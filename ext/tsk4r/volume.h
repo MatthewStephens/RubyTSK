@@ -42,7 +42,9 @@ void  deallocate_volume_system();
 VALUE initialize_volume_system(int argc, VALUE *args, VALUE self);
 VALUE open_volume_system(VALUE self, VALUE image_obj, VALUE options);
 static VALUE close_volume_system(VALUE self);
-static VALUE read_volume_system_block(int argc, VALUE *args, VALUE self);
+
+VALUE read_volume_system_block(int argc, VALUE *args, VALUE self);
+
 static VALUE walk_volume_system(VALUE self);
 VALUE volume_expose_part_by_idx(VALUE self, VALUE index);
 VALUE volume_get_partitions(VALUE self);
@@ -53,8 +55,10 @@ VALUE allocate_volume_part(VALUE klass);
 void  deallocate_volume_part();
 VALUE initialize_volume_part(int argc, VALUE *args, VALUE self);
 VALUE open_volume_part(int argc, VALUE *args, VALUE self);
+VALUE read_partition_block(int argc, VALUE *args, VALUE self);
+VALUE read_partition_data(int argc, VALUE *args, VALUE self);
+
 //static VALUE close_volume_part(VALUE self);
-//VALUE read_volume_part_block(int argc, VALUE *args, VALUE self);
 //static VALUE walk_volume_part(VALUE self);
 
 #endif

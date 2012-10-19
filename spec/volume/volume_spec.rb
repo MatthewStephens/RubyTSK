@@ -134,6 +134,36 @@ describe "spec/volume" do
       @volume.inspect_object[:description].should eq @volume.description
     end
   end
+  # data/block read methods
+  describe "Partition#read" do
+    it "Reads data starting at a byte address relative to the start of a Partition" do
+      @volume = Sleuthkit::Volume::System.new(@partitioned_image)
+      @part = @volume.parts.first
+      addr = 1; num_bytes = 4
+      find_this = "ffff0000"
+      @data = @part.read(addr, num_bytes)
+      @data.should eq(find_this)
+    end
+  end
+  describe "Partition#read_block" do
+    it "Reads {num} blocks starting at a block address {addr} relative to the start of a Partition" do
+      @volume = Sleuthkit::Volume::System.new(@partitioned_image)
+      @part = @volume.parts.first
+      addr = 1; num_blocks = 4
+      find_this = "ffff0000"
+      @blocks = @part.read_block(addr, num_blocks)
+      @blocks.should eq(find_this)
+    end
+  end
+  describe "System#read_block" do
+    it "Reads {num} blocks starting at a block address {addr} relative to the start of a Volume System" do
+      @volume = Sleuthkit::Volume::System.new(@partitioned_image)
+      addr = 1; num_blocks = 1
+      find_this = /Apple\x00{27}Apple_partition_map/
+      @blocks = @volume.read_block(addr, num_blocks)
+      @blocks.should match(find_this)
+    end
+  end
   # module methods
   describe "Volume#type_print" do
     it "should return a string reporting the types supported" do
