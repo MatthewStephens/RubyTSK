@@ -12,6 +12,12 @@ describe "spec/volume" do
 		@string = "some string"
 	end
 
+	describe "Sleuthkit::Volume#new(@disk_image)" do
+		it "initializes using convenience (class) method" do
+			@volume = Sleuthkit::Volume.new(@partitioned_image)
+			@volume.should be_an_instance_of Sleuthkit::Volume::System
+		end
+	end
 	describe "#new(@disk_image)" do
 		it "initializes with Sleuthkit::Image passed as param1" do
 			@volume = Sleuthkit::Volume::System.new(@partitioned_image)

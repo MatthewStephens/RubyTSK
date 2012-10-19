@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 module Sleuthkit
   module Volume 
+    def self.new(vs)
+      return ::Sleuthkit::Volume::System.new(vs)
+    end
     def self.type_print
       report=""
       r, w = IO.pipe
