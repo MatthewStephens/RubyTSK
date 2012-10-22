@@ -37,7 +37,7 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
     it "Should call TSK filesystem report function" do
       @file_system = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       @file_system.block_size.should eq(4096)
-      find_this = "Last Backup Date:   Wed Dec 31 19:00:00 1969"
+      find_this = "Last Backup Date: \tWed Dec 31 19:00:00 1969"
       result=""
       @file_system.print_tsk_fsstat(result)
       puts result
@@ -48,7 +48,7 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
     it "Should call TSK filesystem report function via the alias #stat" do
       @file_system = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
       @file_system.block_size.should eq(4096)
-      find_this = "Last Backup Date:   Wed Dec 31 19:00:00 1969"
+      find_this = "Last Backup Date: \tWed Dec 31 19:00:00 1969"
       result=""
       @file_system.stat(result)
       puts result
@@ -58,7 +58,7 @@ describe "spec/experiments", "Sleuthkit FileSystem Experiments" do
   describe "Experiment 4" do
     it "Should call TSK file report function, given an inum" do
       @file_system = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
-      find_this = "Type:  File\nMode:  r---------\nSize:  159744"
+      find_this = "Type:\tFile\nMode:\tr---------\nSize:\t159744"
       inum=3; result=""
       @file_system.istat(inum, result)
       # puts result
