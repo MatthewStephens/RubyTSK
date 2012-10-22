@@ -152,6 +152,59 @@ VALUE initialize_disk_image(int argc, VALUE *args, VALUE self){
   }
 }
 
+// #read_image_block(sector_number, byte_count)
+VALUE read_image_block(int argc, VALUE *args, VALUE self) {
+  VALUE data_string; VALUE sector_num; VALUE length;
+  rb_scan_args(argc, args, "20", &sector_num, &length);
+  // TO DO: ensure arg1 is positive int; arg2 does not exceed num blocks in img.
+  TSK_DADDR_T address = NUM2INT(sector_num);
+  size_t number_of_blocks = NUM2INT(length);
+  
+  struct tsk4r_img_wrapper * img_ptr;
+  Data_Get_Struct(self, struct tsk4r_img_wrapper, img_ptr);
+  TSK_IMG_INFO * image = img_ptr->image;
+  
+  size_t bytes = number_of_blocks * image->sector_size;
+  address = address * image->sector_size;
+  long size = bytes + 1;
+  char *buffer = malloc(size);
+//  memset(buffer, '\0', size);
+  
+  long i = tsk_img_read(image, address, buffer, bytes);
+  if (i < 0) { rb_raise(rb_eException, "tsk_img_read returned with an error.\n"); }
+  if (i != bytes) { rb_warn("tsk_img_read unable to read total number of bytes requested."); }
+
+  data_string = rb_str_new(buffer, size-1);
+  return data_string;
+}
+
+// #read_image_bytes(byte_address, byte_count)
+VALUE read_image_bytes(int argc, VALUE *args, VALUE self) {
+  VALUE data_string; VALUE start_byte; VALUE length;
+  rb_scan_args(argc, args, "20", &start_byte, &length);
+  // TO DO: ensure arg1 is positive int; arg2 does not exceed num blocks in img.
+  TSK_DADDR_T address = NUM2INT(start_byte);
+  size_t number_of_bytes = NUM2INT(length);
+  
+  struct tsk4r_img_wrapper * img_ptr;
+  Data_Get_Struct(self, struct tsk4r_img_wrapper, img_ptr);
+  TSK_IMG_INFO * image = img_ptr->image;
+  
+  size_t bytes = number_of_bytes;
+  long size = bytes + 1;
+  char *buffer = malloc(size);
+  //  memset(buffer, '\0', size);
+  
+  //  long ii = tsk_img_read(image, 0, a_buf, 16);
+  long i = tsk_img_read(image, address, buffer, bytes);
+  if (i < 0) { rb_raise(rb_eException, "tsk_img_read returned with an error.\n"); }
+  if (i != bytes) { rb_warn("tsk_img_read unable to read total number of bytes requested."); }
+  
+  data_string = rb_str_new(buffer, size-1);
+  return data_string;
+}
+
+
 // helper methods
 VALUE image_type_to_desc(VALUE self, VALUE num) {
   const char * description;

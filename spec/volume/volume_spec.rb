@@ -135,24 +135,27 @@ describe "spec/volume" do
     end
   end
   # data/block read methods
-  describe "Partition#read" do
+  describe "Partition#read_bytes" do
     it "Reads data starting at a byte address relative to the start of a Partition" do
       @volume = Sleuthkit::Volume::System.new(@partitioned_image)
-      @part = @volume.parts.first
-      addr = 1; num_bytes = 4
-      find_this = "ffff0000"
-      @data = @part.read(addr, num_bytes)
-      @data.should eq(find_this)
+      @part = @volume.parts[1]
+      addr = 0; num_bytes = 144
+      find_this = /Apple\x00{27}Apple_partition_map/
+      @data = @part.read_bytes(addr, num_bytes)
+      pp @data
+      @data.should match(find_this)
     end
   end
   describe "Partition#read_block" do
     it "Reads {num} blocks starting at a block address {addr} relative to the start of a Partition" do
       @volume = Sleuthkit::Volume::System.new(@partitioned_image)
       @part = @volume.parts.first
-      addr = 1; num_blocks = 4
-      find_this = "ffff0000"
+      addr = 1; num_blocks = 2
+      find_this = /Partition 1\x00{21}Apple_HFS/  # located in block 2
       @blocks = @part.read_block(addr, num_blocks)
-      @blocks.should eq(find_this)
+      @blocks.should match(find_this)
+      @other_blocks = @part.read_block(1,1) 
+      @other_blocks.should_not match(find_this)
     end
   end
   describe "System#read_block" do

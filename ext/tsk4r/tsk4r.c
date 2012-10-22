@@ -88,6 +88,9 @@ void Init_tsk4r() {
   // object methods for Sleuthkit::Image objects
   rb_define_method(rb_cTSKImage, "initialize", initialize_disk_image, -1);
   rb_define_method(rb_cTSKImage, "image_open", image_open, 2);
+  rb_define_method(rb_cTSKImage, "read_block", read_image_block, -1); //read block given sector no. and no. of blocks
+  rb_define_method(rb_cTSKImage, "read_bytes", read_image_bytes, -1); //read block given start byte and no. of bytes
+
   rb_define_module_function(rb_cTSKImage, "image_type_to_description", image_type_to_desc, 1);
   rb_define_module_function(rb_cTSKImage, "image_type_to_name", image_type_to_name, 1);
   rb_define_module_function(rb_cTSKImage, "return_tsk_img_type_supported", return_tsk_img_type_supported, 0);
@@ -135,7 +138,7 @@ void Init_tsk4r() {
   // object methods for VolumePart objects
   rb_define_method(rb_cTSKVolumePart, "initialize", initialize_volume_part, -1);
   rb_define_method(rb_cTSKVolumePart, "open", open_volume_part, -1); // change arg1 to klass?
-  rb_define_method(rb_cTSKVolumePart, "read", read_partition_data, -1); //read bytes given start and no. of blocks
+  rb_define_method(rb_cTSKVolumePart, "read_bytes", read_partition_data, -1); //read bytes given start and no. of blocks
   rb_define_method(rb_cTSKVolumePart, "read_block", read_partition_block, -1); //read block given start and no. of blocks
   
 //  rb_define_method(rb_cTSKVolumePart, "walk", walk_volume_part, 1);

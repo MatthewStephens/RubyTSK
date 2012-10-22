@@ -117,22 +117,18 @@ VALUE read_volume_system_block(int argc, VALUE *args, VALUE self) {
   // TO DO: ensure arg1 is positive int; arg2 does not exceed num blocks in img.
   TSK_DADDR_T address = NUM2INT(addr);
   size_t number_of_blocks = NUM2INT(length);
+  
   struct tsk4r_vs_wrapper * vs_ptr;
   Data_Get_Struct(self, struct tsk4r_vs_wrapper, vs_ptr);
   TSK_VS_INFO * volume = vs_ptr->volume;
+  
   size_t bytes = number_of_blocks * volume->block_size;
   long size = bytes + 1;
   char buffer[size];
   memset(buffer, '\0', size);
-  printf("buffer of %ld created\n", size);
-  printf("trying to read address:%llu, number_of_bytes:%ld\n", address, bytes);
   long i = tsk_vs_read_block(volume, address, buffer, bytes);
-  printf("%ld bytes successfully read\n", i);
-  printf("||%s||\n", buffer);
-  long actual_size;
-  actual_size = sizeof(buffer);
-  printf("buffer was %ld bytes long\n", actual_size);
-  data_string = rb_str_new(buffer, size);
+  if (i < 0) { rb_raise(rb_eException, "tsk_vs_read_block returned with an error.\n"); }
+  data_string = rb_str_new(buffer, size-1);
   return data_string;
 }
 
@@ -235,14 +231,48 @@ VALUE open_volume_part(int argc, VALUE *args, VALUE self){
 }
 
 VALUE read_partition_data(int argc, VALUE *args, VALUE self) {
-  VALUE data_string;
-  data_string = rb_str_new2("test");
+  VALUE data_string; VALUE addr; VALUE length;
+  rb_scan_args(argc, args, "20", &addr, &length);
+  // TO DO: ensure arg1 is positive int; arg2 does not exceed num blocks in img.
+  TSK_OFF_T address = NUM2INT(addr);
+  size_t number_of_bytes = NUM2INT(length);
+  
+  struct tsk4r_vpart_wrapper * vs_ptr;
+  Data_Get_Struct(self, struct tsk4r_vpart_wrapper, vs_ptr);
+  const TSK_VS_PART_INFO * partition = vs_ptr->volume_part;
+  
+  VALUE description = rb_iv_get(self, "@description");
+  char * desc = StringValuePtr(description);
+  printf("Partition is '%s'\n", desc);
+  size_t bytes = number_of_bytes;
+  long size = bytes + 1;
+  char buffer[size];
+  //memset(buffer, '\0', size);
+  ssize_t i = tsk_vs_part_read(partition, address, buffer, bytes);
+  if (i < 0) { rb_raise(rb_eException, "tsk_vs_part_read returned with an error.\n"); }
+  if (i != bytes) { rb_warn("tsk_vs_part_read unable to read total number of bytes requested."); }
+  data_string = rb_str_new(buffer, size-1);
   return data_string;
 }
 
 VALUE read_partition_block(int argc, VALUE *args, VALUE self) {
-  VALUE data_string;
-  data_string = rb_str_new2("test");
+  VALUE data_string; VALUE addr; VALUE length;
+  rb_scan_args(argc, args, "20", &addr, &length);
+  // TO DO: ensure arg1 is positive int; arg2 does not exceed num blocks in img.
+  TSK_DADDR_T address = NUM2INT(addr);
+  size_t number_of_blocks = NUM2INT(length);
+  
+  struct tsk4r_vpart_wrapper * vs_ptr;
+  Data_Get_Struct(self, struct tsk4r_vpart_wrapper, vs_ptr);
+  const TSK_VS_PART_INFO * partition = vs_ptr->volume_part;
+  
+  size_t bytes = number_of_blocks * partition->vs->block_size;
+  long size = bytes + 1;
+  char buffer[size];
+  memset(buffer, '\0', size);
+  long i = tsk_vs_part_read_block(partition, address, buffer, bytes);
+  if (i < 0) { rb_raise(rb_eException, "tsk_vs_part_read_block returned with an error.\n"); }
+  data_string = rb_str_new(buffer, size-1);
   return data_string;
 }
 

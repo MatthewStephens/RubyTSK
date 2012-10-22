@@ -7,6 +7,7 @@ describe "spec/image" do
     $stderr = StringIO.new
       
 		@sample_filename = "#{@sample_dir}/tsk4r_img_01.dmg"
+		@sample2_filename = "#{@sample_dir}/tsk4r_img_02.dmg"
 		@split_image_files = Dir.glob("#{@sample_dir}/tsk4r_img_01.dmg.split.?")
 		
 		puts "File #{@sample_image} not found!!" unless File.exist?(@sample_filename)
@@ -87,6 +88,34 @@ describe "spec/image" do
       escaped=Regexp.escape(find_this)
       @report = Sleuthkit::Image.type_print
       @report.should match(escaped)
+    end
+  end
+  # read methods
+  describe "Image#read_block" do
+    it "Reads {num} blocks starting at a block address {addr} relative to the start of an Image" do
+			@image = Sleuthkit::Image.new(@sample2_filename)
+      sector_addr = 28656; num_blocks = 1
+      find_this = "this is a test txt file.\nIt has two lines."
+      @blocks = @image.read_block(sector_addr, num_blocks)
+      @blocks.should match(find_this)
+    end
+  end
+  describe "Image#read_block" do
+    it "Reads {num} blocks starting at a block address {addr} relative to the start of an Image" do
+			@image = Sleuthkit::Image.new(@sample_filename)
+      sector_addr = 1; num_blocks = 1
+      find_this = /Apple\x00{27}Apple_partition_map/
+      @blocks = @image.read_block(sector_addr, num_blocks)
+      @blocks.should match(find_this)
+    end
+  end
+  describe "Image#read_bytes" do
+    it "Reads {num} blocks starting at a block address {addr} relative to the start of an Image" do
+			@image = Sleuthkit::Image.new(@sample_filename)
+      byte_addr = 512; num_bytes = 256
+      find_this = /Apple\x00{27}Apple_partition_map/
+      @blocks = @image.read_bytes(byte_addr, num_bytes)
+      @blocks.should match(find_this)
     end
   end
   
