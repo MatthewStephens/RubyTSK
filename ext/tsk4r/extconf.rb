@@ -38,10 +38,10 @@ if enable_config('debug')
 	puts '[INFO] enabling debug library build configuration.'
 	if RUBY_VERSION < '1.9'
 		$CFLAGS = CONFIG['CFLAGS'].gsub(/\s\-O\d?\s/, ' -O0 ')
-		$CFLAGS.gsub!(/\s?\-g\w*\s/, ' -ggdb3 ')
+		$CFLAGS.gsub!(/\s?\-g\w*\s/, ' -g3 -ggdb3 ')
 		CONFIG['LDSHARED'] = CONFIG['LDSHARED'].gsub(/\s\-s(\s|\z)/, ' ')
 	else
-		CONFIG['debugflags'] << ' -ggdb3 -O0'
+		CONFIG['debugflags'] << ' -g3 -ggdb3 -O0'
 	end
 end
 
