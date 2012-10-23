@@ -120,3 +120,12 @@ VALUE open_fs_directory(VALUE self, VALUE source_obj, VALUE reference, VALUE opt
   }
   return self;
 }
+
+VALUE get_size(VALUE self) {
+  VALUE size; struct tsk4r_fs_dir_wrapper * dir_wrapper; TSK_FS_DIR * dir;
+  Data_Get_Struct(self, struct tsk4r_fs_dir_wrapper, dir_wrapper);
+  dir = dir_wrapper->directory;
+  unsigned long val = tsk_fs_dir_getsize(dir);
+  size = ULONG2NUM(val);
+  return size;
+}

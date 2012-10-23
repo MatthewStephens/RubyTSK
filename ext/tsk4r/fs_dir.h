@@ -37,5 +37,6 @@ VALUE allocate_fs_dir(VALUE self);
 void  deallocate_fs_dir(struct tsk4r_fs_dir_wrapper * ptr);
 VALUE initialize_fs_dir(int argc, VALUE *args, VALUE self);
 VALUE open_fs_directory(VALUE self, VALUE parent_obj, VALUE name_or_inum, VALUE opts);
+VALUE get_size(VALUE self);
 
 #endif

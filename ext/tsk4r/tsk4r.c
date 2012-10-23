@@ -185,6 +185,7 @@ void Init_tsk4r() {
   // object methods for FileSystemDirectory objects
   rb_define_method(rb_cTSKFileSystemDir, "initialize", initialize_fs_dir, -1);
   rb_define_private_method(rb_cTSKFileSystemDir, "open_fs_directory", open_fs_directory, 3);
+  rb_define_method(rb_cTSKFileSystemDir, "get_size", get_size, 0);
   
   // attributes
   rb_define_attr(rb_cTSKFileSystemDir, "parent", 1, 0);

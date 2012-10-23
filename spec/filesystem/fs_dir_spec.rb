@@ -18,6 +18,7 @@ describe "spec/filesystem" do
     @volume = Sleuthkit::Volume::System.new(@mac_partitioned_image)
   end
   
+  # methods returning a Directory object
   describe "FileSystem#find_directory_by_inum (inum)" do
     it "should return a directory listing sought by inum" do
       @filesystem = Sleuthkit::FileSystem::System.new(@mac_fs_only_image)
@@ -65,6 +66,15 @@ describe "spec/filesystem" do
       @dir.should be_an_instance_of Sleuthkit::FileSystem::Directory 
       @dir.inum.should eq(26)
       @dir.names[1].should match("sample.txt")
+    end
+  end
+  # Directory methods
+  describe "get_size" do
+    it "should return the number of files and subdirectories in a Directory" do
+      @filesystem = Sleuthkit::FileSystem.new(@volume)
+      @dir = @filesystem.find_directory_by_name('Folder A')
+      @dir.names_used.should eq(3)
+      @dir.get_size.should eq(3)
     end
   end
   
