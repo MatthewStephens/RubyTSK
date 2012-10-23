@@ -15,7 +15,6 @@
 extern struct TSK_FS_BLOCK fs_block;
 
 VALUE allocate_fs_block(VALUE self);
-void  deallocate_fs_block(TSK_FS_BLOCK * ptr);
 VALUE initialize_fs_block(int argc, VALUE *args, VALUE self);
 VALUE fetch_block(VALUE self, VALUE filesystem, VALUE address);
 

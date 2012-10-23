@@ -14,12 +14,9 @@
 
 VALUE allocate_fs_block(VALUE klass){
   TSK_FS_BLOCK * ptr;
-  return Data_Make_Struct(klass, TSK_FS_BLOCK, 0, deallocate_fs_block, ptr);
+  return Data_Make_Struct(klass, TSK_FS_BLOCK, 0, tsk_fs_block_free, ptr);
 }
 
-void deallocate_fs_block(TSK_FS_BLOCK * ptr) {
-  xfree(ptr);
-}
 
 VALUE initialize_fs_block(int argc, VALUE *args, VALUE self) {
   VALUE filesystem; VALUE address;
