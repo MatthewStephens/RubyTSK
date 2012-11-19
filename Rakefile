@@ -28,5 +28,11 @@ namespace :spec do
   end
 end
 
+# helper to run clean, build and compile
+desc "Cleans, Builds and Compiles"
+task :cbc => [ :clean, :build, :compile ] do
+	  puts "Cleaned, Built, Compiled."
+end
+
 # add other tasks found in lib/tasks/*.rake
 Dir.glob('tasks/*.rake').each { |r| import r }
