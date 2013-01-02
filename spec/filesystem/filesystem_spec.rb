@@ -273,10 +273,10 @@ describe "spec/filesystem" do
       @filesystem = Sleuthkit::FileSystem::System.new(@volume)
       if Sleuthkit::TSK_VERSION =~ /^4/
       then
-        puts "This feature not available on newer versions of libtsk.  Downgrade to acquire."
+        #puts "This feature not available on newer versions of libtsk.  Downgrade to acquire."
         @filesystem.respond_to?("isOrphanHunting").should eq(false)
       else
-        puts "TESTING #{Sleuthkit::TSK_VERSION} FOR isOrphanHunting, a TSK_FS_INFO field available on tsk < 4.0.1"
+        #puts "TESTING #{Sleuthkit::TSK_VERSION} FOR isOrphanHunting, a TSK_FS_INFO field available on tsk < 4.0.1"
         @filesystem.isOrphanHunting.should eq(0)        
       end
       

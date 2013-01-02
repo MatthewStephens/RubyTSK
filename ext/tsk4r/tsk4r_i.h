@@ -31,7 +31,7 @@
 #define TSK4R_HIDE_ADVANCED_FEATURE
 #endif
 
-#if MY_TSK_VER > 0x040000ff
+#if MY_TSK_VER < 0x040000ff
 #define TSK4R_DEPRECATED_TSK4_FEATURE
 #endif
 
