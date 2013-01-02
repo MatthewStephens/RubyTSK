@@ -183,12 +183,6 @@ describe "spec/filesystem" do
       @filesystem.inum_count.should eq(45)
     end
   end
-  describe "#isOrphanHunting" do
-    it "returns the @isOrphanHunting attr" do
-      @filesystem = Sleuthkit::FileSystem::System.new(@volume)
-      @filesystem.isOrphanHunting.should eq(0)
-    end
-  end
   describe "#journ_inum" do
     it "returns the @journ_inum attr" do
       @filesystem = Sleuthkit::FileSystem::System.new(@volume)
@@ -271,6 +265,21 @@ describe "spec/filesystem" do
         # puts "This feature not available on older versions of libtsk.  Upgrade perhaps?"
         @filesystem.respond_to?("block_post_size").should eq(false)
       end
+    end
+  end
+  
+  describe "#isOrphanHunting" do
+    it "returns the OrphanHunting flag value (only available on libtsk < 4.0.1 )" do
+      @filesystem = Sleuthkit::FileSystem::System.new(@volume)
+      if Sleuthkit::TSK_VERSION =~ /^4/
+      then
+        puts "This feature not available on newer versions of libtsk.  Downgrade to acquire."
+        @filesystem.respond_to?("isOrphanHunting").should eq(false)
+      else
+        puts "TESTING #{Sleuthkit::TSK_VERSION} FOR isOrphanHunting, a TSK_FS_INFO field available on tsk < 4.0.1"
+        @filesystem.isOrphanHunting.should eq(0)        
+      end
+      
     end
   end
 end

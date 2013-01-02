@@ -311,7 +311,9 @@ void populate_instance_variables(VALUE self) {
   //    rb_iv_set(self, "@get_default_attr_type", fs_ptr->filesystem->get_default_attr_type); // do not impl
   //    rb_iv_set(self, "@inode_walk", fs_ptr->filesystem->inode_walk);//no
   rb_iv_set(self, "@inum_count", ULONG2NUM((unsigned long int)fs_ptr->filesystem->inum_count));
+#ifdef TSK4R_DEPRECATED_TSK4_FEATURE
   rb_iv_set(self, "@isOrphanHunting", UINT2NUM((uint)fs_ptr->filesystem->isOrphanHunting));
+#endif
   //    rb_iv_set(self, "@istat", fs_ptr->filesystem->istat); // do not impl
   //    rb_iv_set(self, "@jblk_walk", fs_ptr->filesystem->jblk_walk);//no
   //    rb_iv_set(self, "@jentry_walk", fs_ptr->filesystem->jentry_walk);//no

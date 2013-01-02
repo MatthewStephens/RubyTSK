@@ -31,10 +31,14 @@
 #define TSK4R_HIDE_ADVANCED_FEATURE
 #endif
 
+#if MY_TSK_VER > 0x040000ff
+#define TSK4R_DEPRECATED_TSK4_FEATURE
+#endif
+
 #ifndef TSK4R_HIDE_ADVANCED_FEATURE
-#define TSK4R_FS_ATTRS_COUNT 24
+#define TSK4R_FS_ATTRS_COUNT 23
 #else
-#define TSK4R_FS_ATTRS_COUNT 22
+#define TSK4R_FS_ATTRS_COUNT 21
 #endif
 
 #define TSK4R_BLOCK_ATTRS \
@@ -54,7 +58,6 @@
 "fs_id_used", \
 "ftype", \
 "inum_count", \
-"isOrphanHunting", \
 "journ_inum", \
 "last_block", \
 "last_block_act", \

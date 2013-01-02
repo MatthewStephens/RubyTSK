@@ -175,7 +175,9 @@ void Init_tsk4r() {
   rb_define_attr(rb_cTSKFileSystem, "name", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "description", 1, 0);
   rb_define_attr(rb_cTSKFileSystem, "parent", 1, 0);
-  
+#ifdef TSK4R_DEPRECATED_TSK4_FEATURE
+  rb_define_attr(rb_cTSKFileSystem, "isOrphanHunting", 1, 0);
+#endif
   
   /* Sleuthkit::FileSystemDirectory */
   // object methods for FileSystemDirectory objects
