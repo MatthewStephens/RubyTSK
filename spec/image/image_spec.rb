@@ -50,7 +50,7 @@ describe "spec/image" do
       puts @split_image_files
       @image = Sleuthkit::Image.new(@split_image_files)
       @image.size.should eq(40992768)
-      @image.description.should eq("Split raw files")
+      @image.description.should match("plit raw file")
     end
   end
   # attribute test
@@ -83,7 +83,7 @@ describe "spec/image" do
   end
   describe "Image#type_print" do
     it "should return a string reporting the types supported" do
-      find_this="raw (Single raw file (dd))"
+      find_this="aff (Advanced Forensic Format)"
       escaped=Regexp.escape(find_this)
       @report = Sleuthkit::Image.type_print
       @report.should match(escaped)
